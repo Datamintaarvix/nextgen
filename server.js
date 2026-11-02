@@ -93,6 +93,33 @@ if (fs.existsSync(nestedDir) && staticDir !== nestedDir) {
   app.use(express.static(nestedDir));
 }
 
+// Explicit media asset fallback resolution (ensures hero video, logo, and photos resolve in both root and nested deployments)
+const resolveAssetPath = (filename) => {
+  const p1 = path.join(__dirname, filename);
+  if (fs.existsSync(p1)) return p1;
+  const p2 = path.join(nestedDir, filename);
+  if (fs.existsSync(p2)) return p2;
+  return null;
+};
+
+app.get('/vid1.mp4', (req, res, next) => {
+  const filePath = resolveAssetPath('vid1.mp4');
+  if (filePath) return res.sendFile(filePath);
+  next();
+});
+
+app.get('/logo.jpeg', (req, res, next) => {
+  const filePath = resolveAssetPath('logo.jpeg');
+  if (filePath) return res.sendFile(filePath);
+  next();
+});
+
+app.get('/san.jpeg', (req, res, next) => {
+  const filePath = resolveAssetPath('san.jpeg');
+  if (filePath) return res.sendFile(filePath);
+  next();
+});
+
 // Seed Database on startup
 const defaultAdminEmail = (process.env.ADMIN_EMAIL || 'admin@nextgendma.com').toLowerCase().trim();
 const defaultAdminPassword = process.env.ADMIN_DEFAULT_PASSWORD || '';
