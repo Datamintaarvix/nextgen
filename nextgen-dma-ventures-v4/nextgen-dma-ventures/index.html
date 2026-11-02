@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXTGEN DMA VENTURES | Engineering Tomorrow • Premier Tech Academy Bangalore</title>
+    <meta name="description" content="NEXTGEN DMA VENTURES - Building Tomorrow's Tech Talent. Creating Today's Digital Impact. Practical technology education, 17 industry programs, and enterprise digital solutions in Bangalore.">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              white:       '#FFFFFF',
+              black:       '#000000',
+              mint:        '#65D2C5',
+              'mint-light':'#8ae2d8',
+              'mint-dark': '#4dbcb0',
+              charcoal:    '#000000',
+              graphite:    '#111111',
+              deepteal:    '#65D2C5',
+              vibrantteal: '#65D2C5',
+              lightteal:   '#65D2C5',
+              offwhite:    '#FFFFFF',
+              offwhite2:   '#F7F9F8',
+              brand: {
+                50:  '#F7F9F8',
+                100: '#e8f7f6',
+                300: '#8ae2d8',
+                400: '#65D2C5',
+                500: '#65D2C5',
+                600: '#65D2C5',
+                700: '#4dbcb0',
+                800: '#000000',
+                900: '#000000',
+                950: '#000000',
+              },
+              accent: {
+                300: '#8ae2d8',
+                400: '#65D2C5',
+                500: '#65D2C5',
+                600: '#4dbcb0',
+                700: '#3da59a',
+              }
+            },
+            fontFamily: {
+              display: ['"Bebas Neue"', 'sans-serif'],
+              sans:    ['"Plus Jakarta Sans"', 'sans-serif'],
+              mono:    ['"Space Grotesk"', 'monospace']
+            }
+          }
+        }
+      }
+    </script>
+
+    <!-- Font Awesome Icons 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Razorpay Official Checkout SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    
+    <!-- Google Fonts: Bebas Neue, Plus Jakarta Sans, Space Grotesk -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom Glassmorphism CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="updates.css">
+</head>
+
+<body class="bg-white text-black font-sans antialiased overflow-x-hidden selection:bg-mint selection:text-black">
+
+    <!-- PERMANENT FIXED WHITE HEADER -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-mint/25 shadow-sm transition-all duration-200" id="navbar">
+        <div class="container mx-auto px-4 lg:px-8 py-3.5 flex items-center justify-between">
+            
+            <!-- Official NEXTGEN Logo & Brand Identity (Clean Presentation) -->
+            <button onclick="navigateToTab('home')" class="flex items-center gap-3.5 group focus:outline-none text-left">
+                <img src="./logo.jpeg" alt="NEXTGEN DNA VENTURES Official Logo" class="w-12 h-12 sm:w-16 sm:h-16 object-contain flex-shrink-0 group-hover:scale-105 transition duration-300">
+                <div class="flex flex-col">
+                    <span class="font-display text-2xl sm:text-3xl tracking-wider text-black leading-none group-hover:text-mint-dark transition duration-300 brand-title">
+                        NEXTGEN <span class="text-mint">DNA</span> VENTURES
+                    </span>
+                    <span class="font-mono text-[9px] uppercase font-bold text-slate-500 tracking-[0.25em] mt-1 flex items-center gap-1.5 brand-sub">
+                        <span class="w-1.5 h-1.5 rounded-full bg-mint shadow-xs"></span>
+                        TECH ACADEMY &bull; BANGALORE
+                    </span>
+                </div>
+            </button>
+
+            <!-- Desktop Navigation Links (with Mint Active Indicators) -->
+            <nav class="hidden lg:flex items-center gap-1 font-mono text-xs uppercase tracking-widest">
+                <button onclick="navigateToTab('home')" class="nav-link" id="nav-home">Home</button>
+                <button onclick="navigateToTab('about')" class="nav-link" id="nav-about">About</button>
+                <button onclick="navigateToTab('courses')" class="nav-link" id="nav-courses">Courses &amp; Internships</button>
+                <button onclick="navigateToTab('learning')" class="nav-link" id="nav-learning">Approach</button>
+                <button onclick="navigateToTab('contact')" class="nav-link" id="nav-contact">Contact</button>
+            </nav>
+
+            <!-- Action CTA Button (Brand Colors: Black with Mint Hover) -->
+            <div class="hidden sm:flex items-center space-x-4">
+                <button onclick="scrollToEnquiry('General Enquiry')" class="px-6 py-2.5 rounded-full bg-black hover:bg-mint text-white hover:text-black border border-mint/40 hover:border-mint font-mono text-xs font-bold tracking-widest uppercase transition-all duration-300 shadow-md flex items-center gap-2 group">
+                    <span>Let's Talk</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] text-mint group-hover:text-black group-hover:translate-x-1 transition-all"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu Toggle Button -->
+            <button onclick="toggleMobileMenu()" class="lg:hidden p-2.5 rounded-xl bg-white border border-mint/40 text-black hover:text-mint focus:outline-none transition" aria-label="Toggle Navigation">
+                <i class="fa-solid fa-bars text-xl" id="menu-icon"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Drawer Menu (Solid White Background with Black Typography) -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-b border-mint/30 px-6 pt-4 pb-6 space-y-2.5 shadow-2xl">
+            <button onclick="navigateToTab('home')" class="mobile-nav-link block w-full text-left py-3 px-4 rounded-xl text-black font-mono text-xs uppercase tracking-wider hover:bg-mint/15 hover:text-black font-semibold transition">Home</button>
+            <button onclick="navigateToTab('about')" class="mobile-nav-link block w-full text-left py-3 px-4 rounded-xl text-black font-mono text-xs uppercase tracking-wider hover:bg-mint/15 hover:text-black font-semibold transition">About Us</button>
+            <button onclick="navigateToTab('courses')" class="mobile-nav-link block w-full text-left py-3 px-4 rounded-xl text-black font-mono text-xs uppercase tracking-wider hover:bg-mint/15 hover:text-black font-semibold transition">47 Courses &amp; Internships</button>
+            <button onclick="navigateToTab('learning')" class="mobile-nav-link block w-full text-left py-3 px-4 rounded-xl text-black font-mono text-xs uppercase tracking-wider hover:bg-mint/15 hover:text-black font-semibold transition">Learning Approach</button>
+            <button onclick="navigateToTab('contact')" class="mobile-nav-link block w-full text-left py-3 px-4 rounded-xl text-black font-mono text-xs uppercase tracking-wider hover:bg-mint/15 hover:text-black font-semibold transition">Contact &amp; Support</button>
+            <div class="pt-3 border-t border-slate-200">
+                <button onclick="scrollToEnquiry('General Enquiry')" class="w-full py-3.5 rounded-full bg-mint text-black font-mono text-xs font-bold tracking-widest uppercase text-center shadow-lg shadow-mint/25 hover:bg-mint-light transition">
+                    Enquire Now &bull; Speak to Counsellor
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENT SECTIONS CONTAINER -->
+    <main class="flex-grow">
+
+        <!-- ==========================================
+             TAB 1: HOME PAGE — PREMIUM GLASSMORPHISM
+             ========================================== -->
+        <section id="tab-home" class="tab-content transition-opacity duration-300">
+            
+            <!-- 1. HERO SECTION — FULL VIEWPORT VIDEO WITH GLASS BADGES -->
+            <div class="hero-video-fullscreen">
+                <video
+                    id="hero-video"
+                    autoplay
+                    loop
+                    muted
+                    playsinline
+                    preload="auto"
+                >
+                    <source src="./ng.mp4" type="video/mp4">
+                </video>
+
+                <!-- Floating Glass Live Status Badge on Video -->
+                <div class="absolute top-6 left-6 z-10 hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-mint/40 text-white font-mono text-[10px] tracking-wider uppercase">
+                    <span class="w-2 h-2 rounded-full bg-mint animate-ping"></span>
+                    <span>Bangalore Innovation Hub &bull; Live Batch</span>
+                </div>
+
+                <!-- Floating Glass Metadata Badge on Video (Top Right) -->
+                <div class="absolute top-6 right-6 z-10 hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white font-mono text-[10px] tracking-wider uppercase">
+                    <span class="text-mint font-bold">47 Career Tracks</span> &bull; 100% Practical Labs
+                </div>
+
+                <!-- Gradient bottom with subtle scroll indicator -->
+                <div class="hero-video-gradient-bottom"></div>
+
+                <!-- Scroll Down Indicator with Mint Glow Line -->
+                <div class="hero-scroll-indicator">
+                    <span class="hero-scroll-text">SCROLL</span>
+                    <div class="hero-scroll-line"></div>
+                </div>
+            </div>
+
+            <!-- 2. BRAND MARQUEE SECTION — PURE BLACK + MINT TEAL -->
+            <div class="bg-black text-white border-y border-mint/30 py-5 overflow-hidden relative">
+                <div class="brand-marquee-track flex whitespace-nowrap">
+                    <span class="font-display text-2xl sm:text-3xl tracking-widest text-white mx-6 flex items-center gap-6">
+                        <span>INNOVATION FIRST</span>
+                        <span class="w-2 h-2 rounded-full bg-mint shadow-xs"></span>
+                        <span class="text-mint">ENGINEERING EXCELLENCE</span>
+                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                        <span>DIGITAL FUTURE</span>
+                        <span class="w-2 h-2 rounded-full bg-mint"></span>
+                        <span class="text-mint font-bold">BUILT TO TRANSFORM</span>
+                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                        <span>ENTERPRISE SOLUTIONS</span>
+                        <span class="w-2 h-2 rounded-full bg-mint"></span>
+                        <span class="text-mint">47 CAREER TRACKS</span>
+                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                    </span>
+                    <span class="font-display text-2xl sm:text-3xl tracking-widest text-white mx-6 flex items-center gap-6" aria-hidden="true">
+                        <span>INNOVATION FIRST</span>
+                        <span class="w-2 h-2 rounded-full bg-mint"></span>
+                        <span class="text-mint">ENGINEERING EXCELLENCE</span>
+                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                        <span>DIGITAL FUTURE</span>
+                        <span class="w-2 h-2 rounded-full bg-mint"></span>
+                        <span class="text-mint font-bold">BUILT TO TRANSFORM</span>
+                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                        <span>ENTERPRISE SOLUTIONS</span>
+                        <span class="w-2 h-2 rounded-full bg-mint"></span>
+                        <span class="text-mint">47 CAREER TRACKS</span>
+                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- 3. SERVICES SECTION — THE LATEST INNOVATIONS ("WHAT WE CREATE") -->
+            <!-- Alternating Circular Image + Glass Content Layout -->
+            <div class="py-24 bg-white border-b border-mint/20 relative" id="services-section">
+                <!-- Ambient Mint Glow -->
+                <div class="ambient-glow-mint top-20 left-10"></div>
+                <div class="ambient-glow-mint bottom-20 right-10"></div>
+
+                <div class="container mx-auto px-4 lg:px-8 relative z-10">
+                    
+                    <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 pb-6 border-b border-mint/20 gap-6">
+                        <div>
+                            <span class="glass-pill mb-3">Capabilities &amp; Solutions</span>
+                            <h2 class="font-display text-5xl sm:text-6xl text-black tracking-tight uppercase mt-2">WHAT WE CREATE.</h2>
+                            <p class="text-slate-600 text-sm sm:text-base mt-2">Technology that moves businesses and careers forward.</p>
+                        </div>
+                        <button onclick="navigateToTab('courses')" class="glass-btn-secondary self-start md:self-auto">
+                            <span>VIEW ALL 47 COURSES</span>
+                            <i class="fa-solid fa-arrow-right text-xs text-mint"></i>
+                        </button>
+                    </div>
+
+                    <!-- 10 Alternating Circular Glass Rows -->
+                    <div class="space-y-6">
+                        
+                        <!-- 01 Web Development (Image Left, Content Right) -->
+                        <div class="service-alternating-row group">
+                            <div class="service-circle-frame">
+                                <div class="service-circle-glow"></div>
+                                <div class="service-circle-inner">
+                                    <img src="https://images.unsplash.com/photo-1547658719-da2b51169166?auto=format&fit=crop&w=600&q=80" alt="Web Development" class="service-circle-img">
+                                </div>
+                                <div class="service-circle-badge">01</div>
+                            </div>
+                            <div class="service-content-side">
+                                <div class="service-meta-tag">
+                                    <span class="service-meta-number">01 / 10</span>
+                                    <span>Engineering &bull; Web Platforms</span>
+                                </div>
+                                <h3 class="service-title">Web Development</h3>
+                                <p class="service-desc">
+                                    Modern, responsive full-stack web applications and architectures engineered for enterprise scale. We deliver performant web portals, high-converting digital storefronts, and robust browser ecosystems designed around speed, accessibility, and clean code.
+                                </p>
+                                <div class="service-tech-tags">
+                                    <span class="service-tech-tag">React.js</span>
+                                    <span class="service-tech-tag">Next.js</span>
+                                    <span class="service-tech-tag">TypeScript</span>
+                                    <span class="service-tech-tag">Tailwind CSS</span>
+                                    <span class="service-tech-tag">REST APIs</span>
+                                    <span class="service-tech-tag">Node.js</span>
+                                </div>
+                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
+                                    <span>Explore Web Track</span>
+                                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 02 Software Development (Content Left, Image Right) -->
+                        <div class="service-alternating-row reverse-row group">
+                            <div class="service-circle-frame">
+                                <div class="service-circle-glow"></div>
+                                <div class="service-circle-inner">
+                                    <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80" alt="Software Development" class="service-circle-img">
+                                </div>
+                                <div class="service-circle-badge">02</div>
+                            </div>
+                            <div class="service-content-side">
+                                <div class="service-meta-tag">
+                                    <span class="service-meta-number">02 / 10</span>
+                                    <span>Architecture &bull; Core Engineering</span>
+                                </div>
+                                <h3 class="service-title">Software Development</h3>
+                                <p class="service-desc">
+                                    Robust backend systems, microservices, and bespoke software solutions crafted with strict clean code standards. From complex multi-tenant SaaS backends to database optimization, we engineer software ready to handle millions of transactions.
+                                </p>
+                                <div class="service-tech-tags">
+                                    <span class="service-tech-tag">Java 17+</span>
+                                    <span class="service-tech-tag">Spring Boot</span>
+                                    <span class="service-tech-tag">Microservices</span>
+                                    <span class="service-tech-tag">PostgreSQL</span>
+                                    <span class="service-tech-tag">Docker</span>
+                                    <span class="service-tech-tag">System Design</span>
+                                </div>
+                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
+                                    <span>Explore Software Track</span>
+                                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 03 UI/UX Design (Image Left, Content Right) -->
+                        <div class="service-alternating-row group">
+                            <div class="service-circle-frame">
+                                <div class="service-circle-glow"></div>
+                                <div class="service-circle-inner">
+                                    <img src="https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=600&q=80" alt="UI/UX Design" class="service-circle-img">
+                                </div>
+                                <div class="service-circle-badge">03</div>
+                            </div>
+                            <div class="service-content-side">
+                                <div class="service-meta-tag">
+                                    <span class="service-meta-number">03 / 10</span>
+                                    <span>Experience &bull; Product Design</span>
+                                </div>
+                                <h3 class="service-title">UI/UX Design</h3>
+                                <p class="service-desc">
+                                    Intuitive, user-centered digital products combining comprehensive design systems, user journeys, wireframing, interactive prototyping, and visual clarity. We bridge the gap between creative visual artistry and functional usability.
+                                </p>
+                                <div class="service-tech-tags">
+                                    <span class="service-tech-tag">Figma</span>
+                                    <span class="service-tech-tag">Design Systems</span>
+                                    <span class="service-tech-tag">User Research</span>
+                                    <span class="service-tech-tag">Wireframing</span>
+                                    <span class="service-tech-tag">Prototyping</span>
+                                    <span class="service-tech-tag">Usability Testing</span>
+                                </div>
+                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
+                                    <span>Explore Design Track</span>
+                                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 04 Mobile App Development (Content Left, Image Right) -->
+                        <div class="service-alternating-row reverse-row group">
+                            <div class="service-circle-frame">
+                                <div class="service-circle-glow"></div>
+                                <div class="service-circle-inner">
+                                    <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&q=80" alt="Mobile App Development" class="service-circle-img">
+                                </div>
+                                <div class="service-circle-badge">04</div>
+                            </div>
+                            <div class="service-content-side">
+                                <div class="service-meta-tag">
+                                    <span class="service-meta-number">04 / 10</span>
+                                    <span>Mobile &bull; Cross-Platform</span>
+                                </div>
+                                <h3 class="service-title">Mobile App Development</h3>
+                                <p class="service-desc">
+                                    High-performance iOS and Android mobile experiences using Flutter and React Native with native device capability integrations, offline caching, push notifications, and cloud synchronization for seamless on-the-go utility.
+                                </p>
+                                <div class="service-tech-tags">
+                                    <span class="service-tech-tag">Flutter</span>
+                                    <span class="service-tech-tag">Dart</span>
+                                    <span class="service-tech-tag">React Native</span>
+                                    <span class="service-tech-tag">Firebase</span>
+                                    <span class="service-tech-tag">iOS / Android</span>
+                                    <span class="service-tech-tag">App Store Deploy</span>
+                                </div>
+                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
+                                    <span>Explore Mobile Track</span>
+                                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 05 E-Commerce Solutions (Image Left, Content Right) -->
+                        <div class="service-alternating-row group">
+                            <div class="service-circle-frame">
+                                <div class="service-circle-glow"></div>
+                                <div class="service-circle-inner">
+                                    <img src="https://images.unsplash.com/photo-1556742049-0a67c5574f73?auto=format&fit=crop&w=600&q=80" alt="E-Commerce Solutions" class="service-circle-img">
+                                </div>
+                                <div class="service-circle-badge">05</div>
+                            </div>
+                            <div class="service-content-side">
+                                <div class="service-meta-tag">
+                                    <span class="service-meta-number">05 / 10</span>
+                                    <span>Commerce &bull; Conversion Engines</span>
+                                </div>
+                                <h3 class="service-title">E-Commerce Solutions</h3>
+                                <p class="service-desc">
+                                    Conversion-focused digital storefronts, multi-currency payment gateway integrations, frictionless checkout funnels, inventory orchestration, and headless commerce setups built to maximize average order value and customer retention.
+                                </p>
+                                <div class="service-tech-tags">
+                                    <span class="service-tech-tag">Shopify Plus</span>
+                                    <span class="service-tech-tag">WooCommerce</span>
+                                    <span class="service-tech-tag">Stripe Gateway</span>
+                                    <span class="service-tech-tag">Payment APIs</span>
+                                    <span class="service-tech-tag">Headless Storefront</span>
+                                </div>
+                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
+                                    <span>Explore Commerce Track</span>
+                                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 06 AI & Automation (Content Left, Image Right) -->
+                        <div class="service-alternating-row reverse-row group">
+                            <div class="service-circle-frame">
+                                <div class="service-circle-glow"></div>
+                                <div class="service-circle-inner">
+                                    <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=600&q=80" alt="AI & Automation" class="service-circle-img">
+                                </div>
+                                <div class="service-circle-badge">06</div>
+                            </div>
+                            <div class="service-content-side">
+                                <div class="service-meta-tag">
+                                    <span class="service-meta-number">06 / 10</span>
+                                    <span>Intelligence &bull; Generative AI</span>
+                                </div>
+                                <h3 class="service-title">AI &amp; Automation</h3>
+                                <p class="service-desc">
+                                    Generative AI, LLMs, neural network architectures, and intelligent workflow automation saving thousands of repetitive manual hours. We engineer custom enterprise AI bots, vector search knowledge engines, and automated decision workflows.
+                                </p>
+                                <div class="service-tech-tags">
+                                    <span class="service-tech-tag">PyTorch</span>
+                                    <span class="service-tech-tag">OpenAI API</span>
+                                    <span class="service-tech-tag">LangChain</span>
+                                    <span class="service-tech-tag">HuggingFace</span>
+                                    <span class="service-tech-tag">LLM Prompts</span>
+                                    <span class="service-tech-tag">Python Bots</span>
+                                </div>
+                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
+                                    <span>Explore AI Track</span>
+                                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 07 Cloud & Deployment (Image Left, Content Right) -->
+                        <div class="service-alternating-row group">
+                            <div class="service-circle-frame">
+                                <div class="service-circle-glow"></div>
+                                <div class="service-circle-inner">
+                                    <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80" alt="Cloud & DevOps" class="service-circle-img">
+                                </div>
+                                <div class="service-circle-badge">07</div>
+                            </div>
+                            <div class="service-content-side">
+                                <div class="service-meta-tag">
+                                    <span class="service-meta-number">07 / 10</span>
+                                    <span>Infrastructure &bull; Cloud & DevOps</span>
+                                </div>
+                                <h3 class="service-title">Cloud &amp; DevOps</h3>
+                                <p class="service-desc">
+                                    Scalable cloud hosting across AWS and Microsoft Azure, automated CI/CD continuous deployment pipelines, container orchestration with Kubernetes, and Infrastructure-as-Code setups ensuring 99.99% uptime and auto-scaling resilience.
+                                </p>
+                                <div class="service-tech-tags">
+                                    <span class="service-tech-tag">AWS Cloud</span>
+                                    <span class="service-tech-tag">Azure</span>
+                                    <span class="service-tech-tag">Docker</span>
+                                    <span class="service-tech-tag">Kubernetes</span>
+                                    <span class="service-tech-tag">CI/CD Jenkins</span>
+                                    <span class="service-tech-tag">Terraform</span>
+                                </div>
+                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
+                                    <span>Explore Cloud Track</span>
+                                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 08 Custom Digital Solutions (Content Left, Image Right) -->
+                        <div class="service-alternating-row reverse-row group">
+                            <div class="service-circle-frame">
+                                <div class="service-circle-glow"></div>
+                                <div class="service-circle-inner">
+                                    <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80" alt="Custom Digital Solutions" class="service-circle-img">
+                                </div>
+                                <div class="service-circle-badge">08</div>
+                            </div>
+                            <div class="service-content-side">
+                                <div class="service-meta-tag">
+                                    <span class="service-meta-number">08 / 10</span>
+                                    <span>Enterprise &bull; Custom Platforms</span>
+                                </div>
+                                <h3 class="service-title">Custom Digital Solutions</h3>
+                                <p class="service-desc">
+                                    Tailored proprietary software platforms and internal tooling built to eliminate unique industry bottlenecks, legacy workflow friction, and operational silos. We architect custom solutions matched strictly to your business DNA.
+                                </p>
+                                <div class="service-tech-tags">
+                                    <span class="service-tech-tag">Custom Portals</span>
+                                    <span class="service-tech-tag">Enterprise ERP</span>
+                                    <span class="service-tech-tag">REST &amp; GraphQL</span>
+                                    <span class="service-tech-tag">Role Permissions</span>
+                                    <span class="service-tech-tag">Security Compliance</span>
+                                </div>
+                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
+                                    <span>Explore Custom Solutions</span>
+                                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 09 Data Analytics (Image Left, Content Right) -->
+                        <div class="service-alternating-row group">
+                            <div class="service-circle-frame">
+                                <div class="service-circle-glow"></div>
+                                <div class="service-circle-inner">
+                                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80" alt="Data Analytics" class="service-circle-img">
+                                </div>
+                                <div class="service-circle-badge">09</div>
+                            </div>
+                            <div class="service-content-side">
+                                <div class="service-meta-tag">
+                                    <span class="service-meta-number">09 / 10</span>
+                                    <span>Intelligence &bull; Business Analytics</span>
+                                </div>
+                                <h3 class="service-title">Data Analytics &amp; BI</h3>
+                                <p class="service-desc">
+                                    Transforming complex enterprise datasets into interactive Power BI and SQL executive dashboards, predictive data models, and statistical insights that give leadership clear visibility into growth drivers and revenue opportunities.
+                                </p>
+                                <div class="service-tech-tags">
+                                    <span class="service-tech-tag">Power BI</span>
+                                    <span class="service-tech-tag">Advanced SQL</span>
+                                    <span class="service-tech-tag">Tableau</span>
+                                    <span class="service-tech-tag">Python Pandas</span>
+                                    <span class="service-tech-tag">DAX Studio</span>
+                                    <span class="service-tech-tag">ETL Pipelines</span>
+                                </div>
+                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
+                                    <span>Explore Data Track</span>
+                                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 10 Social Media Management (Content Left, Image Right) -->
+                        <div class="service-alternating-row reverse-row group">
+                            <div class="service-circle-frame">
+                                <div class="service-circle-glow"></div>
+                                <div class="service-circle-inner">
+                                    <img src="https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=crop&w=600&q=80" alt="Social Media Management" class="service-circle-img">
+                                </div>
+                                <div class="service-circle-badge">10</div>
+                            </div>
+                            <div class="service-content-side">
+                                <div class="service-meta-tag">
+                                    <span class="service-meta-number">10 / 10</span>
+                                    <span>Growth &bull; Digital Performance</span>
+                                </div>
+                                <h3 class="service-title">Social &amp; Growth Marketing</h3>
+                                <p class="service-desc">
+                                    Strategic brand positioning, multi-channel performance digital marketing, Search Engine Optimization (SEO), Meta and Google Ads acquisition campaigns, and audience engagement architectures designed for sustainable, compounding growth.
+                                </p>
+                                <div class="service-tech-tags">
+                                    <span class="service-tech-tag">SEO Strategy</span>
+                                    <span class="service-tech-tag">Google Ads</span>
+                                    <span class="service-tech-tag">Meta Ads Manager</span>
+                                    <span class="service-tech-tag">GA4 Analytics</span>
+                                    <span class="service-tech-tag">Brand Storytelling</span>
+                                </div>
+                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
+                                    <span>Explore Growth Track</span>
+                                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. BRAND PHILOSOPHY SECTION — DARK GLASS WITH MINT GLOW -->
+            <div class="py-24 bg-black text-white border-y border-mint/30 relative overflow-hidden">
+                <div class="ambient-glow-mint top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+                <div class="container mx-auto px-4 lg:px-8 max-w-4xl text-center space-y-8 relative z-10">
+                    <span class="glass-pill glass-pill-dark">THE NEXTGEN PHILOSOPHY</span>
+
+                    <h2 class="font-display text-4xl sm:text-5xl lg:text-7xl text-white uppercase leading-[1.05] tracking-tight">
+                        NOT JUST BUILDING TECHNOLOGY.<br>
+                        BUILDING <span class="mint-gradient-text">WHAT'S NEXT</span>.
+                    </h2>
+
+                    <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed font-light">
+                        We believe technology should do more than solve problems. It should create opportunities, inspire innovation, and transform the way businesses grow.
+                    </p>
+
+                    <div>
+                        <button onclick="navigateToTab('about')" class="glass-btn-primary mx-auto group">
+                            <span>DISCOVER OUR STORY</span>
+                            <i class="fa-solid fa-arrow-right text-xs text-black group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. EXPLORE OUR CAPABILITIES (3D Curved Arc Panorama Gallery as in Reference Image) -->
+            <div class="capabilities-arc-section py-24">
+                <div class="container mx-auto px-4 lg:px-8">
+                    
+                    <!-- Top Centered Editorial Header -->
+                    <div class="text-center max-w-3xl mx-auto mb-10">
+                        <span class="glass-pill glass-pill-dark mb-3">
+                            <span class="w-1.5 h-1.5 rounded-full bg-mint"></span>
+                            Core Disciplines
+                        </span>
+                        <h2 class="font-display text-5xl sm:text-6xl lg:text-7xl text-white uppercase tracking-tight leading-none mt-2">
+                            EXPLORE OUR <span class="mint-gradient-text">CAPABILITIES</span>
+                        </h2>
+                        <p class="text-slate-300 text-sm sm:text-base mt-3 max-w-xl mx-auto leading-relaxed font-light">
+                            Comprehensive technological capabilities delivering measurable business advantage.
+                        </p>
+                        
+                        <!-- CTA Pill Button (Matching user reference image) -->
+                        <div class="mt-6 flex justify-center">
+                            <button onclick="navigateToTab('courses')" class="glass-btn-primary">
+                                <span>Get Started for Free &bull; Explore Track</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 3D Curved Arc Ribbon of Portrait Cards (Cylindrical panorama effect) -->
+                <div class="capabilities-arc-viewport">
+                    <div class="capabilities-arc-track">
+                        
+                        <!-- Card 1 (Far Left Arc) -->
+                        <div class="arc-card arc-card-1" onclick="navigateToTab('courses')">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=500&q=80" alt="Cloud Architect">
+                            <div class="arc-card-overlay">
+                                <span class="arc-card-role">Cloud Architecture</span>
+                                <div class="arc-card-name">Enterprise Systems</div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2 (Mid-Left Arc) -->
+                        <div class="arc-card arc-card-2" onclick="navigateToTab('courses')">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" alt="Full Stack Developer">
+                            <div class="arc-card-overlay">
+                                <span class="arc-card-role">Full-Stack Web</span>
+                                <div class="arc-card-name">Modern Platforms</div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3 (Left-Center Arc) -->
+                        <div class="arc-card arc-card-3" onclick="navigateToTab('courses')">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&q=80" alt="AI & ML Specialist">
+                            <div class="arc-card-overlay">
+                                <span class="arc-card-role">Machine Learning</span>
+                                <div class="arc-card-name">Intelligent Bots</div>
+                            </div>
+                        </div>
+
+                        <!-- Card 4 (Center Key Card — Elevated) -->
+                        <div class="arc-card arc-card-4" onclick="navigateToTab('courses')">
+                            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=500&q=80" alt="Lead Product Designer">
+                            <div class="arc-card-overlay">
+                                <span class="arc-card-role">Creative Direction</span>
+                                <div class="arc-card-name">UI/UX Innovation</div>
+                            </div>
+                        </div>
+
+                        <!-- Card 5 (Right-Center Arc) -->
+                        <div class="arc-card arc-card-5" onclick="navigateToTab('courses')">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&q=80" alt="DevOps & SRE Engineer">
+                            <div class="arc-card-overlay">
+                                <span class="arc-card-role">DevOps &amp; Cloud</span>
+                                <div class="arc-card-name">CI/CD Pipelines</div>
+                            </div>
+                        </div>
+
+                        <!-- Card 6 (Mid-Right Arc) -->
+                        <div class="arc-card arc-card-6" onclick="navigateToTab('courses')">
+                            <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=500&q=80" alt="Data Intelligence Lead">
+                            <div class="arc-card-overlay">
+                                <span class="arc-card-role">Data Analytics</span>
+                                <div class="arc-card-name">Power BI &amp; SQL</div>
+                            </div>
+                        </div>
+
+                        <!-- Card 7 (Far Right Arc) -->
+                        <div class="arc-card arc-card-7" onclick="navigateToTab('courses')">
+                            <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=500&q=80" alt="Cybersecurity Analyst">
+                            <div class="arc-card-overlay">
+                                <span class="arc-card-role">Cyber Defense</span>
+                                <div class="arc-card-name">Ethical Security</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Feature Columns Below the Arc (Matching Reference Layout in Frosted Glass) -->
+                <div class="container mx-auto px-4 lg:px-8 mt-14 pt-10 border-t border-white/10">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center sm:text-left">
+                        
+                        <!-- Column 1: Real-Time Collaboration -->
+                        <div class="glass-card-dark p-7">
+                            <h4 class="font-display text-2xl sm:text-3xl text-white uppercase tracking-wide flex items-center justify-center sm:justify-start gap-2.5">
+                                <span class="w-2 h-2 rounded-full bg-mint shadow-xs"></span>
+                                Real-Time Collaboration
+                            </h4>
+                            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed mt-2.5 font-light">
+                                Communicate seamlessly and keep teams in sync with ultra-fast web ecosystems, live pair programming, instant messaging, and shared digital assets.
+                            </p>
+                        </div>
+
+                        <!-- Column 2: Task & Project Tracking -->
+                        <div class="glass-card-dark p-7">
+                            <h4 class="font-display text-2xl sm:text-3xl text-white uppercase tracking-wide flex items-center justify-center sm:justify-start gap-2.5">
+                                <span class="w-2 h-2 rounded-full bg-mint shadow-xs"></span>
+                                Task &amp; Project Tracking
+                            </h4>
+                            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed mt-2.5 font-light">
+                                Assign tasks, set production milestones, and visualize code progress with boards, lists, and sprint timelines tailored strictly to your team's style.
+                            </p>
+                        </div>
+
+                        <!-- Column 3: Performance Insights -->
+                        <div class="glass-card-dark p-7">
+                            <h4 class="font-display text-2xl sm:text-3xl text-white uppercase tracking-wide flex items-center justify-center sm:justify-start gap-2.5">
+                                <span class="w-2 h-2 rounded-full bg-mint shadow-xs"></span>
+                                Performance Insights
+                            </h4>
+                            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed mt-2.5 font-light">
+                                Make smarter decisions with analytics that drive productivity trends, eliminate code bottlenecks, and balance team workload effectively.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 6. FEATURED 47 PROGRAMS PREVIEW (Frosted Glass Tiles) -->
+            <div class="py-24 bg-white border-b border-mint/20 relative">
+                <div class="container mx-auto px-4 lg:px-8">
+                    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+                        <div>
+                            <span class="glass-pill mb-3">Tech Academy Tracks</span>
+                            <h2 class="font-display text-4xl sm:text-5xl text-black uppercase tracking-tight mt-2">MOST POPULAR PROGRAMS</h2>
+                            <p class="text-slate-600 text-sm mt-1">Real production code, mentor reviews, and dedicated career preparation.</p>
+                        </div>
+                        <button onclick="navigateToTab('courses')" class="glass-btn-primary self-start md:self-auto">
+                            <span>Browse All 47 Courses</span> <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Featured Courses Container (Preserved JavaScript Rendering) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="featured-courses-container">
+                        <!-- Populated by script.js with .course-tile -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. EDITORIAL ASYMMETRIC COLLAGE: INSIDE NEXTGEN (Glass Details) -->
+            <div class="py-24 bg-black text-white border-b border-mint/30 relative overflow-hidden">
+                <div class="ambient-glow-mint top-10 right-10"></div>
+                <div class="container mx-auto px-4 lg:px-8 relative z-10">
+                    <div class="grid lg:grid-cols-12 gap-12 items-center">
+                        <div class="lg:col-span-6 space-y-6">
+                            <span class="glass-pill glass-pill-dark">Bangalore Training Campus</span>
+                            <h2 class="font-display text-4xl sm:text-5xl text-white uppercase leading-tight">
+                                INSIDE <span class="mint-gradient-text">NEXTGEN</span>.
+                            </h2>
+                            <p class="text-slate-300 text-sm sm:text-base leading-relaxed font-light">
+                                NextGen DMA Ventures operates at the heart of Bangalore's Silicon Valley in HSR Layout. We blend intensive project sprints with real industry mentorship, equipping engineers with both the craftsmanship and the problem-solving mentality expected by high-budget modern technology brands.
+                            </p>
+                            <div class="grid grid-cols-2 gap-4 pt-2">
+                                <div class="glass-card-dark p-5">
+                                    <div class="font-mono text-xs font-bold text-mint uppercase">80% Hands-On</div>
+                                    <p class="text-xs text-slate-300 mt-1 font-light">Daily coding labs, production builds, and peer architecture critiques.</p>
+                                </div>
+                                <div class="glass-card-dark p-5">
+                                    <div class="font-mono text-xs font-bold text-mint uppercase">1-on-1 Reviews</div>
+                                    <p class="text-xs text-slate-300 mt-1 font-light">Direct feedback from senior engineers on code hygiene and design patterns.</p>
+                                </div>
+                            </div>
+                            <button onclick="navigateToTab('about')" class="glass-btn-primary">
+                                <span>Learn More About Our Hub</span> <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </button>
+                        </div>
+
+                        <div class="lg:col-span-6">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="rounded-3xl overflow-hidden border border-mint/30 shadow-2xl">
+                                    <img src="san.jpeg" alt="Bangalore Training Hub Campus" class="w-full h-64 object-cover hover:scale-105 transition duration-500">
+                                </div>
+                                <div class="rounded-3xl overflow-hidden border border-mint/30 shadow-2xl flex items-center justify-center p-6 bg-white/5 backdrop-blur-xl">
+                                    <img src="logo.jpeg" alt="NEXTGEN Logo Detail" class="w-full max-h-48 object-contain">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. STUDENT STORIES / TESTIMONIALS (Frosted Glass Cards) -->
+            <div class="py-24 bg-white border-b border-mint/20 relative">
+                <div class="container mx-auto px-4 lg:px-8">
+                    <div class="text-center max-w-xl mx-auto mb-14">
+                        <span class="glass-pill mb-3">Real Transformation</span>
+                        <h2 class="font-display text-4xl sm:text-5xl text-black uppercase tracking-tight mt-2">STUDENT STORIES</h2>
+                        <p class="text-slate-600 text-sm mt-1">Authentic feedback from graduates thriving across modern tech organisations.</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="testimonial-glass-card">
+                            <div>
+                                <div class="text-mint text-base mb-3 tracking-widest">★★★★★</div>
+                                <p class="text-slate-700 text-xs sm:text-sm leading-relaxed">
+                                    &ldquo;The hands-on projects and mentor-led code reviews helped me build real confidence in Full Stack development. Working with the official workflows prepared me for day one at work.&rdquo;
+                                </p>
+                            </div>
+                            <div class="pt-6 mt-6 border-t border-mint/20 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-mint/20 text-black flex items-center justify-center font-bold text-xs border border-mint/40">
+                                    <i class="fa-solid fa-user text-mint-dark"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-xs text-black">Student Alumnus</div>
+                                    <div class="text-[10px] font-mono text-slate-500 uppercase">Full Stack Web Development</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="testimonial-glass-card">
+                            <div>
+                                <div class="text-mint text-base mb-3 tracking-widest">★★★★★</div>
+                                <p class="text-slate-700 text-xs sm:text-sm leading-relaxed">
+                                    &ldquo;Practical learning from day one. The AI course explained mathematical concepts clearly with real Python workflows, LLM agents, and PyTorch implementations.&rdquo;
+                                </p>
+                            </div>
+                            <div class="pt-6 mt-6 border-t border-mint/20 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-mint/20 text-black flex items-center justify-center font-bold text-xs border border-mint/40">
+                                    <i class="fa-solid fa-user text-mint-dark"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-xs text-black">Student Alumnus</div>
+                                    <div class="text-[10px] font-mono text-slate-500 uppercase">Artificial Intelligence &amp; ML</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="testimonial-glass-card">
+                            <div>
+                                <div class="text-mint text-base mb-3 tracking-widest">★★★★★</div>
+                                <p class="text-slate-700 text-xs sm:text-sm leading-relaxed">
+                                    &ldquo;Great campus in HSR Layout with supportive trainers. The hybrid mentorship fit my schedule perfectly and the mock technical interviews were priceless.&rdquo;
+                                </p>
+                            </div>
+                            <div class="pt-6 mt-6 border-t border-mint/20 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-mint/20 text-black flex items-center justify-center font-bold text-xs border border-mint/40">
+                                    <i class="fa-solid fa-user text-mint-dark"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-xs text-black">Student Alumnus</div>
+                                    <div class="text-[10px] font-mono text-slate-500 uppercase">Cloud &amp; DevOps Engineering</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. CONTACT / FINAL CONVERSION CTA (Pure Black Glass Banner) -->
+            <div class="py-20 bg-white">
+                <div class="container mx-auto px-4 lg:px-8">
+                    <div class="glass-card-dark p-8 sm:p-14 relative overflow-hidden shadow-2xl">
+                        <div class="ambient-glow-mint -right-10 -top-10"></div>
+                        
+                        <div class="relative z-10 max-w-2xl space-y-5">
+                            <span class="font-mono text-xs uppercase tracking-widest text-mint font-bold flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-mint animate-pulse"></span>
+                                READY TO TRANSFORM?
+                            </span>
+                            <h2 class="font-display text-4xl sm:text-6xl uppercase tracking-tight text-white leading-none">
+                                LET'S BUILD <span class="mint-gradient-text">WHAT'S NEXT</span>.
+                            </h2>
+                            <p class="text-slate-300 text-sm sm:text-base font-light leading-relaxed">
+                                Have an idea, a challenge, or a career vision? Speak directly with our engineering and student counsellor team in Bangalore.
+                            </p>
+                            <div class="pt-2">
+                                <button onclick="scrollToEnquiry('General Enquiry')" class="glass-btn-primary">
+                                    <span>START A PROJECT / ENQUIRE NOW</span>
+                                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- ==========================================
+             TAB 2: ALL 47 COURSES & COMMAND HUB
+             ========================================== -->
+        <section id="tab-courses" class="tab-content hidden py-16 bg-white relative">
+            <div class="ambient-glow-mint top-10 right-10"></div>
+            <div class="container mx-auto px-4 lg:px-8 relative z-10">
+
+                <!-- Glass Header Banner -->
+                <div class="glass-card p-8 sm:p-12 mb-10 relative overflow-hidden">
+                    <div class="relative z-10 max-w-3xl">
+                        <span class="glass-pill mb-4">
+                            <span class="w-2 h-2 rounded-full bg-mint animate-pulse"></span>
+                            Official 2026 Curriculum &bull; All 47 Programs &amp; Internships
+                        </span>
+                        <h1 class="font-display text-4xl sm:text-6xl text-black tracking-tight uppercase leading-none mt-2">
+                            Browse Our <span class="text-mint">47 Professional</span> Courses &amp; Internships
+                        </h1>
+                        <p class="text-slate-600 mt-4 text-sm sm:text-base leading-relaxed font-light">
+                            Explore all 47 industry-aligned career tracks spanning Artificial Intelligence, Full-Stack Engineering, Cloud &amp; Cyber Defense, Design &amp; QA, Mechanical CAD/FEA, Electric Vehicle Automotive Engineering, and Advanced Smart Factory Technologies.
+                        </p>
+
+                        <!-- Key Pillars in Glass -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-8 pt-6 border-t border-mint/20 text-xs">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-certificate text-mint text-sm"></i>
+                                <span class="font-semibold text-black">Govt &amp; Industry Certified</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-code text-mint text-sm"></i>
+                                <span class="font-semibold text-black">100% Practical Labs</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-user-tie text-mint text-sm"></i>
+                                <span class="font-semibold text-black">1-on-1 Mentorship</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-briefcase text-mint text-sm"></i>
+                                <span class="font-semibold text-black">Verified Internship</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Glass Filter & Command Hub -->
+                <div class="glass-card p-6 sm:p-8 mb-10 space-y-6">
+                    
+                    <!-- Search + Duration Filter + Sort + Count Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-center">
+                        <!-- Glass Search Box -->
+                        <div class="lg:col-span-5 relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="text" id="course-search-input" onkeyup="filterCourses()" placeholder="Search by course name, skill, or tool (e.g. AI, Python, SolidWorks, CATIA, EV, Java)..." class="glass-input pl-11">
+                        </div>
+
+                        <!-- Glass Duration Selector -->
+                        <div class="lg:col-span-3 relative">
+                            <select id="duration-filter" onchange="filterCourses()" class="glass-input cursor-pointer font-mono text-xs appearance-none pr-8">
+                                <option value="all">⏱ All Durations (20–36 Weeks)</option>
+                                <option value="lt24">20 – 22 Weeks (Focused Programs)</option>
+                                <option value="24-26">24 – 26 Weeks (Core Engineering)</option>
+                                <option value="28-30">28 – 30 Weeks (Professional Tracks)</option>
+                                <option value="gt30">32 – 36 Weeks (Master Specialization)</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                        </div>
+
+                        <!-- Glass Sort Selector -->
+                        <div class="lg:col-span-2 relative">
+                            <select id="sort-filter" onchange="filterCourses()" class="glass-input cursor-pointer font-mono text-xs appearance-none pr-8">
+                                <option value="default">↕ Sort: Featured</option>
+                                <option value="fee-asc">Fee: Low to High</option>
+                                <option value="fee-desc">Fee: High to Low</option>
+                                <option value="duration-asc">Duration: Short to Long</option>
+                                <option value="duration-desc">Duration: Long to Short</option>
+                                <option value="title-asc">Alphabetical (A - Z)</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                        </div>
+
+                        <!-- Reset Button -->
+                        <div class="lg:col-span-2">
+                            <button onclick="resetFilters()" class="w-full py-3 px-4 rounded-xl border border-mint/40 hover:bg-black hover:text-mint text-black text-xs font-mono font-bold transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-rotate-left text-xs"></i>
+                                <span>Reset All</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Category Pills & Live Count Bar (All 7 Official Categories) -->
+                    <div class="pt-4 border-t border-mint/20 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+                        <!-- 7 Category Tabs -->
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="setCategoryFilter('all')" class="cat-pill active-cat px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center gap-2" data-cat="all">
+                                <i class="fa-solid fa-shapes text-mint"></i>
+                                <span>All Categories</span>
+                                <span class="ml-1 px-1.5 py-0.5 rounded-full bg-white/20 text-[10px]">47</span>
+                            </button>
+                            <button onclick="setCategoryFilter('Artificial Intelligence & Data Technologies')" class="cat-pill px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center gap-2" data-cat="Artificial Intelligence & Data Technologies">
+                                <i class="fa-solid fa-brain text-mint"></i>
+                                <span>AI &amp; Data</span>
+                                <span class="ml-1 px-1.5 py-0.5 rounded-full bg-black/10 text-[10px]">5</span>
+                            </button>
+                            <button onclick="setCategoryFilter('Software Development')" class="cat-pill px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center gap-2" data-cat="Software Development">
+                                <i class="fa-solid fa-code text-mint"></i>
+                                <span>Software Dev</span>
+                                <span class="ml-1 px-1.5 py-0.5 rounded-full bg-black/10 text-[10px]">6</span>
+                            </button>
+                            <button onclick="setCategoryFilter('Security & Infrastructure')" class="cat-pill px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center gap-2" data-cat="Security & Infrastructure">
+                                <i class="fa-solid fa-shield-halved text-mint"></i>
+                                <span>Security &amp; Cloud</span>
+                                <span class="ml-1 px-1.5 py-0.5 rounded-full bg-black/10 text-[10px]">3</span>
+                            </button>
+                            <button onclick="setCategoryFilter('Design & Quality')" class="cat-pill px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center gap-2" data-cat="Design & Quality">
+                                <i class="fa-solid fa-pen-ruler text-mint"></i>
+                                <span>Design &amp; Quality</span>
+                                <span class="ml-1 px-1.5 py-0.5 rounded-full bg-black/10 text-[10px]">3</span>
+                            </button>
+                            <button onclick="setCategoryFilter('Mechanical Engineering')" class="cat-pill px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center gap-2" data-cat="Mechanical Engineering">
+                                <i class="fa-solid fa-gear text-mint"></i>
+                                <span>Mechanical Engg</span>
+                                <span class="ml-1 px-1.5 py-0.5 rounded-full bg-black/10 text-[10px]">10</span>
+                            </button>
+                            <button onclick="setCategoryFilter('Automobile Engineering')" class="cat-pill px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center gap-2" data-cat="Automobile Engineering">
+                                <i class="fa-solid fa-car-side text-mint"></i>
+                                <span>Automobile Engg</span>
+                                <span class="ml-1 px-1.5 py-0.5 rounded-full bg-black/10 text-[10px]">10</span>
+                            </button>
+                            <button onclick="setCategoryFilter('Advanced Technology')" class="cat-pill px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center gap-2" data-cat="Advanced Technology">
+                                <i class="fa-solid fa-microchip text-mint"></i>
+                                <span>Advanced Tech</span>
+                                <span class="ml-1 px-1.5 py-0.5 rounded-full bg-black/10 text-[10px]">8</span>
+                            </button>
+                        </div>
+
+                        <!-- Live Results Counter -->
+                        <div class="text-xs font-mono text-slate-600 flex items-center gap-2 flex-shrink-0">
+                            <span class="w-2 h-2 rounded-full bg-mint shadow-xs"></span>
+                            <span>Showing <strong id="courses-count" class="text-black font-extrabold">47</strong> of <strong id="courses-total" class="text-black font-extrabold">47</strong> Programs &amp; Internships</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Grid in Frosted Glass -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="all-courses-grid">
+                    <!-- Populated via JavaScript with .course-tile -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="no-courses-found" class="hidden text-center py-20 px-6 glass-card my-8 max-w-xl mx-auto">
+                    <div class="w-16 h-16 rounded-2xl bg-mint/20 text-black mx-auto flex items-center justify-center text-2xl mb-4 border border-mint/40">
+                        <i class="fa-solid fa-magnifying-glass text-mint-dark"></i>
+                    </div>
+                    <h3 class="text-xl font-display text-black uppercase">No Matching Programs Found</h3>
+                    <p class="text-xs text-slate-500 mt-2 max-w-sm mx-auto leading-relaxed">We couldn't find any courses matching your current filter criteria. Try resetting your search or exploring another domain.</p>
+                    <button onclick="resetFilters()" class="mt-6 glass-btn-primary">
+                        <i class="fa-solid fa-rotate-left text-xs"></i>
+                        <span>Reset All Filters</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==========================================
+             TAB 3: ABOUT US — GLASSMORPHISM
+             ========================================== -->
+        <section id="tab-about" class="tab-content hidden py-16 bg-white relative">
+            <div class="ambient-glow-mint top-20 left-10"></div>
+            <div class="container mx-auto px-4 lg:px-8 space-y-16 relative z-10">
+                
+                <!-- Top Intro / Main Feature Banner -->
+                <div class="grid lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-6 space-y-6">
+                        <span class="glass-pill">
+                            About Nextgen DMA Ventures
+                        </span>
+                        <h2 class="font-display text-4xl sm:text-5xl text-black uppercase leading-tight">
+                            Building Tomorrow's Tech Talent. <span class="text-mint">Creating Today's Digital Impact.</span>
+                        </h2>
+                        <p class="text-slate-600 text-sm sm:text-base leading-relaxed font-light">
+                            NextGen DMA Ventures is a technology-driven learning and innovation company based in Bangalore, India's leading technology hub. We bring together practical tech education, industry-oriented skill development, and digital solution thinking to help individuals and businesses move forward with confidence.
+                        </p>
+                        <p class="text-slate-600 text-sm leading-relaxed font-light">
+                            Our focus goes beyond teaching technology. We help learners understand how technology works in the real world and encourage them to turn ideas into meaningful outcomes.
+                        </p>
+
+                        <!-- Mission & Vision Glass Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <div class="glass-card p-5">
+                                <div class="text-black font-bold font-mono text-xs uppercase mb-1 flex items-center gap-2">
+                                    <i class="fa-solid fa-bullseye text-mint"></i> Our Mission
+                                </div>
+                                <p class="text-xs text-slate-600 leading-relaxed mt-1 font-light">
+                                    To make technology skills and digital innovation more accessible through practical learning, thoughtful engineering, and solutions that address meaningful challenges.
+                                </p>
+                            </div>
+                            <div class="glass-card p-5">
+                                <div class="text-black font-bold font-mono text-xs uppercase mb-1 flex items-center gap-2">
+                                    <i class="fa-solid fa-eye text-mint"></i> Our Vision
+                                </div>
+                                <p class="text-xs text-slate-600 leading-relaxed mt-1 font-light">
+                                    To become a trusted force in technology education and digital innovation, empowering people to grow their capabilities and helping businesses embrace a smarter future.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Image Block with Glass Caption -->
+                    <div class="lg:col-span-6 relative">
+                        <div class="relative rounded-3xl overflow-hidden shadow-2xl border border-mint/30">
+                            <img src="san.jpeg" alt="Bangalore State-of-the-Art Training Hub" class="w-full h-[400px] object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                            <div class="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-black/70 backdrop-blur-md border border-mint/30 text-white">
+                                <div class="font-display text-2xl uppercase tracking-wide">Bangalore State-of-the-Art Training Hub</div>
+                                <div class="text-xs text-slate-300 font-mono mt-1">Modern labs, high-speed fiber connectivity &amp; collaborative workspaces.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teaching Methodology Section (4 Frosted Glass Cards) -->
+                <div class="py-10 border-t border-mint/20" id="methodology">
+                    <div class="text-center max-w-xl mx-auto mb-12">
+                        <span class="glass-pill mb-3">Pedagogy</span>
+                        <h2 class="font-display text-4xl text-black uppercase tracking-tight mt-2">Learn by Doing. Improve by Building.</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="method-card">
+                            <div class="method-icon">›_</div>
+                            <h3 class="font-bold text-sm text-black mb-2">80% Practical / 20% Theory</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">Apply concepts through coding exercises, guided implementation, and project-based practice, supported by fundamental theory.</p>
+                        </div>
+
+                        <div class="method-card">
+                            <div class="method-icon">⑂</div>
+                            <h3 class="font-bold text-sm text-black mb-2">Mentor-Led Code Reviews</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">Understand coding mistakes, improve implementation choices, and learn to write clearer, more maintainable code.</p>
+                        </div>
+
+                        <div class="method-card">
+                            <div class="method-icon">▤</div>
+                            <h3 class="font-bold text-sm text-black mb-2">Portfolio-Focused Builds</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">Turn learning into demonstrable work through projects that showcase your technical abilities and development journey.</p>
+                        </div>
+
+                        <div class="method-card">
+                            <div class="method-icon">♟</div>
+                            <h3 class="font-bold text-sm text-black mb-2">Personalized Support</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">Receive guidance, identify areas for improvement, and progress through technical challenges with clarity.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Skills Evolution Section -->
+                <div class="py-10 border-t border-mint/20" id="student-evolution">
+                    <div class="text-center max-w-xl mx-auto mb-12">
+                        <span class="glass-pill mb-3">Transformation Matrix</span>
+                        <h2 class="font-display text-4xl text-black uppercase tracking-tight mt-2">Student Skills Evolution</h2>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                        <div class="evolution-card">
+                            <span class="inline-block px-3 py-1 rounded-full bg-slate-100 text-black font-mono text-[10px] font-bold uppercase tracking-wider mb-4 border border-slate-200">
+                                ✕ &nbsp; BEFORE LEARNING
+                            </span>
+                            <h3 class="font-display text-2xl text-black uppercase mb-3">Learning the Fundamentals</h3>
+                            <ul class="space-y-2 text-xs text-slate-600">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-slate-400"></i> Building foundational programming knowledge.</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-slate-400"></i> Learning to develop practical applications.</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-slate-400"></i> Understanding how to present projects and skills.</li>
+                            </ul>
+                            <div class="mt-6 pt-4 border-t border-slate-200 text-xs font-mono font-bold text-slate-500">
+                                Outcome: A foundation to build upon
+                            </div>
+                        </div>
+
+                        <div class="evolution-card after-card">
+                            <span class="inline-block px-3 py-1 rounded-full bg-mint text-black font-mono text-[10px] font-bold uppercase tracking-wider mb-4 shadow-sm">
+                                ✓ &nbsp; SKILLS IN PROGRESS
+                            </span>
+                            <h3 class="font-display text-2xl text-white uppercase mb-3">Developing Job-Ready Skills</h3>
+                            <ul class="space-y-2 text-xs text-slate-300">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-mint"></i> Creating practical projects and building a portfolio.</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-mint"></i> Practicing technical problem-solving and coding interviews.</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-mint"></i> Improving resumes and professional profiles.</li>
+                            </ul>
+                            <div class="mt-6 pt-4 border-t border-white/10 text-xs font-mono font-bold text-mint">
+                                Outcome: Greater confidence through practice
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Call To Action & Commitment (Dark Glass Banner) -->
+                <div class="glass-card-dark p-8 sm:p-12 text-center space-y-6 relative overflow-hidden">
+                    <div class="ambient-glow-mint top-0 left-1/2 -translate-x-1/2"></div>
+                    <div class="max-w-2xl mx-auto space-y-2 relative z-10">
+                        <h3 class="font-display text-3xl sm:text-4xl uppercase text-white tracking-wide">Let's Create Something Meaningful.</h3>
+                        <p class="text-xs sm:text-sm leading-relaxed text-slate-300 font-light">
+                            Have an idea, a challenge, or a project in mind? We are committed to creating digital experiences that combine functionality, thoughtful design, and long-term value.
+                        </p>
+                    </div>
+
+                    <div class="relative z-10">
+                        <button onclick="scrollToEnquiry('General Enquiry')" class="glass-btn-primary">
+                            <span>Let's Talk About Your Project</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ==========================================
+             TAB 4: LEARNING APPROACH & FAQ
+             ========================================== -->
+        <section id="tab-learning" class="tab-content hidden py-16 bg-white relative">
+            <div class="ambient-glow-mint top-10 left-10"></div>
+            <div class="container mx-auto px-4 lg:px-8 relative z-10">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="glass-pill mb-3">The Nextgen Advantage</span>
+                    <h2 class="font-display text-4xl sm:text-5xl text-black uppercase mt-2">How We Train Tech Professionals</h2>
+                    <p class="text-slate-600 text-sm sm:text-base mt-2">Our practical pedagogy focuses on hands-on code execution, code reviews, and industry readiness.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="glass-card p-7 relative overflow-hidden">
+                        <span class="font-display text-6xl text-slate-100 absolute right-4 top-2 select-none">01</span>
+                        <div class="w-12 h-12 rounded-xl bg-black text-mint flex items-center justify-center text-xl mb-4 relative z-10 border border-mint/40">
+                            <i class="fa-solid fa-laptop-code"></i>
+                        </div>
+                        <h3 class="font-bold text-base text-black mb-2 relative z-10">Live Instructor Sessions</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed relative z-10">
+                            Interactive live classes with real-time screen sharing, live coding, and Q&A instead of pre-recorded passive lectures.
+                        </p>
+                    </div>
+
+                    <div class="glass-card p-7 relative overflow-hidden">
+                        <span class="font-display text-6xl text-slate-100 absolute right-4 top-2 select-none">02</span>
+                        <div class="w-12 h-12 rounded-xl bg-black text-mint flex items-center justify-center text-xl mb-4 relative z-10 border border-mint/40">
+                            <i class="fa-solid fa-diagram-project"></i>
+                        </div>
+                        <h3 class="font-bold text-base text-black mb-2 relative z-10">Capstone Projects</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed relative z-10">
+                            Build real industry applications from scratch. Every student completes 3 to 5 full capstone projects.
+                        </p>
+                    </div>
+
+                    <div class="glass-card p-7 relative overflow-hidden">
+                        <span class="font-display text-6xl text-slate-100 absolute right-4 top-2 select-none">03</span>
+                        <div class="w-12 h-12 rounded-xl bg-black text-mint flex items-center justify-center text-xl mb-4 relative z-10 border border-mint/40">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <h3 class="font-bold text-base text-black mb-2 relative z-10">1-on-1 Mentorship</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed relative z-10">
+                            Dedicated code reviews and doubt-clearing sessions to resolve bugs and accelerate your progress.
+                        </p>
+                    </div>
+
+                    <div class="glass-card p-7 relative overflow-hidden">
+                        <span class="font-display text-6xl text-slate-100 absolute right-4 top-2 select-none">04</span>
+                        <div class="w-12 h-12 rounded-xl bg-black text-mint flex items-center justify-center text-xl mb-4 relative z-10 border border-mint/40">
+                            <i class="fa-solid fa-briefcase"></i>
+                        </div>
+                        <h3 class="font-bold text-base text-black mb-2 relative z-10">Career Placement Prep</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed relative z-10">
+                            Resume building, GitHub portfolio optimization, mock technical interviews, and referral support.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-20 max-w-4xl mx-auto">
+                    <div class="text-center mb-10">
+                        <span class="glass-pill mb-3">Got Questions?</span>
+                        <h3 class="font-display text-3xl sm:text-4xl text-black uppercase mt-2">Frequently Asked Questions</h3>
+                    </div>
+
+                    <!-- FAQ Dynamic Container (Glassmorphism Accordion) -->
+                    <div class="space-y-4" id="faq-container"></div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==========================================
+             TAB 5: CONTACT & INTERACTIVE GOOGLE MAP
+             ========================================== -->
+        <section id="tab-contact" class="tab-content hidden py-16 lg:py-24 bg-white relative">
+            <div class="ambient-glow-mint top-10 right-10"></div>
+            <div class="ambient-glow-mint bottom-10 left-10"></div>
+
+            <div class="container mx-auto px-4 lg:px-8 relative z-10">
+                <div class="text-center max-w-3xl mx-auto mb-12 lg:mb-16">
+                    <span class="glass-pill mb-3">Get in Touch</span>
+                    <h2 class="font-display text-4xl sm:text-6xl text-black uppercase mt-2 tracking-tight">
+                        Start Your <span class="text-mint">Tech Career</span> Journey Today
+                    </h2>
+                    <p class="text-slate-600 text-sm sm:text-base leading-relaxed mt-3 font-light">
+                        Have questions regarding course modules, class timings, or career assistance? Speak directly with our student counsellors in Bangalore.
+                    </p>
+                </div>
+
+                <div class="max-w-6xl mx-auto grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+                    
+                    <!-- Contact / Enquiry Form in Frosted Glass -->
+                    <div class="lg:col-span-7 order-1" id="enquiry-form-section">
+                        <div class="glass-card p-6 sm:p-10">
+                            <h3 class="font-display text-2xl text-black uppercase mb-1">Course Admissions &amp; Internship Application</h3>
+                            <p class="text-xs text-slate-500 mb-6 font-mono">Fill in your details below. Official fee and duration update automatically based on your selection.</p>
+                            
+                            <form id="enquiry-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                                
+                                <!-- Row 1: Student Name & Mobile Number -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-mono font-semibold text-black mb-1">Student Name *</label>
+                                        <input type="text" id="form-name" required placeholder="e.g. Rahul Sharma" class="glass-input">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-mono font-semibold text-black mb-1">Mobile Number *</label>
+                                        <input type="tel" id="form-phone" required placeholder="e.g. +91 9876543210" class="glass-input">
+                                    </div>
+                                </div>
+
+                                <!-- Row 2: Email Address & College / Institution -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-mono font-semibold text-black mb-1">Email Address *</label>
+                                        <input type="email" id="form-email" required placeholder="rahul@example.com" class="glass-input">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-mono font-semibold text-black mb-1">College / Institution</label>
+                                        <input type="text" id="form-college" placeholder="e.g. RV College of Engineering, Bangalore" class="glass-input">
+                                    </div>
+                                </div>
+
+                                <!-- Row 3: Selected Course & Auto-Populated Course Fee -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-mono font-semibold text-black mb-1">Selected Course *</label>
+                                        <select id="form-course" required class="glass-input cursor-pointer font-mono text-xs">
+                                            <option value="">Select a Course / Program...</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-mono font-semibold text-black mb-1 flex items-center justify-between">
+                                            <span>Official Course Fee</span>
+                                            <span class="text-[10px] text-mint font-bold uppercase tracking-wider">Auto-Populated</span>
+                                        </label>
+                                        <input type="text" id="form-fee" readonly placeholder="Auto-populated with course fee" class="glass-input bg-black/5 font-mono font-bold text-black cursor-not-allowed">
+                                    </div>
+                                </div>
+
+                                <!-- Learning Preference -->
+                                <div>
+                                    <label class="block text-xs font-mono font-semibold text-black mb-1">Learning Preference</label>
+                                    <div class="flex items-center space-x-6 text-xs text-black pt-1">
+                                        <label class="flex items-center cursor-pointer">
+                                            <input type="radio" name="learning-mode" value="Bangalore Classroom" checked class="text-mint focus:ring-mint">
+                                            <span class="ml-2 font-mono">Bangalore Classroom Labs</span>
+                                        </label>
+                                        <label class="flex items-center cursor-pointer">
+                                            <input type="radio" name="learning-mode" value="Online Live Interactive" class="text-mint focus:ring-mint">
+                                            <span class="ml-2 font-mono">Online Live Batch</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Message -->
+                                <div>
+                                    <label class="block text-xs font-mono font-semibold text-black mb-1">Message or Queries (Optional)</label>
+                                    <textarea id="form-message" rows="3" placeholder="Tell us about your educational background or technical goals..." class="glass-input"></textarea>
+                                </div>
+
+                                <button type="submit" class="w-full py-4 rounded-xl bg-black hover:bg-mint text-white hover:text-black border border-mint/40 font-mono text-xs font-bold uppercase tracking-widest shadow-lg transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-2">
+                                    <span>Submit Course Application</span>
+                                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                                </button>
+                            </form>
+
+                            <!-- Error Message Banner -->
+                            <div id="form-error-message" class="hidden mt-4 p-4 rounded-xl bg-red-950/80 border border-red-500 text-white text-xs backdrop-blur-md">
+                                <div class="flex items-center gap-2 font-bold text-sm text-red-400">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Validation Note
+                                </div>
+                                <p id="form-error-text" class="mt-1 text-slate-200"></p>
+                            </div>
+
+                            <!-- Success Message Banner -->
+                            <div id="form-success-message" class="hidden mt-4 p-4 rounded-xl bg-black/95 border border-mint text-white text-xs backdrop-blur-md shadow-2xl">
+                                <div class="flex items-center gap-2 font-bold text-sm text-mint">
+                                    <i class="fa-solid fa-circle-check"></i> Application Submitted Successfully!
+                                </div>
+                                <p id="success-course-details" class="mt-1 text-mint font-mono font-semibold"></p>
+                                <p class="mt-1 text-slate-300">Our senior Bangalore admissions counselling team will contact you within 24 hours with the official syllabus, batch schedule, and payment options.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campus Details & INTERACTIVE GOOGLE MAP Column -->
+                    <div class="lg:col-span-5 order-2 space-y-6">
+                        
+                        <!-- Campus Contact Information Card in Frosted Glass -->
+                        <div class="glass-card p-6 sm:p-8 space-y-5">
+                            <h3 class="font-display text-2xl text-black uppercase">Bangalore Training Campus</h3>
+                            
+                            <div class="space-y-4 text-xs sm:text-sm text-slate-700">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-9 h-9 rounded-xl bg-black text-mint flex items-center justify-center flex-shrink-0 mt-0.5 border border-mint/30 shadow-xs">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-black">Office Location</div>
+                                        <p class="text-slate-600 mt-0.5">HSR Layout, Sector 1, Bangalore, Karnataka - 560102</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-3">
+                                    <div class="w-9 h-9 rounded-xl bg-black text-mint flex items-center justify-center flex-shrink-0 mt-0.5 border border-mint/30 shadow-xs">
+                                        <i class="fa-solid fa-phone"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-black">Direct Line</div>
+                                        <a href="tel:+919787076296" class="text-slate-600 hover:text-mint-dark mt-0.5 block font-mono">+91 9787076296</a>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-3">
+                                    <div class="w-9 h-9 rounded-xl bg-black text-mint flex items-center justify-center flex-shrink-0 mt-0.5 border border-mint/30 shadow-xs">
+                                        <i class="fa-solid fa-envelope"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-black">Admissions Desk</div>
+                                        <a href="mailto:admissions@nextgendma.com" class="text-slate-600 hover:text-mint-dark mt-0.5 block font-mono">admissions@nextgendma.com</a>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-3">
+                                    <div class="w-9 h-9 rounded-xl bg-black text-mint flex items-center justify-center flex-shrink-0 mt-0.5 border border-mint/30 shadow-xs">
+                                        <i class="fa-regular fa-clock"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-black">Campus Hours</div>
+                                        <p class="text-slate-600 mt-0.5">Mon &ndash; Sat: 9:00 AM &ndash; 7:00 PM IST</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- INTERACTIVE GOOGLE MAP (Embedded inside a Premium Glassmorphism Container) -->
+                        <div class="glass-map-container">
+                            <iframe 
+                                src="https://maps.google.com/maps?q=HSR+Layout+Sector+1+Bangalore+Karnataka+560102&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade"
+                                title="NEXTGEN DMA VENTURES Bangalore Campus Google Map Location">
+                            </iframe>
+
+                            <!-- Floating Glass Location Card & Get Directions Button -->
+                            <div class="glass-map-badge">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-mint animate-ping"></span>
+                                    <span class="font-mono text-[10px] uppercase font-bold text-mint tracking-widest">Bangalore Hub</span>
+                                </div>
+                                <div class="font-display text-lg text-white mt-1">HSR Layout &bull; Sector 1</div>
+                                <p class="text-[11px] text-slate-300 font-sans mt-0.5">Karnataka - 560102</p>
+                                <a href="https://www.google.com/maps/dir/?api=1&destination=HSR+Layout+Sector+1+Bangalore+Karnataka+560102" target="_blank" rel="noopener noreferrer" class="glass-map-directions-btn">
+                                    <i class="fa-solid fa-diamond-turn-right text-xs"></i>
+                                    <span>Get Directions</span>
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==========================================
+         FOOTER — PURE BLACK GLASSMORPHISM DESIGN
+         ========================================== -->
+    <footer class="bg-black text-white border-t border-mint/30 pt-16 pb-12 text-xs relative overflow-hidden">
+        <div class="ambient-glow-mint top-0 right-10"></div>
+        <div class="container mx-auto px-4 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-12 border-b border-white/10">
+                
+                <!-- Brand Column -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <img src="./logo.jpeg" alt="NEXTGEN DNA VENTURES Logo" class="w-14 h-14 object-contain flex-shrink-0">
+                        <div>
+                            <span class="font-display text-2xl text-white tracking-wide">NEXTGEN <span class="text-mint">DNA</span> VENTURES</span>
+                            <div class="font-mono text-[9px] uppercase tracking-widest text-slate-400">Tech Academy &bull; Bangalore</div>
+                        </div>
+                    </div>
+                    <p class="text-xs leading-relaxed max-w-sm text-slate-400 font-light">
+                        NextGen DMA Ventures is a technology-driven learning and innovation company based in Bangalore, India's leading technology hub. We bring together practical tech education, industry-oriented skill development, and digital solution thinking.
+                    </p>
+                    <div class="flex items-center gap-3 pt-2">
+                        <a href="https://linkedin.com" target="_blank" class="w-9 h-9 rounded-full bg-white/10 border border-mint/30 flex items-center justify-center text-white hover:text-black hover:bg-mint transition" aria-label="LinkedIn">
+                            <i class="fa-brands fa-linkedin-in text-xs"></i>
+                        </a>
+                        <a href="https://instagram.com" target="_blank" class="w-9 h-9 rounded-full bg-white/10 border border-mint/30 flex items-center justify-center text-white hover:text-black hover:bg-mint transition" aria-label="Instagram">
+                            <i class="fa-brands fa-instagram text-xs"></i>
+                        </a>
+                        <a href="https://wa.me/919787076296" target="_blank" class="w-9 h-9 rounded-full bg-white/10 border border-mint/30 flex items-center justify-center text-white hover:text-black hover:bg-mint transition" aria-label="WhatsApp">
+                            <i class="fa-brands fa-whatsapp text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Navigation Links in Glass -->
+                <div class="lg:col-span-3 space-y-3 font-mono">
+                    <h4 class="font-display text-base text-mint uppercase tracking-wider">Navigation</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><button onclick="navigateToTab('home')" class="hover:text-mint transition">Home</button></li>
+                        <li><button onclick="navigateToTab('courses')" class="hover:text-mint transition">All 47 Courses &amp; Internships</button></li>
+                        <li><button onclick="navigateToTab('about')" class="hover:text-mint transition">About Bangalore Hub</button></li>
+                        <li><button onclick="navigateToTab('learning')" class="hover:text-mint transition">Learning Approach &amp; FAQ</button></li>
+                        <li><button onclick="navigateToTab('contact')" class="hover:text-mint transition">Contact &amp; Support</button></li>
+                    </ul>
+                </div>
+
+                <!-- Bangalore Campus -->
+                <div class="lg:col-span-4 space-y-3 text-xs">
+                    <h4 class="font-display text-base text-mint uppercase tracking-wider">Bangalore Campus</h4>
+                    <p class="leading-relaxed flex items-start gap-2 text-slate-300">
+                        <i class="fa-solid fa-location-dot text-mint mt-0.5"></i>
+                        <span>HSR Layout, Sector 1, Bangalore, Karnataka - 560102</span>
+                    </p>
+                    <p class="mt-2">
+                        <a href="tel:+919787076296" class="hover:text-mint text-slate-300 flex items-center gap-2 font-mono">
+                            <i class="fa-solid fa-phone text-mint"></i> +91 9787076296
+                        </a>
+                    </p>
+                    <p class="mt-2">
+                        <a href="mailto:admissions@nextgendma.com" class="hover:text-mint text-slate-300 flex items-center gap-2 font-mono">
+                            <i class="fa-solid fa-envelope text-mint"></i> admissions@nextgendma.com
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="pt-8 flex flex-col sm:flex-row justify-between items-center text-slate-400 gap-4 text-xs font-mono">
+                <div>&copy; 2026 NextGen DMA Ventures Bangalore. All rights reserved.</div>
+                <div class="text-mint flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-mint"></span>
+                    Tech Academy &bull; Enterprise Innovation Hub
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- COURSE DETAILS MODAL (Frosted Glass Container) -->
+    <div id="course-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-2xl hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-black/90 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative border border-mint/40" id="modal-container">
+            <button onclick="closeCourseModal()" class="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-white/10 hover:bg-mint hover:text-black text-white flex items-center justify-center border border-white/20 transition" aria-label="Close modal">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+            <div id="modal-content-container">
+                <!-- Populated via openCourseModal(courseId) in script.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         STUDENT REGISTRATION & RAZORPAY CHECKOUT MODAL
+         ========================================================================= -->
+    <div id="booking-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-2xl hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-black/95 rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl relative border border-mint/40 p-6 sm:p-8 space-y-6">
+            
+            <!-- Close button -->
+            <button onclick="closeBookingModal()" class="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-white/10 hover:bg-mint hover:text-black text-white flex items-center justify-center border border-white/20 transition" aria-label="Close booking modal">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+
+            <!-- Header -->
+            <div class="border-b border-white/10 pb-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-mint animate-pulse"></span>
+                    <span class="font-mono text-xs uppercase tracking-widest text-mint font-bold">Official Admission Form</span>
+                </div>
+                <h2 class="font-display text-2xl sm:text-3xl text-white uppercase mt-1">Book Your Admission Slot</h2>
+                <p class="text-xs text-slate-400 font-mono mt-0.5">Fill in your details below to proceed to the secure Razorpay payment gateway.</p>
+            </div>
+
+            <!-- Booking Form -->
+            <form id="booking-form" onsubmit="handleBookingFormSubmit(event)" class="space-y-5 text-white">
+                
+                <!-- Selected Course Summary Strip (Read-Only) -->
+                <div class="p-4 rounded-2xl bg-white/5 border border-mint/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                    <div>
+                        <div class="text-[10px] font-mono uppercase text-slate-400">Selected Course Track</div>
+                        <div class="font-bold text-white text-sm" id="book-course-name">Artificial Intelligence</div>
+                        <div class="text-[11px] font-mono text-mint" id="book-course-duration">28 Weeks Program</div>
+                    </div>
+                    <div class="text-left sm:text-right">
+                        <div class="text-[10px] font-mono uppercase text-slate-400">Total Course Fee</div>
+                        <div class="font-display text-xl text-white font-bold" id="book-course-total-fee">₹34,999</div>
+                    </div>
+                </div>
+
+                <!-- PAYMENT OPTION SELECTOR (Advance ₹2,499 vs Full Fee) -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-mono font-bold uppercase tracking-wider text-mint">
+                        Select Payment Option
+                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        
+                        <!-- Option 1: Pay Advance ₹2,499 -->
+                        <label class="relative flex flex-col p-4 rounded-xl border border-mint/40 bg-white/5 cursor-pointer hover:border-mint transition peer-checked:bg-mint/10 payment-option-card active-option" id="card-option-advance">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-xs uppercase text-white">Pay Advance</span>
+                                <input type="radio" name="booking-payment-type" value="advance" checked onchange="updatePaymentCalculation()" class="text-mint focus:ring-mint">
+                            </div>
+                            <div class="font-display text-2xl text-mint mt-1">₹2,499</div>
+                            <div class="text-[11px] text-slate-300 mt-1 leading-snug">
+                                Reserve your slot today. Adjusted against total fee.
+                            </div>
+                            <div class="mt-2 text-[10px] font-mono text-mint font-semibold flex items-center gap-1">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                                <span>Remaining Balance: <strong id="book-advance-balance">₹32,500</strong></span>
+                            </div>
+                        </label>
+
+                        <!-- Option 2: Pay Full Course Fee -->
+                        <label class="relative flex flex-col p-4 rounded-xl border border-white/20 bg-white/5 cursor-pointer hover:border-mint transition payment-option-card" id="card-option-full">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-xs uppercase text-white">Pay Full Course Fee</span>
+                                <input type="radio" name="booking-payment-type" value="full" onchange="updatePaymentCalculation()" class="text-mint focus:ring-mint">
+                            </div>
+                            <div class="font-display text-2xl text-white mt-1" id="book-full-fee-display">₹34,999</div>
+                            <div class="text-[11px] text-slate-300 mt-1 leading-snug">
+                                Complete your entire fee in a single transaction.
+                            </div>
+                            <div class="mt-2 text-[10px] font-mono text-emerald-400 font-semibold flex items-center gap-1">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span>Remaining Balance: ₹0 (Fully Paid)</span>
+                            </div>
+                        </label>
+
+                    </div>
+                </div>
+
+                <!-- STUDENT DETAILS FIELDS -->
+                <div class="space-y-3 pt-2">
+                    <div class="text-xs font-mono font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                        <i class="fa-solid fa-user text-mint"></i> Student Information
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <!-- Full Name -->
+                        <div>
+                            <label class="block text-[11px] font-mono text-slate-300 mb-1">Full Name <span class="text-mint">*</span></label>
+                            <input type="text" id="book-name" required placeholder="e.g. Rahul Sharma" class="glass-input w-full">
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label class="block text-[11px] font-mono text-slate-300 mb-1">Email Address <span class="text-mint">*</span></label>
+                            <input type="email" id="book-email" required placeholder="e.g. rahul.sharma@example.com" class="glass-input w-full">
+                        </div>
+
+                        <!-- Mobile Number -->
+                        <div>
+                            <label class="block text-[11px] font-mono text-slate-300 mb-1">Mobile Number (10 digits) <span class="text-mint">*</span></label>
+                            <input type="tel" id="book-phone" required placeholder="e.g. 9876543210" class="glass-input w-full">
+                        </div>
+
+                        <!-- WhatsApp Number -->
+                        <div>
+                            <label class="block text-[11px] font-mono text-slate-300 mb-1">WhatsApp Number</label>
+                            <input type="tel" id="book-whatsapp" placeholder="Same as mobile if blank" class="glass-input w-full">
+                        </div>
+
+                        <!-- College / Institution -->
+                        <div>
+                            <label class="block text-[11px] font-mono text-slate-300 mb-1">College / Institution Name</label>
+                            <input type="text" id="book-college" placeholder="e.g. RV College of Engineering" class="glass-input w-full">
+                        </div>
+
+                        <!-- Department -->
+                        <div>
+                            <label class="block text-[11px] font-mono text-slate-300 mb-1">Department / Branch</label>
+                            <input type="text" id="book-department" placeholder="e.g. Computer Science / Mechanical" class="glass-input w-full">
+                        </div>
+
+                        <!-- Year of Study -->
+                        <div>
+                            <label class="block text-[11px] font-mono text-slate-300 mb-1">Current Year of Study</label>
+                            <select id="book-year" class="glass-input w-full bg-[#172126] cursor-pointer">
+                                <option value="1st Year">1st Year Undergraduate</option>
+                                <option value="2nd Year">2nd Year Undergraduate</option>
+                                <option value="3rd Year">3rd Year Undergraduate</option>
+                                <option value="4th Year / Final Year" selected>4th Year / Final Year</option>
+                                <option value="Recent Graduate">Recent Graduate</option>
+                                <option value="Working Professional">Working Professional</option>
+                            </select>
+                        </div>
+
+                        <!-- State -->
+                        <div>
+                            <label class="block text-[11px] font-mono text-slate-300 mb-1">State / Location</label>
+                            <input type="text" id="book-state" placeholder="e.g. Karnataka" class="glass-input w-full">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REAL-TIME ORDER SUMMARY BOX -->
+                <div class="p-4 rounded-2xl bg-black/80 border border-mint/40 font-mono text-xs space-y-2">
+                    <div class="flex justify-between text-slate-400">
+                        <span>Total Course Fee:</span>
+                        <span class="text-white font-bold" id="summary-total-fee">₹34,999</span>
+                    </div>
+                    <div class="flex justify-between text-slate-400">
+                        <span>Amount Payable Now:</span>
+                        <span class="text-mint font-bold text-base" id="summary-payable-now">₹2,499</span>
+                    </div>
+                    <div class="flex justify-between text-slate-400 pt-1 border-t border-white/10">
+                        <span>Remaining Balance After Payment:</span>
+                        <span class="text-amber-300 font-bold" id="summary-remaining-balance">₹32,500</span>
+                    </div>
+                    <div class="text-[10px] text-slate-400 pt-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-shield-halved text-mint"></i>
+                        <span>Secured via official Razorpay 256-bit encrypted checkout.</span>
+                    </div>
+                </div>
+
+                <!-- Validation Error Banner -->
+                <div id="booking-error-banner" class="hidden p-3 rounded-xl bg-red-950/80 border border-red-500/60 text-red-200 text-xs font-mono flex items-start gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5"></i>
+                    <span id="booking-error-text">Please correct the highlighted fields.</span>
+                </div>
+
+                <!-- Hidden form inputs -->
+                <input type="hidden" id="book-course-id" value="">
+
+                <!-- Proceed to Payment Button -->
+                <button type="submit" id="book-pay-btn" class="w-full py-4 rounded-xl bg-mint hover:bg-mint-light text-black font-mono text-xs font-bold uppercase tracking-widest shadow-xl transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-lock"></i>
+                    <span id="book-pay-btn-label">PROCEED TO PAY ₹2,499 (RAZORPAY)</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         PAYMENT SUCCESS & RECEIPT CONFIRMATION MODAL
+         ========================================================================= -->
+    <div id="payment-success-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-black/95 rounded-3xl max-w-xl w-full max-h-[92vh] overflow-y-auto shadow-2xl relative border border-mint p-6 sm:p-8 space-y-6 text-white text-center">
+            
+            <div class="w-16 h-16 rounded-full bg-mint/20 border border-mint text-mint flex items-center justify-center mx-auto text-3xl shadow-xl shadow-mint/20">
+                <i class="fa-solid fa-check"></i>
+            </div>
+
+            <div>
+                <span class="px-3 py-1 bg-mint/20 text-mint border border-mint/40 text-[10px] font-mono font-bold uppercase rounded-full tracking-wider">
+                    Payment Successful
+                </span>
+                <h2 class="font-display text-3xl sm:text-4xl text-white uppercase mt-2">Your Course Registration Has Been Received!</h2>
+                <p class="text-xs text-slate-300 font-mono mt-1" id="success-tailored-note">
+                    Your ₹2,499 advance payment is confirmed. Your course slot reservation has been recorded.
+                </p>
+            </div>
+
+            <!-- Verified Details Box -->
+            <div class="p-5 rounded-2xl bg-white/5 border border-white/10 text-left font-mono text-xs space-y-2.5">
+                <div class="flex justify-between py-1 border-b border-white/10">
+                    <span class="text-slate-400">Registration ID</span>
+                    <span class="text-mint font-bold" id="success-reg-id">NDV2026-1001</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-white/10">
+                    <span class="text-slate-400">Student Name</span>
+                    <span class="text-white font-bold" id="success-student-name">Rahul Sharma</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-white/10">
+                    <span class="text-slate-400">Course Name</span>
+                    <span class="text-white" id="success-course-name">Artificial Intelligence</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-white/10">
+                    <span class="text-slate-400">Total Course Fee</span>
+                    <span class="text-white font-bold" id="success-total-fee">₹34,999</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-white/10 bg-mint/10 px-2 rounded">
+                    <span class="text-mint font-bold">Amount Paid</span>
+                    <span class="text-mint font-bold text-sm" id="success-amount-paid">₹2,499</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-white/10">
+                    <span class="text-slate-400">Remaining Balance</span>
+                    <span class="text-amber-300 font-bold" id="success-remaining-balance">₹32,500</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-white/10">
+                    <span class="text-slate-400">Payment Reference</span>
+                    <span class="text-slate-300 text-[10px]" id="success-payment-id">pay_sample123</span>
+                </div>
+                <div class="flex justify-between py-1">
+                    <span class="text-slate-400">Payment Status</span>
+                    <span class="text-emerald-400 font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span id="success-payment-status">Advance Paid – Slot Reserved</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-3 pt-2">
+                <button onclick="downloadVerifiedReceipt()" class="w-full py-3.5 rounded-xl bg-mint hover:bg-mint-light text-black font-mono text-xs font-bold uppercase tracking-wider shadow-lg transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Download Official Payment Receipt</span>
+                </button>
+                <div class="flex gap-3">
+                    <button onclick="closeSuccessModal()" class="flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-mono text-xs font-bold uppercase tracking-wider transition">
+                        Back to Home
+                    </button>
+                    <a href="https://wa.me/919787076296" target="_blank" class="flex-1 py-3 rounded-xl border border-mint/40 text-mint hover:bg-mint hover:text-black font-mono text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5">
+                        <i class="fa-brands fa-whatsapp"></i> Contact Support
+                    </a>
+                </div>
+            </div>
+
+            <p class="text-[11px] font-mono text-slate-400">
+                A copy of this payment receipt has also been dispatched to your email address.
+            </p>
+        </div>
+    </div>
+
+    <!-- External Script File -->
+    <script src="script.js"></script>
+</body>
+</html>

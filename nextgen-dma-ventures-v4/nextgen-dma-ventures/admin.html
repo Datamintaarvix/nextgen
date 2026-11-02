@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard &bull; NEXTGEN DNA VENTURES</title>
+  
+  <!-- Google Fonts: Space Grotesk & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandWhite: '#FFFFFF',
+            brandBlack: '#000000',
+            mint: '#65D2C5',
+            'mint-dark': '#008779',
+            'mint-light': '#bbf3ec'
+          },
+          fontFamily: {
+            sans: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+            display: ['Space Grotesk', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --mint: #65D2C5;
+      --mint-glow: rgba(101, 210, 197, 0.25);
+    }
+    body {
+      background-color: #0b0f12;
+      color: #ffffff;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .glass-panel {
+      background: rgba(18, 24, 28, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(101, 210, 197, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    .glass-input {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(101, 210, 197, 0.25);
+      color: #ffffff;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .glass-input:focus {
+      border-color: #65D2C5;
+      box-shadow: 0 0 12px rgba(101, 210, 197, 0.3);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .btn-mint {
+      background: #65D2C5;
+      color: #000000;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 9px 18px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-mint:hover {
+      background: #8ae2d8;
+      box-shadow: 0 0 16px rgba(101, 210, 197, 0.4);
+      transform: translateY(-1px);
+    }
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+      border: 1px solid rgba(101, 210, 197, 0.3);
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-outline:hover {
+      background: rgba(101, 210, 197, 0.15);
+      border-color: #65D2C5;
+      color: #65D2C5;
+    }
+    .tab-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      transition: all 0.2s;
+    }
+    .tab-pill.active {
+      background: #65D2C5;
+      color: #000000;
+      font-weight: 700;
+      border-color: #65D2C5;
+    }
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0b0f12; }
+    ::-webkit-scrollbar-thumb { background: rgba(101, 210, 197, 0.3); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #65D2C5; }
+  </style>
+</head>
+<body class="min-h-screen antialiased flex flex-col justify-between">
+
+  <!-- =========================================================================
+       1. AUTH VIEW: ADMIN LOGIN SCREEN (Shown if not logged in)
+       ========================================================================= -->
+  <div id="login-view" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-2xl">
+    <div class="glass-panel p-8 sm:p-10 rounded-3xl max-w-md w-full relative overflow-hidden border border-mint/40 shadow-2xl">
+      <div class="absolute -top-20 -right-20 w-44 h-44 rounded-full bg-mint/10 filter blur-3xl pointer-events-none"></div>
+      
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/5 border border-mint/40 mb-3 shadow-lg">
+          <i class="fa-solid fa-shield-halved text-2xl text-mint"></i>
+        </div>
+        <h1 class="font-display text-2xl font-black uppercase tracking-wider text-white">NEXTGEN <span class="text-mint">ADMIN</span></h1>
+        <p class="text-slate-400 font-mono text-xs mt-1">Course Admissions &bull; Razorpay Payment Console</p>
+      </div>
+
+      <form id="admin-login-form" onsubmit="handleAdminLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-mono font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Admin Email</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="email" id="login-email" required placeholder="admin@nextgendma.com" class="glass-input w-full pl-10 text-white font-mono text-xs">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Password</label>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="password" id="login-password" required placeholder="••••••••••••" class="glass-input w-full pl-10 text-white text-xs">
+          </div>
+        </div>
+
+        <div id="login-error-box" class="hidden p-3 rounded-xl bg-red-950/80 border border-red-500/60 text-red-200 text-xs font-mono flex items-start gap-2">
+          <i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5"></i>
+          <span id="login-error-text"></span>
+        </div>
+
+        <button type="submit" id="login-submit-btn" class="w-full btn-mint justify-center py-3.5 mt-2">
+          <span>Authorize Admin Access</span>
+          <i class="fa-solid fa-arrow-right text-xs"></i>
+        </button>
+
+        <div class="pt-2 text-center text-[11px] font-mono text-slate-500">
+          Default seed credentials: <code class="text-mint">admin@nextgendma.com</code> / <code class="text-mint">NextgenAdmin2026!</code>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       2. DASHBOARD VIEW: MAIN ADMIN CONSOLE (Shown after authentication)
+       ========================================================================= -->
+  <div id="dashboard-view" class="hidden flex-1 flex flex-col">
+    
+    <!-- Top Fixed Admin Navbar -->
+    <header class="glass-panel sticky top-0 z-40 border-b border-mint/20 px-4 lg:px-8 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="./logo.jpeg" alt="Logo" class="w-9 h-9 object-contain rounded-lg border border-white/20">
+        <div>
+          <div class="font-display font-black text-sm tracking-wider text-white">NEXTGEN <span class="text-mint">DNA</span> VENTURES</div>
+          <div class="font-mono text-[9px] text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-mint animate-pulse"></span>
+            <span>Admissions &bull; Payment Management Console</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="/" target="_blank" class="btn-outline hidden sm:inline-flex text-xs">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>View Public Site</span>
+        </a>
+        <div class="h-6 w-px bg-white/10 hidden sm:block"></div>
+        <div class="text-right hidden md:block">
+          <div class="text-xs font-bold text-white" id="admin-user-display">Super Admin</div>
+          <div class="text-[10px] font-mono text-mint" id="admin-email-display">admin@nextgendma.com</div>
+        </div>
+        <button onclick="handleAdminLogout()" class="btn-outline border-red-500/30 text-red-300 hover:bg-red-950/40 hover:text-red-200 text-xs">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span class="hidden sm:inline">Logout</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 container mx-auto px-4 lg:px-8 py-8 space-y-8">
+      
+      <!-- Top Title & Quick Actions Row -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="font-display text-2xl sm:text-3xl font-black uppercase text-white tracking-tight">Overview Dashboard</h2>
+          <p class="text-xs font-mono text-slate-400 mt-1">Real-time registration statistics, Razorpay collections, and candidate pipeline.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2.5">
+          <button onclick="exportRegistrationsCSV()" class="btn-outline text-xs">
+            <i class="fa-solid fa-file-csv text-mint"></i>
+            <span>Export Registrations</span>
+          </button>
+          <button onclick="exportPaymentsCSV()" class="btn-outline text-xs">
+            <i class="fa-solid fa-receipt text-mint"></i>
+            <span>Export Payments</span>
+          </button>
+          <button onclick="fetchDashboardData()" class="btn-mint text-xs">
+            <i class="fa-solid fa-rotate text-xs"></i>
+            <span>Refresh Data</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 8 STAT CARDS GRID -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="stats-grid">
+        <!-- 1. Total Registrations -->
+        <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group hover:border-mint transition">
+          <div class="text-[10px] font-mono uppercase text-slate-400 tracking-wider">Total Registrations</div>
+          <div class="text-2xl sm:text-3xl font-display font-black text-white mt-1" id="stat-total-regs">0</div>
+          <div class="text-[10px] font-mono text-slate-400 mt-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-users text-mint"></i> Candidates Enrolled
+          </div>
+        </div>
+
+        <!-- 2. Advance Payments -->
+        <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group hover:border-mint transition">
+          <div class="text-[10px] font-mono uppercase text-slate-400 tracking-wider">Advance Paid (₹2,499)</div>
+          <div class="text-2xl sm:text-3xl font-display font-black text-mint mt-1" id="stat-advance-paid">0</div>
+          <div class="text-[10px] font-mono text-slate-400 mt-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-ticket text-mint"></i> Slot Reservations
+          </div>
+        </div>
+
+        <!-- 3. Fully Paid -->
+        <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group hover:border-mint transition">
+          <div class="text-[10px] font-mono uppercase text-slate-400 tracking-wider">Fully Paid</div>
+          <div class="text-2xl sm:text-3xl font-display font-black text-white mt-1" id="stat-full-paid">0</div>
+          <div class="text-[10px] font-mono text-slate-400 mt-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-check text-mint"></i> 100% Cleared
+          </div>
+        </div>
+
+        <!-- 4. Total Revenue Collected -->
+        <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group hover:border-mint transition bg-mint/5 border-mint/40">
+          <div class="text-[10px] font-mono uppercase text-mint font-bold tracking-wider">Revenue Collected</div>
+          <div class="text-2xl sm:text-3xl font-display font-black text-white mt-1" id="stat-total-revenue">₹0</div>
+          <div class="text-[10px] font-mono text-mint mt-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-indian-rupee-sign"></i> Verified in Gateway
+          </div>
+        </div>
+
+        <!-- 5. Pending Balances -->
+        <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group hover:border-amber-400 transition">
+          <div class="text-[10px] font-mono uppercase text-slate-400 tracking-wider">Outstanding Balances</div>
+          <div class="text-2xl sm:text-3xl font-display font-black text-amber-300 mt-1" id="stat-pending-balance">₹0</div>
+          <div class="text-[10px] font-mono text-slate-400 mt-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> Balance to Collect
+          </div>
+        </div>
+
+        <!-- 6. Failed Payments -->
+        <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group hover:border-red-400 transition">
+          <div class="text-[10px] font-mono uppercase text-slate-400 tracking-wider">Failed / Cancelled</div>
+          <div class="text-2xl sm:text-3xl font-display font-black text-red-400 mt-1" id="stat-failed-payments">0</div>
+          <div class="text-[10px] font-mono text-slate-400 mt-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-xmark text-red-400"></i> Abandoned / Dropped
+          </div>
+        </div>
+
+        <!-- 7. Pending Payments -->
+        <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group hover:border-slate-400 transition">
+          <div class="text-[10px] font-mono uppercase text-slate-400 tracking-wider">Payment Initiated</div>
+          <div class="text-2xl sm:text-3xl font-display font-black text-slate-300 mt-1" id="stat-pending-payments">0</div>
+          <div class="text-[10px] font-mono text-slate-400 mt-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-hourglass-half text-slate-400"></i> Awaiting Checkout
+          </div>
+        </div>
+
+        <!-- 8. Today's Registrations -->
+        <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group hover:border-mint transition">
+          <div class="text-[10px] font-mono uppercase text-slate-400 tracking-wider">Today's Registrations</div>
+          <div class="text-2xl sm:text-3xl font-display font-black text-mint mt-1" id="stat-today-regs">0</div>
+          <div class="text-[10px] font-mono text-slate-400 mt-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-calendar-day text-mint"></i> Current Date Pipeline
+          </div>
+        </div>
+      </div>
+
+      <!-- REGISTRATIONS MANAGEMENT SECTION -->
+      <div class="glass-panel p-6 sm:p-8 rounded-3xl space-y-6">
+        
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+          <div>
+            <h3 class="font-display text-xl font-bold uppercase text-white flex items-center gap-2">
+              <i class="fa-solid fa-table-list text-mint"></i>
+              <span>Registered Students &amp; Transactions</span>
+            </h3>
+            <p class="text-xs font-mono text-slate-400 mt-1">Search, filter by payment status or course category, and view individual profiles.</p>
+          </div>
+          <div class="text-xs font-mono text-slate-400">
+            Showing <strong id="table-showing-count" class="text-mint">0</strong> records
+          </div>
+        </div>
+
+        <!-- Filter & Search Controls Bar -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5">
+          <!-- Search box -->
+          <div class="md:col-span-5 relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="admin-search-input" onkeyup="debounceSearch()" placeholder="Search by name, reg ID, email, phone, course, payment ID..." class="glass-input w-full pl-10 text-xs">
+          </div>
+
+          <!-- Status Filter -->
+          <div class="md:col-span-3">
+            <select id="admin-status-filter" onchange="fetchRegistrations()" class="glass-input w-full cursor-pointer text-xs font-mono bg-[#172126]">
+              <option value="all">Status: All Statuses</option>
+              <option value="Advance Paid">Advance Paid – Slot Reserved</option>
+              <option value="Fully Paid">Fully Paid</option>
+              <option value="Payment Pending">Payment Pending / Initiated</option>
+              <option value="Payment Failed">Payment Failed / Cancelled</option>
+            </select>
+          </div>
+
+          <!-- Category Filter -->
+          <div class="md:col-span-3">
+            <select id="admin-category-filter" onchange="fetchRegistrations()" class="glass-input w-full cursor-pointer text-xs font-mono bg-[#172126]">
+              <option value="all">Category: All 7 Categories</option>
+              <option value="Artificial Intelligence & Data Technologies">AI &amp; Data Technologies</option>
+              <option value="Software Development">Software Development</option>
+              <option value="Security & Infrastructure">Security &amp; Infrastructure</option>
+              <option value="Design & Quality">Design &amp; Quality</option>
+              <option value="Mechanical Engineering">Mechanical Engineering</option>
+              <option value="Automobile Engineering">Automobile Engineering</option>
+              <option value="Advanced Technology">Advanced Technology</option>
+            </select>
+          </div>
+
+          <!-- Reset Filter -->
+          <div class="md:col-span-1">
+            <button onclick="resetAdminFilters()" title="Reset Filters" class="btn-outline w-full justify-center py-2.5">
+              <i class="fa-solid fa-rotate-left text-xs"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Data Table Container -->
+        <div class="overflow-x-auto rounded-xl border border-white/10">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-black/80 font-mono text-[10px] uppercase text-slate-400 tracking-wider border-b border-white/10">
+              <tr>
+                <th class="py-3.5 px-4">Reg ID</th>
+                <th class="py-3.5 px-4">Student Name</th>
+                <th class="py-3.5 px-4">Contact</th>
+                <th class="py-3.5 px-4">Course &amp; Category</th>
+                <th class="py-3.5 px-4 text-right">Fee (INR)</th>
+                <th class="py-3.5 px-4 text-right">Paid</th>
+                <th class="py-3.5 px-4 text-right">Balance</th>
+                <th class="py-3.5 px-4">Type</th>
+                <th class="py-3.5 px-4">Status</th>
+                <th class="py-3.5 px-4">Date</th>
+                <th class="py-3.5 px-4 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="registrations-tbody" class="divide-y divide-white/5 font-sans">
+              <!-- Populated via fetchRegistrations() -->
+            </tbody>
+          </table>
+          <div id="table-empty-state" class="hidden py-16 text-center text-slate-400 font-mono text-xs">
+            <i class="fa-solid fa-magnifying-glass text-2xl text-slate-600 mb-2 block"></i>
+            No student registrations found matching the specified filters.
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-4 px-8 text-center text-[11px] font-mono text-slate-500">
+      &copy; 2026 NEXTGEN DNA VENTURES &bull; Enterprise Admissions Engine &bull; HSR Layout, Sector 1, Bangalore
+    </footer>
+
+  </div>
+
+  <!-- =========================================================================
+       3. REGISTRATION DETAILS DRAWER / MODAL
+       ========================================================================= -->
+  <div id="details-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-panel rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-y-auto border border-mint/40 shadow-2xl relative p-6 sm:p-8 space-y-6">
+      
+      <!-- Close button -->
+      <button onclick="closeDetailsModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/10 hover:bg-mint hover:text-black flex items-center justify-center transition text-white">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+
+      <div class="flex items-center gap-3 border-b border-white/10 pb-4">
+        <div class="w-10 h-10 rounded-xl bg-mint/20 text-mint border border-mint/40 flex items-center justify-center font-bold text-sm">
+          <i class="fa-solid fa-user-graduate"></i>
+        </div>
+        <div>
+          <h3 class="font-display text-xl font-bold uppercase text-white" id="modal-student-name">Student Profile</h3>
+          <div class="font-mono text-xs text-mint" id="modal-reg-id">NDV2026-0000</div>
+        </div>
+      </div>
+
+      <div id="modal-content-body" class="space-y-6 text-xs">
+        <!-- Loaded dynamically via viewRegistrationDetails(regId) -->
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Front-end Logic Script for Admin Panel -->
+  <script>
+    let searchDebounceTimer = null;
+
+    // Check session on initial load
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAdminSession();
+    });
+
+    async function checkAdminSession() {
+      try {
+        const res = await fetch('/api/admin/check-session');
+        const data = await res.json();
+        if (data.authenticated) {
+          showDashboardView(data.user);
+        } else {
+          showLoginView();
+        }
+      } catch (err) {
+        showLoginView();
+      }
+    }
+
+    function showLoginView() {
+      document.getElementById('login-view').classList.remove('hidden');
+      document.getElementById('dashboard-view').classList.add('hidden');
+    }
+
+    function showDashboardView(user) {
+      document.getElementById('login-view').classList.add('hidden');
+      document.getElementById('dashboard-view').classList.remove('hidden');
+
+      if (user) {
+        if (user.name) document.getElementById('admin-user-display').textContent = user.name;
+        if (user.email) document.getElementById('admin-email-display').textContent = user.email;
+      }
+
+      fetchDashboardData();
+    }
+
+    async function handleAdminLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const errBox = document.getElementById('login-error-box');
+      const errText = document.getElementById('login-error-text');
+      const submitBtn = document.getElementById('login-submit-btn');
+
+      errBox.classList.add('hidden');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          showDashboardView(data.user);
+        } else {
+          errText.textContent = data.error || 'Login failed. Please check your credentials.';
+          errBox.classList.remove('hidden');
+        }
+      } catch (err) {
+        errText.textContent = 'Server connection error. Please try again.';
+        errBox.classList.remove('hidden');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Authorize Admin Access</span> <i class="fa-solid fa-arrow-right text-xs"></i>';
+      }
+    }
+
+    async function handleAdminLogout() {
+      try {
+        await fetch('/api/admin/logout', { method: 'POST' });
+      } catch (e) {}
+      showLoginView();
+    }
+
+    async function fetchDashboardData() {
+      await Promise.all([
+        fetchStats(),
+        fetchRegistrations()
+      ]);
+    }
+
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/admin/dashboard-stats');
+        const data = await res.json();
+        if (data.success && data.stats) {
+          const s = data.stats;
+          document.getElementById('stat-total-regs').textContent = s.totalRegistrations || 0;
+          document.getElementById('stat-advance-paid').textContent = s.advancePayments || 0;
+          document.getElementById('stat-full-paid').textContent = s.fullPayments || 0;
+          document.getElementById('stat-total-revenue').textContent = '₹' + Number(s.totalRevenueCollected || 0).toLocaleString('en-IN');
+          document.getElementById('stat-pending-balance').textContent = '₹' + Number(s.pendingBalances || 0).toLocaleString('en-IN');
+          document.getElementById('stat-failed-payments').textContent = s.failedPayments || 0;
+          document.getElementById('stat-pending-payments').textContent = s.pendingPayments || 0;
+          document.getElementById('stat-today-regs').textContent = s.todayRegistrations || 0;
+        }
+      } catch (err) {
+        console.error('Failed to fetch stats:', err);
+      }
+    }
+
+    async function fetchRegistrations() {
+      const search = document.getElementById('admin-search-input').value.trim();
+      const status = document.getElementById('admin-status-filter').value;
+      const category = document.getElementById('admin-category-filter').value;
+
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+      if (status !== 'all') params.append('status', status);
+      if (category !== 'all') params.append('category', category);
+
+      try {
+        const res = await fetch(`/api/admin/registrations?${params.toString()}`);
+        const data = await res.json();
+        const tbody = document.getElementById('registrations-tbody');
+        const emptyState = document.getElementById('table-empty-state');
+        const showingCount = document.getElementById('table-showing-count');
+
+        if (!data.success || !data.registrations || data.registrations.length === 0) {
+          tbody.innerHTML = '';
+          emptyState.classList.remove('hidden');
+          showingCount.textContent = '0';
+          return;
+        }
+
+        emptyState.classList.add('hidden');
+        showingCount.textContent = data.registrations.length;
+
+        tbody.innerHTML = data.registrations.map(r => {
+          let statusBadgeClass = 'bg-slate-800 text-slate-300 border-slate-700';
+          if (r.registration_status.includes('Advance Paid')) statusBadgeClass = 'bg-mint/20 text-mint border-mint/40 font-bold';
+          else if (r.registration_status.includes('Fully Paid')) statusBadgeClass = 'bg-emerald-950 text-emerald-300 border-emerald-500/40 font-bold';
+          else if (r.registration_status.includes('Failed')) statusBadgeClass = 'bg-red-950 text-red-300 border-red-500/40';
+
+          const formattedDate = new Date(r.created_at).toLocaleDateString('en-IN', {
+            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+          });
+
+          return `
+            <tr class="hover:bg-white/5 transition">
+              <td class="py-3 px-4 font-mono font-bold text-mint">${r.registration_id}</td>
+              <td class="py-3 px-4">
+                <div class="font-bold text-white">${r.student_name}</div>
+                <div class="text-[10px] text-slate-400 font-mono">${r.student_email}</div>
+              </td>
+              <td class="py-3 px-4 font-mono text-[11px] text-slate-300">
+                <a href="tel:${r.student_phone}" class="hover:text-mint">${r.student_phone}</a>
+              </td>
+              <td class="py-3 px-4">
+                <div class="font-medium text-white">${r.course_name}</div>
+                <div class="text-[10px] text-slate-400 font-mono">${r.course_category || ''} (${r.course_duration || ''})</div>
+              </td>
+              <td class="py-3 px-4 text-right font-mono text-slate-300">₹${Number(r.total_course_fee).toLocaleString('en-IN')}</td>
+              <td class="py-3 px-4 text-right font-mono font-bold ${r.total_amount_paid > 0 ? 'text-mint' : 'text-slate-400'}">₹${Number(r.total_amount_paid).toLocaleString('en-IN')}</td>
+              <td class="py-3 px-4 text-right font-mono ${r.remaining_balance > 0 ? 'text-amber-300' : 'text-emerald-400'}">₹${Number(r.remaining_balance).toLocaleString('en-IN')}</td>
+              <td class="py-3 px-4 font-mono text-[10px] uppercase text-slate-300">${r.payment_type}</td>
+              <td class="py-3 px-4">
+                <span class="inline-block px-2.5 py-1 rounded-full text-[10px] font-mono border ${statusBadgeClass}">
+                  ${r.registration_status}
+                </span>
+              </td>
+              <td class="py-3 px-4 font-mono text-[10px] text-slate-400">${formattedDate}</td>
+              <td class="py-3 px-4 text-center">
+                <button onclick="viewRegistrationDetails('${r.registration_id}')" class="btn-outline py-1 px-2.5 text-[11px]" title="View Full Details">
+                  <i class="fa-solid fa-eye text-mint"></i>
+                  <span>View</span>
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error('Failed to fetch registrations:', err);
+      }
+    }
+
+    function debounceSearch() {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        fetchRegistrations();
+      }, 300);
+    }
+
+    function resetAdminFilters() {
+      document.getElementById('admin-search-input').value = '';
+      document.getElementById('admin-status-filter').value = 'all';
+      document.getElementById('admin-category-filter').value = 'all';
+      fetchRegistrations();
+    }
+
+    async function viewRegistrationDetails(regId) {
+      try {
+        const res = await fetch(`/api/admin/registrations/${regId}`);
+        const data = await res.json();
+        if (!data.success || !data.registration) {
+          alert('Could not find registration details.');
+          return;
+        }
+
+        const r = data.registration;
+        const s = r.student || {};
+        const payments = r.payments || [];
+        const emails = r.email_logs || [];
+
+        document.getElementById('modal-student-name').textContent = s.full_name || 'Student Details';
+        document.getElementById('modal-reg-id').textContent = r.registration_id;
+
+        const body = document.getElementById('modal-content-body');
+        body.innerHTML = `
+          <!-- 1. Quick Financial Summary Banner -->
+          <div class="glass-panel p-4 rounded-2xl border border-mint/40 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+            <div>
+              <div class="text-[10px] font-mono text-slate-400 uppercase">Total Fee</div>
+              <div class="text-base font-bold text-white mt-0.5">₹${Number(r.total_course_fee).toLocaleString('en-IN')}</div>
+            </div>
+            <div>
+              <div class="text-[10px] font-mono text-slate-400 uppercase">Amount Paid</div>
+              <div class="text-base font-bold text-mint mt-0.5">₹${Number(r.total_amount_paid).toLocaleString('en-IN')}</div>
+            </div>
+            <div>
+              <div class="text-[10px] font-mono text-slate-400 uppercase">Balance</div>
+              <div class="text-base font-bold ${r.remaining_balance > 0 ? 'text-amber-400' : 'text-emerald-400'} mt-0.5">₹${Number(r.remaining_balance).toLocaleString('en-IN')}</div>
+            </div>
+            <div>
+              <div class="text-[10px] font-mono text-slate-400 uppercase">Status</div>
+              <div class="text-xs font-mono font-bold mt-1 text-mint">${r.registration_status}</div>
+            </div>
+          </div>
+
+          <!-- 2. Student & Course Info Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- Student Information -->
+            <div class="glass-panel p-4 rounded-2xl space-y-2">
+              <h4 class="font-mono text-xs uppercase font-bold text-mint flex items-center gap-2">
+                <i class="fa-solid fa-id-card"></i> Student Information
+              </h4>
+              <div class="space-y-1.5 text-slate-300 font-mono text-[11px]">
+                <div><span class="text-slate-500">Email:</span> <a href="mailto:${s.email}" class="text-white hover:text-mint">${s.email}</a></div>
+                <div><span class="text-slate-500">Mobile:</span> <a href="tel:${s.phone}" class="text-white hover:text-mint">${s.phone}</a></div>
+                <div><span class="text-slate-500">WhatsApp:</span> <a href="https://wa.me/${s.whatsapp}" target="_blank" class="text-white hover:text-mint">${s.whatsapp}</a></div>
+                <div><span class="text-slate-500">College:</span> ${s.college || 'Not specified'}</div>
+                <div><span class="text-slate-500">Department:</span> ${s.department || 'Not specified'}</div>
+                <div><span class="text-slate-500">Year of Study:</span> ${s.year_of_study || 'Not specified'}</div>
+                <div><span class="text-slate-500">State:</span> ${s.state || 'Not specified'}</div>
+              </div>
+            </div>
+
+            <!-- Course Information -->
+            <div class="glass-panel p-4 rounded-2xl space-y-2">
+              <h4 class="font-mono text-xs uppercase font-bold text-mint flex items-center gap-2">
+                <i class="fa-solid fa-graduation-cap"></i> Course Track
+              </h4>
+              <div class="space-y-1.5 text-slate-300 font-mono text-[11px]">
+                <div><span class="text-slate-500">Course:</span> <strong class="text-white">${r.course_name}</strong></div>
+                <div><span class="text-slate-500">Category:</span> ${r.course_category}</div>
+                <div><span class="text-slate-500">Duration:</span> ${r.course_duration}</div>
+                <div><span class="text-slate-500">Payment Option:</span> <span class="uppercase text-mint">${r.payment_type}</span></div>
+                <div><span class="text-slate-500">Registered On:</span> ${new Date(r.created_at).toLocaleString('en-IN')}</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 3. Payment Transactions History -->
+          <div class="glass-panel p-4 rounded-2xl space-y-3">
+            <h4 class="font-mono text-xs uppercase font-bold text-mint flex items-center justify-between">
+              <span class="flex items-center gap-2"><i class="fa-solid fa-receipt"></i> Verified Transactions (${payments.length})</span>
+            </h4>
+            
+            ${payments.length === 0 ? '<div class="text-slate-500 font-mono text-[11px]">No transactions recorded yet.</div>' : `
+              <div class="space-y-2 font-mono text-[11px]">
+                ${payments.map(p => `
+                  <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <div class="text-white font-bold">₹${Number(p.amount).toLocaleString('en-IN')} &bull; <span class="text-mint">${p.payment_type}</span></div>
+                      <div class="text-[10px] text-slate-400">Order ID: ${p.razorpay_order_id || 'N/A'} | Pay ID: ${p.razorpay_payment_id || 'N/A'}</div>
+                    </div>
+                    <div class="text-right">
+                      <span class="px-2 py-0.5 rounded text-[10px] ${p.payment_status === 'success' ? 'bg-emerald-950 text-emerald-300' : 'bg-red-950 text-red-300'}">${p.payment_status}</span>
+                      <div class="text-[10px] text-slate-500 mt-1">${p.verified_at ? new Date(p.verified_at).toLocaleDateString('en-IN') : new Date(p.created_at).toLocaleDateString('en-IN')}</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `}
+
+            <!-- Record Additional Payment for Outstanding Balance -->
+            ${r.remaining_balance > 0 ? `
+              <div class="pt-3 border-t border-white/10">
+                <div class="text-xs font-mono font-bold text-amber-300 mb-2 flex items-center gap-1.5">
+                  <i class="fa-solid fa-plus-circle"></i> Record Subsequent Balance Payment
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <input type="number" id="manual-amount" placeholder="Amount (e.g. ${r.remaining_balance})" max="${r.remaining_balance}" class="glass-input font-mono text-xs">
+                  <input type="text" id="manual-method" placeholder="Payment Method / Ref (e.g. UPI / NEFT)" class="glass-input font-mono text-xs">
+                  <button onclick="recordBalancePayment('${r.registration_id}')" class="btn-mint text-xs justify-center">
+                    <span>Record Payment</span>
+                  </button>
+                </div>
+              </div>
+            ` : ''}
+
+          </div>
+
+          <!-- 4. Email Log & Receipt Actions -->
+          <div class="glass-panel p-4 rounded-2xl space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <h4 class="font-mono text-xs uppercase font-bold text-mint flex items-center gap-2">
+                <i class="fa-solid fa-envelope"></i> Receipt Email Status (${emails.length})
+              </h4>
+              <div class="flex items-center gap-2">
+                <button onclick="resendReceipt('${r.registration_id}')" class="btn-outline text-xs">
+                  <i class="fa-solid fa-paper-plane text-mint"></i>
+                  <span>Resend Receipt Email</span>
+                </button>
+                <button onclick="printStudentReceipt('${r.registration_id}')" class="btn-mint text-xs">
+                  <i class="fa-solid fa-print"></i>
+                  <span>Print Receipt</span>
+                </button>
+              </div>
+            </div>
+
+            ${emails.length > 0 ? `
+              <div class="space-y-1 font-mono text-[10px] text-slate-400">
+                ${emails.map(e => `
+                  <div class="flex items-center justify-between py-1 border-b border-white/5">
+                    <span>${e.email} &bull; ${e.email_type}</span>
+                    <span class="${e.delivery_status === 'sent' || e.delivery_status === 'simulated' ? 'text-emerald-400' : 'text-red-400'} uppercase font-bold">${e.delivery_status}</span>
+                    <span>${new Date(e.sent_at).toLocaleTimeString('en-IN')}</span>
+                  </div>
+                `).join('')}
+              </div>
+            ` : '<div class="text-slate-500 font-mono text-[11px]">No emails dispatched yet.</div>'}
+          </div>
+
+          <!-- 5. Internal Registration Notes -->
+          <div class="glass-panel p-4 rounded-2xl space-y-2">
+            <h4 class="font-mono text-xs uppercase font-bold text-mint flex items-center gap-2">
+              <i class="fa-solid fa-note-sticky"></i> Internal Notes &amp; Admission Comments
+            </h4>
+            <textarea id="modal-internal-notes" rows="3" class="glass-input w-full font-mono text-xs" placeholder="Add counselling notes, batch timing preferences, document verification notes...">${r.notes || ''}</textarea>
+            <div class="text-right">
+              <button onclick="saveRegistrationNotes('${r.registration_id}')" class="btn-outline text-xs">
+                <i class="fa-solid fa-floppy-disk text-mint"></i>
+                <span>Save Notes</span>
+              </button>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('details-modal').classList.remove('hidden');
+      } catch (err) {
+        alert('Error loading profile: ' + err.message);
+      }
+    }
+
+    function closeDetailsModal() {
+      document.getElementById('details-modal').classList.add('hidden');
+    }
+
+    async function saveRegistrationNotes(regId) {
+      const notes = document.getElementById('modal-internal-notes').value;
+      try {
+        const res = await fetch(`/api/admin/registrations/${regId}/notes`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notes })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('Notes updated successfully.');
+        }
+      } catch (e) {
+        alert('Failed to save notes: ' + e.message);
+      }
+    }
+
+    async function resendReceipt(regId) {
+      if (!confirm('Resend payment receipt email to this candidate?')) return;
+      try {
+        const res = await fetch(`/api/admin/registrations/${regId}/resend-receipt`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          alert('Payment receipt has been re-dispatched.');
+          viewRegistrationDetails(regId);
+        } else {
+          alert('Failed to send receipt: ' + (data.error || 'Unknown error'));
+        }
+      } catch (e) {
+        alert('Server error: ' + e.message);
+      }
+    }
+
+    async function recordBalancePayment(regId) {
+      const amountInput = document.getElementById('manual-amount');
+      const methodInput = document.getElementById('manual-method');
+      const amount = Number(amountInput.value);
+      const method = methodInput.value.trim() || 'Bank Transfer / Admin Receipt';
+
+      if (!amount || amount <= 0) {
+        alert('Please enter a valid payment amount.');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/admin/registrations/${regId}/record-payment`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount, payment_method: method })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('Payment recorded successfully!');
+          fetchDashboardData();
+          viewRegistrationDetails(regId);
+        } else {
+          alert('Failed: ' + (data.error || 'Payment error'));
+        }
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    function printStudentReceipt(regId) {
+      window.open(`/api/registration/status/${regId}?print=true`, '_blank');
+    }
+
+    function exportRegistrationsCSV() {
+      window.location.href = '/api/admin/export/registrations';
+    }
+
+    function exportPaymentsCSV() {
+      window.location.href = '/api/admin/export/payments';
+    }
+  </script>
+
+</body>
+</html>
+
