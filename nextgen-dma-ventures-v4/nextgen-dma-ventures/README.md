@@ -53,8 +53,8 @@ SMTP_FROM_NAME=NEXTGEN DNA VENTURES Admissions
 
 # Admin Authentication
 ADMIN_EMAIL=admin@nextgendma.com
-ADMIN_DEFAULT_PASSWORD=NextgenAdmin2026!
-SESSION_SECRET=nextgen_dna_ventures_super_secret_session_key_2026_xyz!
+ADMIN_DEFAULT_PASSWORD=your_strong_admin_password_here
+SESSION_SECRET=your_super_secret_session_key_min_32_characters_here
 
 # Database Configuration (Supabase PostgreSQL / Cloud Data Store)
 SUPABASE_URL=https://your-project.supabase.co

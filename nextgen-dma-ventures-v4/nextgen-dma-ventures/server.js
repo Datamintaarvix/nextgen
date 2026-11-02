@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * NEXTGEN DNA VENTURES - PRODUCTION BACKEND SERVER
+ * NEXTGEN DMA VENTURES - PRODUCTION BACKEND SERVER
  * ============================================================================
  * Architecture:
  * - Express.js web application
@@ -16,14 +16,16 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
 const path = require('path');
+const fs = require('fs');
 const Razorpay = require('razorpay');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const {
-  loadDB,
   generateRegistrationId,
   seedInitialData,
+  RateLimiterRepo,
+  WebhookEventsRepo,
   StudentsRepo,
   CoursesRepo,
   RegistrationsRepo,
@@ -75,41 +77,65 @@ app.use((req, res, next) => {
 });
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static frontend assets
-app.use(express.static(path.join(__dirname)));
+// Static frontend asset directory resolution (supports both root and nested folder execution)
+const nestedDir = path.join(__dirname, 'nextgen-dma-ventures-v4', 'nextgen-dma-ventures');
+const staticDir = fs.existsSync(path.join(__dirname, 'index.html'))
+  ? __dirname
+  : (fs.existsSync(path.join(nestedDir, 'index.html'))
+      ? nestedDir
+      : __dirname);
+
+app.use(express.static(staticDir));
+if (staticDir !== __dirname) {
+  app.use(express.static(__dirname));
+}
+if (fs.existsSync(nestedDir) && staticDir !== nestedDir) {
+  app.use(express.static(nestedDir));
+}
 
 // Seed Database on startup
 const defaultAdminEmail = (process.env.ADMIN_EMAIL || 'admin@nextgendma.com').toLowerCase().trim();
-const defaultAdminPassword = process.env.ADMIN_DEFAULT_PASSWORD || 'NextgenAdmin2026!';
-const defaultAdminHash = process.env.ADMIN_PASSWORD_HASH || bcrypt.hashSync(defaultAdminPassword, 10);
-seedInitialData(defaultAdminEmail, defaultAdminHash);
+const defaultAdminPassword = process.env.ADMIN_DEFAULT_PASSWORD || '';
+const defaultAdminHash = process.env.ADMIN_PASSWORD_HASH || (defaultAdminPassword ? bcrypt.hashSync(defaultAdminPassword, 10) : '');
+
+if (defaultAdminEmail && defaultAdminHash) {
+  seedInitialData(defaultAdminEmail, defaultAdminHash).catch(err => {
+    console.warn('[Seed] Initialization notice:', err.message);
+  });
+}
 
 // ============================================================================
-// ADMIN AUTHENTICATION MIDDLEWARE & HELPERS
+// ADMIN AUTHENTICATION MIDDLEWARE & HELPERS (Persistent Serverless Security)
 // ============================================================================
 
-const loginAttempts = new Map();
-
-function rateLimitLogin(req, res, next) {
-  const ip = req.ip || req.connection.remoteAddress || 'unknown';
-  const now = Date.now();
-  const record = loginAttempts.get(ip) || { count: 0, firstAttempt: now };
-
-  if (now - record.firstAttempt > 15 * 60 * 1000) {
-    // Reset window after 15 mins
-    record.count = 0;
-    record.firstAttempt = now;
+// Secure IP Extraction (Validates IP shape and ignores forged internal hops)
+function getSecureClientIp(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) {
+    const firstIp = forwarded.split(',')[0].trim();
+    if (/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$|^[a-fA-F0-9:]+$/.test(firstIp)) {
+      return firstIp;
+    }
   }
+  return req.socket.remoteAddress || '127.0.0.1';
+}
 
-  if (record.count >= 8) {
-    return res.status(429).json({
-      error: 'Too many failed login attempts. Please wait 15 minutes before trying again.'
-    });
-  }
-
-  req.ipRecord = record;
+async function rateLimitLogin(req, res, next) {
+  const ip = getSecureClientIp(req);
   req.clientIp = ip;
-  next();
+
+  try {
+    const check = await RateLimiterRepo.checkLimit(ip);
+    if (!check.allowed) {
+      return res.status(429).json({
+        error: `Too many failed login attempts. Access is temporarily locked. Please wait ${check.remainingMinutes || 15} minutes before trying again.`
+      });
+    }
+    next();
+  } catch (err) {
+    console.error('[Rate Limiter Notice]', err.message);
+    next();
+  }
 }
 
 function verifyAdminSession(req, res, next) {
@@ -139,20 +165,24 @@ app.get('/api/config/public-key', (req, res) => {
     advanceAmount: 2499,
     isTestMode: RAZORPAY_KEY_ID.startsWith('rzp_test') || RAZORPAY_KEY_ID.includes('placeholder'),
     currency: 'INR',
-    companyName: 'NEXTGEN DNA VENTURES'
+    companyName: 'NEXTGEN DMA VENTURES'
   });
 });
 
-app.get('/api/courses', (req, res) => {
-  const courses = CoursesRepo.findAll();
-  res.json({ success: true, count: courses.length, courses });
+app.get('/api/courses', async (req, res) => {
+  try {
+    const courses = await CoursesRepo.findAll();
+    res.json({ success: true, count: courses.length, courses });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch courses: ' + err.message });
+  }
 });
 
 // ============================================================================
 // PUBLIC API: STUDENT REGISTRATION & BOOKING INITIATION
 // ============================================================================
 
-app.post('/api/registration/initiate', (req, res) => {
+app.post('/api/registration/initiate', async (req, res) => {
   try {
     const {
       full_name,
@@ -175,7 +205,7 @@ app.post('/api/registration/initiate', (req, res) => {
       });
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ error: 'Please enter a valid email address.' });
     }
@@ -188,14 +218,31 @@ app.post('/api/registration/initiate', (req, res) => {
     // Resolve course
     let course = null;
     if (course_id) {
-      course = CoursesRepo.findById(course_id);
+      course = await CoursesRepo.findById(course_id);
     }
     if (!course && course_name) {
-      course = CoursesRepo.findByName(course_name);
+      course = await CoursesRepo.findByName(course_name);
     }
 
     if (!course) {
       return res.status(404).json({ error: 'Selected course not found in official catalog.' });
+    }
+
+    // Check for existing confirmed registration for this email and course
+    const existingStudent = await StudentsRepo.findAll();
+    const matchedStudent = existingStudent.find(s => s.email.toLowerCase() === email.toLowerCase().trim());
+    if (matchedStudent) {
+      const existingRegs = await RegistrationsRepo.findAll();
+      const duplicateConfirmed = existingRegs.find(r => 
+        r.student_id === matchedStudent.id && 
+        (r.course_id === course.id || r.course_name.toLowerCase() === course.course_name.toLowerCase()) &&
+        (r.registration_status === 'Fully Paid' || r.registration_status === 'Advance Paid – Slot Reserved' || r.registration_status === 'Advance Paid')
+      );
+      if (duplicateConfirmed) {
+        return res.status(409).json({
+          error: `You are already enrolled in ${course.course_name} (Registration ID: ${duplicateConfirmed.registration_id}). Please check your email for receipts or contact admissions.`
+        });
+      }
     }
 
     const selectedPaymentType = payment_type === 'full' ? 'full' : 'advance';
@@ -214,10 +261,10 @@ app.post('/api/registration/initiate', (req, res) => {
     }
 
     // Generate unique Registration ID: NDV2026-XXXX
-    const registrationId = generateRegistrationId();
+    const registrationId = await generateRegistrationId();
 
     // 1. Create Student Record
-    const student = StudentsRepo.create({
+    const student = await StudentsRepo.create({
       registration_id: registrationId,
       full_name,
       email,
@@ -230,7 +277,7 @@ app.post('/api/registration/initiate', (req, res) => {
     });
 
     // 2. Create Initial Registration Record
-    const registration = RegistrationsRepo.create({
+    const registration = await RegistrationsRepo.create({
       registration_id: registrationId,
       student_id: student.id,
       course_id: course.id,
@@ -276,16 +323,37 @@ app.post('/api/payment/create-order', async (req, res) => {
       return res.status(400).json({ error: 'Registration ID is required.' });
     }
 
-    const reg = RegistrationsRepo.findByRegId(registration_id);
+    const reg = await RegistrationsRepo.findByRegId(registration_id);
     if (!reg) {
       return res.status(404).json({ error: 'Registration record not found.' });
     }
 
-    if (reg.registration_status === 'Fully Paid' || reg.registration_status === 'Advance Paid – Slot Reserved') {
-      return res.status(400).json({ error: 'This registration has already been verified and paid.' });
+    const totalFee = Number(reg.total_course_fee);
+    const currentPaid = Number(reg.total_amount_paid || 0);
+    const remainingBalance = Math.max(0, totalFee - currentPaid);
+
+    if (reg.registration_status === 'Fully Paid' || remainingBalance <= 0) {
+      return res.status(400).json({ error: 'This registration is already fully paid. Outstanding balance is ₹0.' });
     }
 
-    const amountInINR = reg.payment_type === 'advance' ? 2499 : reg.total_course_fee;
+    let amountInINR = 0;
+    let paymentTypeForOrder = 'advance';
+
+    if (reg.registration_status === 'Advance Paid' || reg.registration_status === 'Balance Pending') {
+      // Subsequent balance payment
+      amountInINR = remainingBalance;
+      paymentTypeForOrder = 'balance';
+    } else {
+      // Initial transaction
+      if (reg.payment_type === 'advance') {
+        amountInINR = 2499;
+        paymentTypeForOrder = 'advance';
+      } else {
+        amountInINR = totalFee;
+        paymentTypeForOrder = 'full';
+      }
+    }
+
     const amountInPaise = amountInINR * 100;
 
     let razorpayOrderId = null;
@@ -300,7 +368,7 @@ app.post('/api/payment/create-order', async (req, res) => {
           registration_id,
           course_id: reg.course_id,
           course_name: reg.course_name,
-          payment_type: reg.payment_type
+          payment_type: paymentTypeForOrder
         }
       });
       razorpayOrderId = order.id;
@@ -310,18 +378,13 @@ app.post('/api/payment/create-order', async (req, res) => {
     }
 
     // Record Payment Entry in DB
-    PaymentsRepo.create({
+    await PaymentsRepo.create({
       registration_id,
       razorpay_order_id: razorpayOrderId,
       amount: amountInINR,
       currency: 'INR',
-      payment_type: reg.payment_type,
+      payment_type: paymentTypeForOrder,
       payment_status: 'created'
-    });
-
-    // Update Registration Status
-    RegistrationsRepo.update(registration_id, {
-      registration_status: 'Payment Pending'
     });
 
     res.json({
@@ -333,7 +396,7 @@ app.post('/api/payment/create-order', async (req, res) => {
       key_id: RAZORPAY_KEY_ID,
       registration_id,
       course_name: reg.course_name,
-      payment_type: reg.payment_type
+      payment_type: paymentTypeForOrder
     });
   } catch (err) {
     console.error('[Create Order Error]', err);
@@ -358,12 +421,41 @@ app.post('/api/payment/verify-payment', async (req, res) => {
       return res.status(400).json({ error: 'Missing required payment verification parameters.' });
     }
 
-    const reg = RegistrationsRepo.findByRegId(registration_id);
+    const reg = await RegistrationsRepo.findByRegId(registration_id);
     if (!reg) {
       return res.status(404).json({ error: 'Registration record not found.' });
     }
 
-    const student = StudentsRepo.findByRegId(registration_id);
+    // Verify order ID belongs to this registration
+    let paymentRecord = await PaymentsRepo.findByOrderId(razorpay_order_id);
+    if (paymentRecord && paymentRecord.registration_id !== registration_id) {
+      return res.status(400).json({ error: 'Transaction order ID does not match this registration record.' });
+    }
+
+    const student = await StudentsRepo.findByRegId(registration_id);
+
+    // Idempotency check: Return existing verified receipt if this payment was already verified
+    if (paymentRecord && paymentRecord.payment_status === 'success' && paymentRecord.razorpay_payment_id === razorpay_payment_id) {
+      return res.json({
+        success: true,
+        verified: true,
+        registration_id,
+        status: reg.registration_status,
+        message: 'Transaction already verified and processed.',
+        receipt: {
+          student_name: student ? student.full_name : 'Student',
+          email: student ? student.email : '',
+          course_name: reg.course_name,
+          duration: reg.course_duration,
+          total_fee: reg.total_course_fee,
+          amount_paid: reg.total_amount_paid,
+          remaining_balance: reg.remaining_balance,
+          payment_id: razorpay_payment_id,
+          order_id: razorpay_order_id,
+          payment_type: paymentRecord.payment_type
+        }
+      });
+    }
 
     // Signature Verification Logic
     let isSignatureValid = false;
@@ -383,32 +475,44 @@ app.post('/api/payment/verify-payment', async (req, res) => {
 
     if (!isSignatureValid) {
       console.warn(`[Payment Verification Failed] Signature mismatch for Order: ${razorpay_order_id}`);
-      RegistrationsRepo.update(registration_id, { registration_status: 'Payment Failed' });
+      await RegistrationsRepo.update(registration_id, { registration_status: 'Payment Failed' });
+      if (paymentRecord) {
+        await PaymentsRepo.update(paymentRecord.id, { payment_status: 'failed' });
+      }
       return res.status(400).json({ error: 'Payment signature verification failed. Invalid transaction signature.' });
     }
 
-    // Calculate final verified amounts
-    const isAdvance = reg.payment_type === 'advance';
-    const amountPaid = isAdvance ? 2499 : reg.total_course_fee;
-    const remainingBalance = isAdvance ? (reg.total_course_fee - 2499) : 0;
-    const finalStatus = isAdvance ? 'Advance Paid – Slot Reserved' : 'Fully Paid';
+    // Calculate verified payment updates
+    const verifiedAmount = paymentRecord ? Number(paymentRecord.amount) : (reg.payment_type === 'advance' ? 2499 : Number(reg.total_course_fee));
+    const currentPaid = Number(reg.total_amount_paid || 0);
+    const totalFee = Number(reg.total_course_fee);
+    const newPaid = Math.min(totalFee, currentPaid + verifiedAmount);
+    const newRemaining = Math.max(0, totalFee - newPaid);
+
+    let finalStatus;
+    if (newRemaining === 0) {
+      finalStatus = 'Fully Paid';
+    } else if (reg.payment_type === 'advance' && newPaid === 2499) {
+      finalStatus = 'Advance Paid';
+    } else {
+      finalStatus = 'Balance Pending';
+    }
 
     // 1. Update/Record Payment Record
-    let paymentRecord = PaymentsRepo.findByOrderId(razorpay_order_id);
     if (paymentRecord) {
-      PaymentsRepo.update(paymentRecord.id, {
+      await PaymentsRepo.update(paymentRecord.id, {
         razorpay_payment_id,
         razorpay_signature,
         payment_status: 'success',
         verified_at: new Date().toISOString()
       });
     } else {
-      paymentRecord = PaymentsRepo.create({
+      paymentRecord = await PaymentsRepo.create({
         registration_id,
         razorpay_order_id,
         razorpay_payment_id,
         razorpay_signature,
-        amount: amountPaid,
+        amount: verifiedAmount,
         currency: 'INR',
         payment_type: reg.payment_type,
         payment_status: 'success',
@@ -417,9 +521,9 @@ app.post('/api/payment/verify-payment', async (req, res) => {
     }
 
     // 2. Update Registration Record
-    const updatedReg = RegistrationsRepo.update(registration_id, {
-      total_amount_paid: amountPaid,
-      remaining_balance: remainingBalance,
+    const updatedReg = await RegistrationsRepo.update(registration_id, {
+      total_amount_paid: newPaid,
+      remaining_balance: newRemaining,
       registration_status: finalStatus
     });
 
@@ -433,9 +537,9 @@ app.post('/api/payment/verify-payment', async (req, res) => {
         courseName: reg.course_name,
         courseDuration: reg.course_duration,
         totalCourseFee: reg.total_course_fee,
-        paymentType: reg.payment_type,
-        amountPaid,
-        remainingBalance,
+        paymentType: paymentRecord.payment_type,
+        amountPaid: verifiedAmount,
+        remainingBalance: newRemaining,
         razorpayPaymentId: razorpay_payment_id,
         razorpayOrderId: razorpay_order_id,
         paymentDate: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
@@ -453,11 +557,12 @@ app.post('/api/payment/verify-payment', async (req, res) => {
         course_name: reg.course_name,
         duration: reg.course_duration,
         total_fee: reg.total_course_fee,
-        amount_paid: amountPaid,
-        remaining_balance: remainingBalance,
+        amount_paid: verifiedAmount,
+        total_paid_to_date: newPaid,
+        remaining_balance: newRemaining,
         payment_id: razorpay_payment_id,
         order_id: razorpay_order_id,
-        payment_type: reg.payment_type,
+        payment_type: paymentRecord.payment_type,
         email_sent: emailResult.success
       }
     });
@@ -471,18 +576,18 @@ app.post('/api/payment/verify-payment', async (req, res) => {
 // PUBLIC API: PAYMENT FAILURE NOTIFIER
 // ============================================================================
 
-app.post('/api/payment/payment-failed', (req, res) => {
+app.post('/api/payment/payment-failed', async (req, res) => {
   try {
     const { registration_id, razorpay_order_id, error_description } = req.body;
     if (registration_id) {
-      RegistrationsRepo.update(registration_id, {
+      await RegistrationsRepo.update(registration_id, {
         registration_status: 'Payment Failed',
         notes: `Payment failed at checkout: ${error_description || 'User cancelled or gateway rejected'}`
       });
     }
     if (razorpay_order_id) {
-      const p = PaymentsRepo.findByOrderId(razorpay_order_id);
-      if (p) PaymentsRepo.update(p.id, { payment_status: 'failed' });
+      const p = await PaymentsRepo.findByOrderId(razorpay_order_id);
+      if (p) await PaymentsRepo.update(p.id, { payment_status: 'failed' });
     }
     res.json({ success: true, status: 'Payment Failed' });
   } catch (err) {
@@ -512,7 +617,15 @@ app.post('/api/payment/webhook', async (req, res) => {
     }
 
     const event = JSON.parse(rawBody.toString());
-    console.log(`[Webhook Event Received] ${event.event}`);
+    const eventId = req.headers['x-razorpay-event-id'] || event.id || `evt_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
+
+    // Atomic Persistent Webhook Idempotency Check & Insert
+    const { alreadyProcessed } = await WebhookEventsRepo.recordOrSkip(eventId, event.event, event);
+    if (alreadyProcessed) {
+      console.log(`[Webhook Notice] Event ${eventId} was already processed or is processing concurrently. Skipping duplicate execution.`);
+      return res.json({ status: 'already_processed', event_id: eventId });
+    }
+    console.log(`[Webhook Event Processed] ID: ${eventId}, Type: ${event.event}`);
 
     if (event.event === 'payment.captured' || event.event === 'order.paid') {
       const paymentEntity = event.payload.payment.entity;
@@ -522,31 +635,54 @@ app.post('/api/payment/webhook', async (req, res) => {
       const regId = notes.registration_id;
 
       if (regId) {
-        const reg = RegistrationsRepo.findByRegId(regId);
-        if (reg && reg.registration_status !== 'Fully Paid' && reg.registration_status !== 'Advance Paid – Slot Reserved') {
-          const isAdvance = reg.payment_type === 'advance';
-          const amountPaid = isAdvance ? 2499 : reg.total_course_fee;
-          const remainingBalance = isAdvance ? (reg.total_course_fee - 2499) : 0;
-          const finalStatus = isAdvance ? 'Advance Paid – Slot Reserved' : 'Fully Paid';
+        const reg = await RegistrationsRepo.findByRegId(regId);
+        if (reg && reg.registration_status !== 'Fully Paid') {
+          const verifiedAmount = Number(paymentEntity.amount) / 100;
+          const currentPaid = Number(reg.total_amount_paid || 0);
+          const totalFee = Number(reg.total_course_fee);
+          const newPaid = Math.min(totalFee, currentPaid + verifiedAmount);
+          const newRemaining = Math.max(0, totalFee - newPaid);
 
-          PaymentsRepo.create({
-            registration_id: regId,
-            razorpay_order_id: orderId,
-            razorpay_payment_id: paymentId,
-            amount: amountPaid,
-            currency: 'INR',
-            payment_type: reg.payment_type,
-            payment_status: 'success',
-            verified_at: new Date().toISOString()
-          });
+          let finalStatus;
+          if (newRemaining === 0) {
+            finalStatus = 'Fully Paid';
+          } else if (reg.payment_type === 'advance' && newPaid === 2499) {
+            finalStatus = 'Advance Paid';
+          } else {
+            finalStatus = 'Balance Pending';
+          }
 
-          RegistrationsRepo.update(regId, {
-            total_amount_paid: amountPaid,
-            remaining_balance: remainingBalance,
+          let paymentRecord = await PaymentsRepo.findByPaymentId(paymentId);
+          if (!paymentRecord) {
+            paymentRecord = await PaymentsRepo.findByOrderId(orderId);
+          }
+
+          if (paymentRecord) {
+            await PaymentsRepo.update(paymentRecord.id, {
+              razorpay_payment_id: paymentId,
+              payment_status: 'success',
+              verified_at: new Date().toISOString()
+            });
+          } else {
+            await PaymentsRepo.create({
+              registration_id: regId,
+              razorpay_order_id: orderId,
+              razorpay_payment_id: paymentId,
+              amount: verifiedAmount,
+              currency: 'INR',
+              payment_type: notes.payment_type || reg.payment_type,
+              payment_status: 'success',
+              verified_at: new Date().toISOString()
+            });
+          }
+
+          await RegistrationsRepo.update(regId, {
+            total_amount_paid: newPaid,
+            remaining_balance: newRemaining,
             registration_status: finalStatus
           });
 
-          const student = StudentsRepo.findByRegId(regId);
+          const student = await StudentsRepo.findByRegId(regId);
           if (student && student.email) {
             await sendPaymentReceipt({
               registrationId: regId,
@@ -555,9 +691,9 @@ app.post('/api/payment/webhook', async (req, res) => {
               courseName: reg.course_name,
               courseDuration: reg.course_duration,
               totalCourseFee: reg.total_course_fee,
-              paymentType: reg.payment_type,
-              amountPaid,
-              remainingBalance,
+              paymentType: notes.payment_type || reg.payment_type,
+              amountPaid: verifiedAmount,
+              remainingBalance: newRemaining,
               razorpayPaymentId: paymentId,
               razorpayOrderId: orderId
             });
@@ -566,7 +702,7 @@ app.post('/api/payment/webhook', async (req, res) => {
       }
     }
 
-    res.json({ status: 'ok' });
+    res.json({ status: 'ok', event_id: eventId });
   } catch (err) {
     console.error('[Webhook Processing Error]', err);
     res.status(500).send('Webhook error');
@@ -577,33 +713,37 @@ app.post('/api/payment/webhook', async (req, res) => {
 // PUBLIC API: GET VERIFIED REGISTRATION STATUS FOR CONFIRMATION SCREEN
 // ============================================================================
 
-app.get('/api/registration/status/:registrationId', (req, res) => {
-  const regId = req.params.registrationId;
-  const reg = RegistrationsRepo.findByRegId(regId);
-  if (!reg) {
-    return res.status(404).json({ error: 'Registration record not found.' });
+app.get('/api/registration/status/:registrationId', async (req, res) => {
+  try {
+    const regId = req.params.registrationId;
+    const reg = await RegistrationsRepo.findByRegId(regId);
+    if (!reg) {
+      return res.status(404).json({ error: 'Registration record not found.' });
+    }
+
+    const student = await StudentsRepo.findByRegId(regId);
+    const payments = await PaymentsRepo.findByRegId(regId);
+    const latestSuccessPayment = payments.find(p => p.payment_status === 'success') || payments[0] || {};
+
+    res.json({
+      success: true,
+      registration_id: reg.registration_id,
+      student_name: student ? student.full_name : 'Valued Student',
+      email: student ? student.email : '',
+      phone: student ? student.phone : '',
+      course_name: reg.course_name,
+      duration: reg.course_duration,
+      total_fee: reg.total_course_fee,
+      amount_paid: reg.total_amount_paid,
+      remaining_balance: reg.remaining_balance,
+      payment_type: reg.payment_type,
+      registration_status: reg.registration_status,
+      razorpay_payment_id: latestSuccessPayment.razorpay_payment_id || 'N/A',
+      payment_date: latestSuccessPayment.verified_at || reg.created_at
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  const student = StudentsRepo.findByRegId(regId);
-  const payments = PaymentsRepo.findByRegId(regId);
-  const latestSuccessPayment = payments.find(p => p.payment_status === 'success') || payments[0] || {};
-
-  res.json({
-    success: true,
-    registration_id: reg.registration_id,
-    student_name: student ? student.full_name : 'Valued Student',
-    email: student ? student.email : '',
-    phone: student ? student.phone : '',
-    course_name: reg.course_name,
-    duration: reg.course_duration,
-    total_fee: reg.total_course_fee,
-    amount_paid: reg.total_amount_paid,
-    remaining_balance: reg.remaining_balance,
-    payment_type: reg.payment_type,
-    registration_status: reg.registration_status,
-    razorpay_payment_id: latestSuccessPayment.razorpay_payment_id || 'N/A',
-    payment_date: latestSuccessPayment.verified_at || reg.created_at
-  });
 });
 
 // ============================================================================
@@ -618,11 +758,11 @@ app.post('/api/admin/login', rateLimitLogin, async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required.' });
     }
 
-    const admin = AdminUsersRepo.findByEmail(email);
+    const admin = await AdminUsersRepo.findByEmail(email);
     if (!admin) {
-      req.ipRecord.count++;
-      loginAttempts.set(req.clientIp, req.ipRecord);
-      return res.status(401).json({ error: 'Invalid admin credentials.' });
+      await RateLimiterRepo.recordFailedAttempt(req.clientIp);
+      // Generic message prevents account enumeration
+      return res.status(401).json({ error: 'Invalid administrative email or password.' });
     }
 
     let passwordMatch = false;
@@ -632,22 +772,22 @@ app.post('/api/admin/login', rateLimitLogin, async (req, res) => {
       passwordMatch = await bcrypt.compare(password, admin.password_hash);
     }
 
-    // Direct check with fallback if password_hash not yet generated
+    // Direct check with fallback only if password_hash was not pre-computed and default password matches
     if (!passwordMatch && defaultAdminPassword && password === defaultAdminPassword) {
       passwordMatch = true;
       // Auto upgrade password to secure bcrypt hash
       const newHash = await bcrypt.hash(password, 10);
-      AdminUsersRepo.updatePassword(admin.email, newHash);
+      await AdminUsersRepo.updatePassword(admin.email, newHash);
     }
 
     if (!passwordMatch) {
-      req.ipRecord.count++;
-      loginAttempts.set(req.clientIp, req.ipRecord);
-      return res.status(401).json({ error: 'Invalid admin credentials.' });
+      await RateLimiterRepo.recordFailedAttempt(req.clientIp);
+      // Generic message prevents account enumeration
+      return res.status(401).json({ error: 'Invalid administrative email or password.' });
     }
 
-    // Reset login attempts on success
-    loginAttempts.delete(req.clientIp);
+    // Reset rate limiter on successful authentication
+    await RateLimiterRepo.reset(req.clientIp);
 
     // Issue JWT session token (valid 8 hours)
     const token = jwt.sign(
@@ -696,24 +836,24 @@ app.get('/api/admin/check-session', verifyAdminSession, (req, res) => {
 // SECURE ADMIN DASHBOARD APIS (Protected via verifyAdminSession)
 // ============================================================================
 
-app.get('/api/admin/dashboard-stats', verifyAdminSession, (req, res) => {
+app.get('/api/admin/dashboard-stats', verifyAdminSession, async (req, res) => {
   try {
-    const stats = RegistrationsRepo.getStats();
+    const stats = await RegistrationsRepo.getStats();
     res.json({ success: true, stats });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.get('/api/admin/registrations', verifyAdminSession, (req, res) => {
+app.get('/api/admin/registrations', verifyAdminSession, async (req, res) => {
   try {
     const { status, category, search } = req.query;
-    let list = RegistrationsRepo.findAll();
+    let list = await RegistrationsRepo.findAll();
 
-    // Attach student and payment preview
-    const fullList = list.map(r => {
-      const student = StudentsRepo.findByRegId(r.registration_id) || {};
-      const payments = PaymentsRepo.findByRegId(r.registration_id);
+    // Attach student and payment preview asynchronously
+    const fullList = await Promise.all(list.map(async (r) => {
+      const student = (await StudentsRepo.findByRegId(r.registration_id)) || {};
+      const payments = (await PaymentsRepo.findByRegId(r.registration_id)) || [];
       const latestPay = payments[0] || {};
       return {
         ...r,
@@ -727,7 +867,7 @@ app.get('/api/admin/registrations', verifyAdminSession, (req, res) => {
         latest_payment_id: latestPay.razorpay_payment_id || 'N/A',
         payment_status: latestPay.payment_status || 'created'
       };
-    });
+    }));
 
     let filtered = fullList;
 
@@ -761,9 +901,9 @@ app.get('/api/admin/registrations', verifyAdminSession, (req, res) => {
   }
 });
 
-app.get('/api/admin/registrations/:registrationId', verifyAdminSession, (req, res) => {
+app.get('/api/admin/registrations/:registrationId', verifyAdminSession, async (req, res) => {
   try {
-    const detailed = RegistrationsRepo.getDetailed(req.params.registrationId);
+    const detailed = await RegistrationsRepo.getDetailed(req.params.registrationId);
     if (!detailed) {
       return res.status(404).json({ error: 'Registration not found.' });
     }
@@ -773,11 +913,11 @@ app.get('/api/admin/registrations/:registrationId', verifyAdminSession, (req, re
   }
 });
 
-app.post('/api/admin/registrations/:registrationId/notes', verifyAdminSession, (req, res) => {
+app.post('/api/admin/registrations/:registrationId/notes', verifyAdminSession, async (req, res) => {
   try {
     const { notes } = req.body;
-    const updated = RegistrationsRepo.update(req.params.registrationId, { notes });
-    res.json({ success: true, notes: updated.notes });
+    const updated = await RegistrationsRepo.update(req.params.registrationId, { notes });
+    res.json({ success: true, notes: updated ? updated.notes : notes });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -785,12 +925,12 @@ app.post('/api/admin/registrations/:registrationId/notes', verifyAdminSession, (
 
 app.post('/api/admin/registrations/:registrationId/resend-receipt', verifyAdminSession, async (req, res) => {
   try {
-    const detailed = RegistrationsRepo.getDetailed(req.params.registrationId);
+    const detailed = await RegistrationsRepo.getDetailed(req.params.registrationId);
     if (!detailed) {
       return res.status(404).json({ error: 'Registration not found.' });
     }
 
-    if (detailed.registration_status !== 'Fully Paid' && detailed.registration_status !== 'Advance Paid – Slot Reserved') {
+    if (detailed.registration_status !== 'Fully Paid' && detailed.registration_status !== 'Advance Paid – Slot Reserved' && detailed.registration_status !== 'Advance Paid') {
       return res.status(400).json({ error: 'Cannot send receipt for unverified or unpaid registration.' });
     }
 
@@ -827,7 +967,7 @@ app.post('/api/admin/registrations/:registrationId/record-payment', verifyAdminS
       return res.status(400).json({ error: 'Valid payment amount is required.' });
     }
 
-    const reg = RegistrationsRepo.findByRegId(regId);
+    const reg = await RegistrationsRepo.findByRegId(regId);
     if (!reg) {
       return res.status(404).json({ error: 'Registration not found.' });
     }
@@ -842,11 +982,11 @@ app.post('/api/admin/registrations/:registrationId/record-payment', verifyAdminS
       });
     }
 
-    const newRemaining = totalFee - newPaid;
-    const newStatus = newRemaining === 0 ? 'Fully Paid' : 'Advance Paid – Slot Reserved';
+    const newRemaining = Math.max(0, totalFee - newPaid);
+    const newStatus = newRemaining === 0 ? 'Fully Paid' : (newPaid === 2499 ? 'Advance Paid' : 'Balance Pending');
 
     // 1. Record new verified payment
-    const payment = PaymentsRepo.create({
+    const payment = await PaymentsRepo.create({
       registration_id: regId,
       razorpay_order_id: `manual_order_${Date.now()}`,
       razorpay_payment_id: `manual_rec_${Date.now()}`,
@@ -859,7 +999,7 @@ app.post('/api/admin/registrations/:registrationId/record-payment', verifyAdminS
     });
 
     // 2. Update registration totals
-    const updated = RegistrationsRepo.update(regId, {
+    const updated = await RegistrationsRepo.update(regId, {
       total_amount_paid: newPaid,
       remaining_balance: newRemaining,
       registration_status: newStatus,
@@ -878,9 +1018,9 @@ app.post('/api/admin/registrations/:registrationId/record-payment', verifyAdminS
 });
 
 // CSV / Excel Export APIs
-app.get('/api/admin/export/registrations', verifyAdminSession, (req, res) => {
+app.get('/api/admin/export/registrations', verifyAdminSession, async (req, res) => {
   try {
-    const regs = RegistrationsRepo.findAll();
+    const regs = await RegistrationsRepo.findAll();
     const headers = [
       'Registration ID',
       'Student Name',
@@ -902,8 +1042,8 @@ app.get('/api/admin/export/registrations', verifyAdminSession, (req, res) => {
       'Registration Date'
     ];
 
-    const rows = regs.map(r => {
-      const student = StudentsRepo.findByRegId(r.registration_id) || {};
+    const rows = await Promise.all(regs.map(async (r) => {
+      const student = (await StudentsRepo.findByRegId(r.registration_id)) || {};
       return [
         `"${r.registration_id}"`,
         `"${(student.full_name || '').replace(/"/g, '""')}"`,
@@ -924,7 +1064,7 @@ app.get('/api/admin/export/registrations', verifyAdminSession, (req, res) => {
         `"${r.registration_status}"`,
         `"${r.created_at}"`
       ].join(',');
-    });
+    }));
 
     const csvContent = [headers.join(','), ...rows].join('\r\n');
     res.setHeader('Content-Type', 'text/csv');
@@ -935,9 +1075,9 @@ app.get('/api/admin/export/registrations', verifyAdminSession, (req, res) => {
   }
 });
 
-app.get('/api/admin/export/payments', verifyAdminSession, (req, res) => {
+app.get('/api/admin/export/payments', verifyAdminSession, async (req, res) => {
   try {
-    const payments = PaymentsRepo.findAll();
+    const payments = await PaymentsRepo.findAll();
     const headers = [
       'Payment ID',
       'Registration ID',
@@ -975,23 +1115,37 @@ app.get('/api/admin/export/payments', verifyAdminSession, (req, res) => {
 
 // Admin Panel Single Page Application Route
 app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin.html'));
+  res.sendFile(path.join(staticDir, 'admin.html'));
 });
 
 // Default catch-all route sends to main website
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(staticDir, 'index.html'));
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`\n============================================================`);
-  console.log(`🚀 NEXTGEN DNA VENTURES SERVER RUNNING`);
-  console.log(`🌐 Public Website: http://localhost:${PORT}`);
-  console.log(`🔒 Admin Panel   : http://localhost:${PORT}/admin`);
-  console.log(`🔑 Admin Login   : ${defaultAdminEmail}`);
-  console.log(`🔐 Admin Pass    : ${defaultAdminPassword}`);
-  console.log(`💳 Razorpay Mode : ${RAZORPAY_KEY_ID.startsWith('rzp_test') ? 'TEST' : (RAZORPAY_KEY_ID.includes('placeholder') ? 'DEV-SIMULATOR' : 'LIVE')}`);
-  console.log(`============================================================\n`);
+// Centralized Error Handling Middleware (Prevents stack trace leaks in production)
+app.use((err, req, res, next) => {
+  console.error('[Application Error]', err.stack || err.message);
+  const status = err.statusCode || 500;
+  const message = process.env.NODE_ENV === 'production'
+    ? 'An unexpected error occurred. Please try again or contact NEXTGEN DMA VENTURES admissions.'
+    : err.message;
+  res.status(status).json({ success: false, error: message });
 });
 
+// Start Server (Standalone or Local development)
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`\n============================================================`);
+    console.log(`🚀 NEXTGEN DMA VENTURES SERVER RUNNING`);
+    console.log(`🌐 Public Website: http://localhost:${PORT}`);
+    console.log(`🔒 Admin Panel   : http://localhost:${PORT}/admin`);
+    console.log(`🔑 Admin Login   : ${defaultAdminEmail}`);
+    console.log(`🔐 Admin Status  : ${defaultAdminPassword || defaultAdminHash ? '[SECURED VIA ENV]' : '[PENDING CONFIGURATION]'}`);
+    console.log(`💳 Razorpay Mode : ${RAZORPAY_KEY_ID.startsWith('rzp_test') ? 'TEST' : (RAZORPAY_KEY_ID.includes('placeholder') ? 'DEV-SIMULATOR' : 'LIVE')}`);
+    console.log(`============================================================\n`);
+  });
+}
+
+// Export for Vercel Serverless Function Handler
+module.exports = app;

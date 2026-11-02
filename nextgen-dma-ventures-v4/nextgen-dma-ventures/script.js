@@ -1,4 +1,4 @@
-// ── NEXTGEN DNA VENTURES — Premium Glassmorphism UI Engine ──
+// ── NEXTGEN DMA VENTURES — Premium Glassmorphism UI Engine ──
 // Palette: Pure White (#FFFFFF) + Pure Black (#000000) + Mint Teal (#65D2C5)
 if (window.tailwind) {
     tailwind.config = {
@@ -2415,7 +2415,7 @@ async function handleBookingFormSubmit(e) {
             key: orderData.key_id,
             amount: orderData.amount, // in paise
             currency: "INR",
-            name: "NEXTGEN DNA VENTURES",
+            name: "NEXTGEN DMA VENTURES",
             description: `${isAdvance ? 'Advance Slot Reservation' : 'Full Payment'} - ${course.name}`,
             image: "./logo.jpeg",
             order_id: orderData.order_id,
@@ -2720,7 +2720,7 @@ function showFormError(msg) {
 
 // Clean API Integration Handler (Ready for Backend/Webhook Integration)
 async function submitCourseApplicationAPI(payload) {
-    console.log("=== NEXTGEN DNA VENTURES COURSE APPLICATION PAYLOAD ===", payload);
+    console.log("=== NEXTGEN DMA VENTURES COURSE APPLICATION PAYLOAD ===", payload);
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve({

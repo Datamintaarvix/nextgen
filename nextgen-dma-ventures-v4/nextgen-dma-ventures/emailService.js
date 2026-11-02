@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * NEXTGEN DNA VENTURES - EMAIL RECEIPT SERVICE (Nodemailer)
+ * NEXTGEN DMA VENTURES - EMAIL RECEIPT SERVICE (Nodemailer)
  * ============================================================================
  * Generates and sends branded HTML payment receipts upon verified payment.
  * Logs delivery status into the database.
@@ -74,11 +74,13 @@ async function sendPaymentReceipt(receiptData) {
   } = receiptData;
 
   const isAdvance = paymentType === 'advance' || amountPaid === 2499;
-  const paymentTypeTitle = isAdvance ? 'Advance Payment – Slot Reservation' : 'Full Course Fee Payment';
+  const paymentTypeTitle = isAdvance ? 'Advance Payment – Slot Reservation' : (paymentType === 'balance' ? 'Subsequent Course Fee Balance Payment' : 'Full Course Fee Payment');
   
   const paymentNote = isAdvance
     ? 'Your slot reservation advance of ₹2,499 has been received and adjusted against your total course fee. Your admission slot has been reserved.'
-    : 'Your full course fee has been successfully received. Your registration is complete and fully confirmed.';
+    : (remainingBalance === 0 
+        ? 'Your course fee is now fully paid. Your registration is complete and 100% confirmed.'
+        : `Your payment of ${formatINR(amountPaid)} has been received. Remaining balance: ${formatINR(remainingBalance)}.`);
 
   const formattedDate = paymentDate || new Date().toLocaleString('en-IN', {
     timeZone: 'Asia/Kolkata',
@@ -86,12 +88,12 @@ async function sendPaymentReceipt(receiptData) {
     timeStyle: 'short'
   });
 
-  const subject = `Payment Successful – NEXTGEN DNA VENTURES Course Registration (${registrationId})`;
+  const subject = `Payment Successful – NEXTGEN DMA VENTURES Course Registration (${registrationId})`;
 
   const textBody = `
 Dear ${studentName},
 
-Your payment has been successfully received by NEXTGEN DNA VENTURES.
+Your payment has been successfully received by NEXTGEN DMA VENTURES.
 
 PAYMENT RECEIPT
 ------------------------------------------------------------
@@ -111,7 +113,7 @@ Payment Status  : SUCCESSFUL
 Note: ${paymentNote}
 
 Campus Location:
-NEXTGEN DNA VENTURES
+NEXTGEN DMA VENTURES
 HSR Layout, Sector 1, Bangalore, Karnataka - 560102
 Admissions Helpline: +91 9787076296 | Email: admissions@nextgendma.com
 `;
@@ -121,7 +123,7 @@ Admissions Helpline: +91 9787076296 | Email: admissions@nextgendma.com
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Payment Receipt - NEXTGEN DNA VENTURES</title>
+  <title>Payment Receipt - NEXTGEN DMA VENTURES</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0b0f12; color: #172126; margin: 0; padding: 24px; }
     .receipt-card { max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; }
@@ -146,7 +148,7 @@ Admissions Helpline: +91 9787076296 | Email: admissions@nextgendma.com
 <body>
   <div class="receipt-card">
     <div class="receipt-header">
-      <div class="brand-title">NEXTGEN <span class="brand-accent">DNA</span> VENTURES</div>
+      <div class="brand-title">NEXTGEN <span class="brand-accent">DMA</span> VENTURES</div>
       <div class="brand-sub">Tech Academy &bull; Enterprise Innovation Hub</div>
       <div class="status-badge">&check; PAYMENT VERIFIED &bull; OFFICIAL RECEIPT</div>
     </div>
@@ -154,7 +156,7 @@ Admissions Helpline: +91 9787076296 | Email: admissions@nextgendma.com
     <div class="receipt-body">
       <div class="greeting">
         Dear <strong>${studentName}</strong>,<br>
-        Your payment has been successfully received and verified by <strong>NEXTGEN DNA VENTURES</strong>.
+        Your payment has been successfully received and verified by <strong>NEXTGEN DMA VENTURES</strong>.
       </div>
 
       <div class="receipt-box">
@@ -214,7 +216,7 @@ Admissions Helpline: +91 9787076296 | Email: admissions@nextgendma.com
     </div>
 
     <div class="receipt-footer">
-      <div>NEXTGEN DNA VENTURES &bull; HSR Layout, Sector 1, Bangalore, Karnataka - 560102</div>
+      <div>NEXTGEN DMA VENTURES &bull; HSR Layout, Sector 1, Bangalore, Karnataka - 560102</div>
       <div style="margin-top: 4px;">Helpline: <a href="tel:+919787076296" class="contact-link">+91 9787076296</a> | Email: <a href="mailto:admissions@nextgendma.com" class="contact-link">admissions@nextgendma.com</a></div>
       <div style="margin-top: 8px; color: #94a3b8;">This is an electronically generated receipt for your verified payment.</div>
     </div>
@@ -226,7 +228,7 @@ Admissions Helpline: +91 9787076296 | Email: admissions@nextgendma.com
   try {
     const mailer = getTransporter();
     const fromEmail = process.env.SMTP_FROM_EMAIL || 'admissions@nextgendma.com';
-    const fromName = process.env.SMTP_FROM_NAME || 'NEXTGEN DNA VENTURES Admissions';
+    const fromName = process.env.SMTP_FROM_NAME || 'NEXTGEN DMA VENTURES Admissions';
 
     const info = await mailer.sendMail({
       from: `"${fromName}" <${fromEmail}>`,
@@ -239,7 +241,7 @@ Admissions Helpline: +91 9787076296 | Email: admissions@nextgendma.com
     const isSimulated = info && info.messageId && info.messageId.startsWith('sim_');
     const deliveryStatus = isSimulated ? 'simulated' : 'sent';
 
-    EmailLogsRepo.create({
+    await EmailLogsRepo.create({
       registration_id: registrationId,
       email: studentEmail,
       email_type: 'payment_receipt',
@@ -255,14 +257,16 @@ Admissions Helpline: +91 9787076296 | Email: admissions@nextgendma.com
   } catch (err) {
     console.error(`[Email Error] Failed to send receipt to ${studentEmail}:`, err.message);
 
-    EmailLogsRepo.create({
-      registration_id: registrationId,
-      email: studentEmail,
-      email_type: 'payment_receipt',
-      subject,
-      delivery_status: 'failed',
-      error_message: err.message
-    });
+    try {
+      await EmailLogsRepo.create({
+        registration_id: registrationId,
+        email: studentEmail,
+        email_type: 'payment_receipt',
+        subject,
+        delivery_status: 'failed',
+        error_message: err.message
+      });
+    } catch (logErr) {}
 
     return {
       success: false,
@@ -276,4 +280,3 @@ module.exports = {
   sendPaymentReceipt,
   formatINR
 };
-

@@ -1,0 +1,178 @@
+/* ============================================================
+   NEXTGEN DMA VENTURES — GLASSMORPHISM ENHANCEMENTS
+   Palette: #FFFFFF (White) + #000000 (Black) + #65D2C5 (Mint Teal)
+   ============================================================ */
+
+:root {
+  --logo-colour: #65D2C5;
+  --logo-colour-deep: #000000;
+  --logo-colour-soft: #F7F9F8;
+  --revision-ink: #000000;
+  --revision-white: #FFFFFF;
+  --revision-line: rgba(101, 210, 197, 0.30);
+}
+
+/* Force Clean Font System */
+body, h1, h2, h3, h4, h5, h6, p, span, a, li, small, strong, b, button, input, select, textarea {
+  font-style: normal !important;
+}
+
+/* Smooth Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(101, 210, 197, 0.4);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #65D2C5;
+}
+
+/* Glassmorphism Section Backgrounds */
+.section-glass-light {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F7F9F8 50%, #FFFFFF 100%);
+  position: relative;
+}
+
+.section-glass-dark {
+  background: #000000;
+  color: #FFFFFF;
+  position: relative;
+}
+
+/* Ambient Mint Glow Background Accents */
+.ambient-glow-mint {
+  position: absolute;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(101, 210, 197, 0.16) 0%, transparent 70%);
+  filter: blur(50px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Methodology Cards in Glass */
+.method-card {
+  padding: 28px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(101, 210, 197, 0.30);
+  border-radius: 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.method-card:hover {
+  border-color: #65D2C5;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 36px rgba(101, 210, 197, 0.25);
+}
+
+.method-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  background: #000000;
+  color: #65D2C5;
+  border: 1px solid rgba(101, 210, 197, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+/* Evolution Cards in Glass */
+.evolution-card {
+  padding: 32px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(101, 210, 197, 0.30);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.evolution-card.after-card {
+  background: rgba(0, 0, 0, 0.85);
+  color: #FFFFFF;
+  border-color: #65D2C5;
+  box-shadow: 0 12px 40px rgba(101, 210, 197, 0.25);
+}
+
+.evolution-card.after-card h3 {
+  color: #FFFFFF !important;
+}
+
+.evolution-card.after-card ul li {
+  color: #d1d5db !important;
+}
+
+/* Testimonial Cards in Glass */
+.testimonial-glass-card {
+  background: rgba(255, 255, 255, 0.80);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(101, 210, 197, 0.30);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.testimonial-glass-card:hover {
+  border-color: #65D2C5;
+  box-shadow: 0 16px 40px rgba(101, 210, 197, 0.25);
+  transform: translateY(-4px);
+}
+
+/* Legacy Utility Remapping strictly to 3 Brand Colours */
+.bg-brand-600, .bg-brand-500, .bg-brand-700 {
+  background-color: #65D2C5 !important;
+  color: #000000 !important;
+}
+
+.text-brand-600, .text-brand-500, .text-brand-400, .text-accent-400, .text-accent-300 {
+  color: #65D2C5 !important;
+}
+
+.border-brand-500, .border-brand-600, .border-brand-400 {
+  border-color: #65D2C5 !important;
+}
+
+.focus\:ring-brand-500:focus {
+  --tw-ring-color: rgba(101, 210, 197, 0.4) !important;
+}
+
+/* ============================================================
+   RAZORPAY BOOKING & PAYMENT OPTION STYLES
+   ============================================================ */
+.payment-option-card {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.payment-option-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #65D2C5;
+}
+.payment-option-card.active-option {
+  border-color: #65D2C5 !important;
+  background: rgba(101, 210, 197, 0.12) !important;
+  box-shadow: 0 0 20px rgba(101, 210, 197, 0.2);
+}
+

@@ -1,165 +1,70 @@
 /**
  * ============================================================================
- * NEXTGEN DNA VENTURES - DATABASE ARCHITECTURE & SUPABASE CLOUD REPOSITORY
+ * NEXTGEN DMA VENTURES - AUTHORITATIVE SUPABASE CLOUD REPOSITORY LAYER
  * ============================================================================
- * Production-ready Dual-Layer Persistence:
- * 1. Supabase PostgreSQL Cloud Database (via @supabase/supabase-js & REST fallback)
- * 2. Local ACID transactional persistent cache (guarantees zero-downtime offline resiliency)
- *
- * Connected Supabase Instance:
- * https://kbuoysznaztsdqmwwtya.supabase.co
+ * Production Cloud Persistence:
+ * - Direct queries to Supabase PostgreSQL (Never writes to /tmp in production)
+ * - Atomic PostgreSQL sequence for Registration IDs (Never uses record counts)
+ * - Persistent serverless rate limiting via `login_attempts`
+ * - Persistent webhook idempotency via `webhook_events`
+ * - Production-ready transaction & concurrency protection
  */
 
-const fs = require('fs');
-const path = require('path');
 const crypto = require('crypto');
 
-const DATA_DIR = path.join(__dirname, 'data');
-const DB_FILE = path.join(DATA_DIR, 'nextgen_production.json');
-const BACKUP_FILE = path.join(DATA_DIR, 'nextgen_production.backup.json');
+// Environment & Production Detection
+const isProduction = process.env.NODE_ENV === 'production' || Boolean(process.env.VERCEL) || Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME);
 
-// Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-
-// Supabase Credentials from Environment (Never hardcode secrets)
+// Supabase Credentials from Environment
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';
 
 let supabase = null;
-try {
-  const { createClient } = require('@supabase/supabase-js');
-  if (SUPABASE_URL && SUPABASE_KEY) {
+if (SUPABASE_URL && SUPABASE_KEY) {
+  try {
+    const { createClient } = require('@supabase/supabase-js');
     supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: { persistSession: false }
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false
+      }
     });
-    console.log('[Supabase] SDK Client connected to:', SUPABASE_URL);
+    console.log('[Supabase] Initialized SDK client for:', SUPABASE_URL);
+  } catch (err) {
+    console.error('[Supabase] Failed to initialize Supabase client:', err.message);
   }
-} catch (err) {
-  console.log('[Supabase] Note: @supabase/supabase-js not yet loaded. Using REST engine fallback.');
+} else if (isProduction) {
+  console.error('[Supabase] CRITICAL: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be configured in production!');
 }
 
 /**
- * Universal Supabase REST caller (uses built-in fetch if SDK is not installed)
+ * Asserts Supabase is active in production.
  */
-async function supabaseRest(endpoint, options = {}) {
-  if (!SUPABASE_URL || !SUPABASE_KEY) return null;
-  const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
-  const headers = {
-    'apikey': SUPABASE_KEY,
-    'Authorization': `Bearer ${SUPABASE_KEY}`,
-    'Content-Type': 'application/json',
-    'Prefer': 'return=representation',
-    ...(options.headers || {})
-  };
-
-  try {
-    const res = await fetch(url, {
-      method: options.method || 'GET',
-      headers,
-      body: options.body ? JSON.stringify(options.body) : undefined
-    });
-    if (!res.ok) {
-      const errText = await res.text();
-      return { error: errText, status: res.status };
+function assertSupabaseActive(operationName) {
+  if (!supabase) {
+    if (isProduction) {
+      throw new Error(`Database service unavailable: Supabase client is not configured for production (${operationName}). Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.`);
     }
-    const data = await res.json();
-    return { data };
-  } catch (e) {
-    return { error: e.message };
+    return false;
   }
+  return true;
 }
 
-// Initial Local Database Schema
-const INITIAL_STATE = {
-  version: "2.1.0",
-  lastUpdated: new Date().toISOString(),
-  counters: {
-    registrationSequence: 1000
-  },
+// Development In-Memory Store (USED ONLY IN LOCAL DEV WHEN SUPABASE KEYS ARE OMITTED)
+const devMockStore = {
+  counters: { registrationSequence: 1000 },
   students: [],
   courses: [],
   registrations: [],
   payments: [],
   email_logs: [],
-  admin_users: []
+  admin_users: [],
+  login_attempts: new Map(),
+  webhook_events: new Set()
 };
 
-// In-memory cache for fast queries
-let dbCache = null;
-
-/**
- * Load Database from disk with automatic corruption fallback
- */
-function loadDB() {
-  if (dbCache) return dbCache;
-
-  if (fs.existsSync(DB_FILE)) {
-    try {
-      const raw = fs.readFileSync(DB_FILE, 'utf8');
-      dbCache = JSON.parse(raw);
-      return dbCache;
-    } catch (err) {
-      console.error('[DB] Primary database file error, trying backup...', err.message);
-      if (fs.existsSync(BACKUP_FILE)) {
-        try {
-          const backupRaw = fs.readFileSync(BACKUP_FILE, 'utf8');
-          dbCache = JSON.parse(backupRaw);
-          return dbCache;
-        } catch (backupErr) {
-          console.error('[DB] Backup also unreadable. Initializing fresh DB.', backupErr.message);
-        }
-      }
-    }
-  }
-
-  // Initialize fresh
-  dbCache = JSON.parse(JSON.stringify(INITIAL_STATE));
-  saveDB();
-  return dbCache;
-}
-
-/**
- * Atomic save with write-rename pattern
- */
-function saveDB() {
-  if (!dbCache) return;
-  dbCache.lastUpdated = new Date().toISOString();
-
-  const tempFile = path.join(DATA_DIR, `nextgen_temp_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.json`);
-  const dataString = JSON.stringify(dbCache, null, 2);
-
-  try {
-    fs.writeFileSync(tempFile, dataString, 'utf8');
-    if (fs.existsSync(DB_FILE)) {
-      try {
-        fs.copyFileSync(DB_FILE, BACKUP_FILE);
-      } catch (e) {}
-    }
-    fs.renameSync(tempFile, DB_FILE);
-  } catch (err) {
-    console.error('[DB Error] Failed to persist database:', err);
-    try {
-      if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
-    } catch (e) {}
-    throw err;
-  }
-}
-
-/**
- * Generate Sequential Unique Registration ID: NDV2026-1001, NDV2026-1002...
- */
-function generateRegistrationId() {
-  const db = loadDB();
-  db.counters.registrationSequence += 1;
-  const seq = db.counters.registrationSequence;
-  saveDB();
-  return `NDV2026-${seq}`;
-}
-
 // ============================================================================
-// 47 OFFICIAL NEXTGEN DNA VENTURES COURSES (Central Seed Catalog)
+// 47 AUTHORITATIVE NEXTGEN DMA VENTURES COURSES (Authoritative Catalog)
 // ============================================================================
 const OFFICIAL_COURSES = [
   // 1. Artificial Intelligence & Data Technologies
@@ -189,7 +94,7 @@ const OFFICIAL_COURSES = [
 
   // 5. Mechanical Engineering
   { id: "me-001", course_name: "Mechanical CAD Modeling", category: "Mechanical Engineering", duration: 28, duration_text: "28 Weeks", total_fee: 26499 },
-  { id: "me-002", "course_name": "Finite Element Analysis (FEA)", category: "Mechanical Engineering", duration: 28, duration_text: "28 Weeks", total_fee: 28799 },
+  { id: "me-002", finite_element: true, course_name: "Finite Element Analysis (FEA)", category: "Mechanical Engineering", duration: 28, duration_text: "28 Weeks", total_fee: 28799 },
   { id: "me-003", course_name: "Computational Fluid Dynamics (CFD)", category: "Mechanical Engineering", duration: 24, duration_text: "24 Weeks", total_fee: 24999 },
   { id: "me-004", course_name: "Thermal Systems Design", category: "Mechanical Engineering", duration: 24, duration_text: "24 Weeks", total_fee: 24999 },
   { id: "me-005", course_name: "Product Lifecycle Management (PLM)", category: "Mechanical Engineering", duration: 30, duration_text: "30 Weeks", total_fee: 29999 },
@@ -223,81 +128,240 @@ const OFFICIAL_COURSES = [
 ];
 
 /**
- * Seed Courses and Default Admin on Startup
+ * Concurrency-Safe Sequential Registration ID Generation:
+ * Exclusively invokes PostgreSQL stored function `get_next_registration_id()`.
+ * Never uses record counts.
  */
-async function seedInitialData(adminEmail, adminPasswordHash) {
-  const db = loadDB();
-
-  // 1. Seed Courses Locally
-  let coursesModified = false;
-  OFFICIAL_COURSES.forEach(official => {
-    const existingIndex = db.courses.findIndex(c => c.id === official.id || c.course_name.toLowerCase() === official.course_name.toLowerCase());
-    if (existingIndex === -1) {
-      db.courses.push({
-        ...official,
-        status: "active",
-        created_at: new Date().toISOString()
-      });
-      coursesModified = true;
-    } else {
-      db.courses[existingIndex] = {
-        ...db.courses[existingIndex],
-        ...official,
-        status: "active"
-      };
-      coursesModified = true;
+async function generateRegistrationId() {
+  if (assertSupabaseActive('generateRegistrationId')) {
+    try {
+      const { data, error } = await supabase.rpc('get_next_registration_id');
+      if (!error && data) {
+        return data;
+      }
+      if (error) {
+        throw new Error(error.message);
+      }
+    } catch (rpcErr) {
+      if (isProduction) {
+        throw new Error('Database sequence error: Failed to generate atomic registration ID: ' + rpcErr.message);
+      }
     }
-  });
-
-  // 2. Seed Default Admin User if none exists locally
-  if (db.admin_users.length === 0 && adminEmail) {
-    db.admin_users.push({
-      id: "admin-master-001",
-      email: adminEmail.toLowerCase().trim(),
-      password_hash: adminPasswordHash || "",
-      role: "superadmin",
-      name: "Master Administrator",
-      created_at: new Date().toISOString()
-    });
-    coursesModified = true;
   }
 
-  if (coursesModified) {
-    saveDB();
-    console.log(`[DB] Local seed complete: ${db.courses.length} courses loaded.`);
-  }
-
-  // 3. Sync & Seed to Supabase in Background
-  syncCoursesToSupabase();
+  // Development Fallback
+  devMockStore.counters.registrationSequence += 1;
+  return `NDV2026-${devMockStore.counters.registrationSequence}`;
 }
 
-async function syncCoursesToSupabase() {
-  if (!SUPABASE_URL || !SUPABASE_KEY) return;
-  try {
-    if (supabase) {
-      const { error } = await supabase.from('courses').upsert(OFFICIAL_COURSES, { onConflict: 'id' });
-      if (!error) {
-        console.log('[Supabase] Successfully synchronized 47 courses to cloud database.');
+/**
+ * Seed Courses and Initial Administrator Safely
+ */
+async function seedInitialData(adminEmail, adminPasswordHash) {
+  if (supabase) {
+    try {
+      // 1. Seed authoritative courses
+      await supabase.from('courses').upsert(OFFICIAL_COURSES, { onConflict: 'id' });
+
+      // 2. Safe initial administrator bootstrap (One-time only: never overwrites existing)
+      if (adminEmail && adminPasswordHash) {
+        const cleanEmail = adminEmail.toLowerCase().trim();
+        const { data: existing } = await supabase.from('admin_users').select('id').eq('email', cleanEmail).maybeSingle();
+        if (!existing) {
+          const { count } = await supabase.from('admin_users').select('*', { count: 'exact', head: true });
+          if (count === 0) {
+            await supabase.from('admin_users').insert([
+              {
+                id: 'admin-master-001',
+                email: cleanEmail,
+                password_hash: adminPasswordHash,
+                role: 'superadmin',
+                name: 'Master Administrator'
+              }
+            ]);
+            console.log('[Supabase Seed] Bootstrapped initial administrative account for:', cleanEmail);
+          }
+        }
       }
-    } else {
-      await supabaseRest('courses', {
-        method: 'POST',
-        headers: { 'Prefer': 'resolution=merge-duplicates' },
-        body: OFFICIAL_COURSES
+    } catch (err) {
+      console.warn('[Supabase Seed Notice]', err.message);
+    }
+  } else {
+    OFFICIAL_COURSES.forEach(c => {
+      if (!devMockStore.courses.find(x => x.id === c.id)) {
+        devMockStore.courses.push({ ...c, status: 'active' });
+      }
+    });
+    if (adminEmail && adminPasswordHash && devMockStore.admin_users.length === 0) {
+      devMockStore.admin_users.push({
+        id: 'admin-master-001',
+        email: adminEmail.toLowerCase().trim(),
+        password_hash: adminPasswordHash,
+        role: 'superadmin',
+        name: 'Master Administrator'
       });
     }
-  } catch (e) {
-    // Non-fatal, tables may not be created yet
   }
 }
 
 // ============================================================================
-// REPOSITORIES (With Cloud Synchronization)
+// PERSISTENT SERVERLESS RATE LIMITING REPOSITORY (Supabase Cloud)
+// ============================================================================
+const RateLimiterRepo = {
+  async checkLimit(ip) {
+    const now = new Date();
+    if (assertSupabaseActive('RateLimiterRepo.checkLimit')) {
+      const { data, error } = await supabase.from('login_attempts').select('*').eq('ip', ip).maybeSingle();
+      if (error) {
+        console.warn('[RateLimiter Supabase Error]', error.message);
+        return { allowed: true };
+      }
+
+      if (!data) return { allowed: true };
+
+      // 1. Check if currently locked
+      if (data.locked_until && new Date(data.locked_until) > now) {
+        const remainingMinutes = Math.ceil((new Date(data.locked_until) - now) / (60 * 1000));
+        return { allowed: false, remainingMinutes };
+      }
+
+      // 2. Check if window has expired (15 mins)
+      const firstAttempt = new Date(data.first_attempt);
+      if (now - firstAttempt > 15 * 60 * 1000) {
+        // Reset expired window
+        await supabase.from('login_attempts').delete().eq('ip', ip);
+        return { allowed: true };
+      }
+
+      // 3. Check attempt count threshold
+      if (data.attempt_count >= 8) {
+        const lockUntil = new Date(now.getTime() + 15 * 60 * 1000).toISOString();
+        await supabase.from('login_attempts').update({ locked_until: lockUntil }).eq('ip', ip);
+        return { allowed: false, remainingMinutes: 15 };
+      }
+
+      return { allowed: true, count: data.attempt_count };
+    }
+
+    // Dev fallback
+    const mem = devMockStore.login_attempts.get(ip) || { count: 0, first: Date.now() };
+    if (mem.locked && mem.locked > Date.now()) {
+      return { allowed: false, remainingMinutes: Math.ceil((mem.locked - Date.now()) / 60000) };
+    }
+    return { allowed: true };
+  },
+
+  async recordFailedAttempt(ip) {
+    const now = new Date();
+    if (assertSupabaseActive('RateLimiterRepo.recordFailedAttempt')) {
+      const { data } = await supabase.from('login_attempts').select('*').eq('ip', ip).maybeSingle();
+      if (!data) {
+        await supabase.from('login_attempts').insert([
+          {
+            ip,
+            attempt_count: 1,
+            first_attempt: now.toISOString(),
+            last_attempt: now.toISOString()
+          }
+        ]);
+      } else {
+        const newCount = (data.attempt_count || 0) + 1;
+        const updates = {
+          attempt_count: newCount,
+          last_attempt: now.toISOString()
+        };
+        if (newCount >= 8) {
+          updates.locked_until = new Date(now.getTime() + 15 * 60 * 1000).toISOString();
+        }
+        await supabase.from('login_attempts').update(updates).eq('ip', ip);
+      }
+      return;
+    }
+
+    const mem = devMockStore.login_attempts.get(ip) || { count: 0, first: Date.now() };
+    mem.count++;
+    if (mem.count >= 8) mem.locked = Date.now() + 15 * 60 * 1000;
+    devMockStore.login_attempts.set(ip, mem);
+  },
+
+  async reset(ip) {
+    if (assertSupabaseActive('RateLimiterRepo.reset')) {
+      await supabase.from('login_attempts').delete().eq('ip', ip);
+      return;
+    }
+    devMockStore.login_attempts.delete(ip);
+  }
+};
+
+// ============================================================================
+// PERSISTENT WEBHOOK IDEMPOTENCY REPOSITORY (Supabase Cloud)
+// ============================================================================
+const WebhookEventsRepo = {
+  async isProcessed(eventId) {
+    if (assertSupabaseActive('WebhookEventsRepo.isProcessed')) {
+      const { data, error } = await supabase.from('webhook_events').select('event_id').eq('event_id', eventId).maybeSingle();
+      if (error) {
+        console.warn('[WebhookEventsRepo Supabase Error]', error.message);
+        return false;
+      }
+      return Boolean(data);
+    }
+    return devMockStore.webhook_events.has(eventId);
+  },
+
+  async record(eventId, eventType, payload) {
+    if (assertSupabaseActive('WebhookEventsRepo.record')) {
+      await supabase.from('webhook_events').insert([
+        {
+          event_id: eventId,
+          event_type: eventType,
+          payload: typeof payload === 'object' ? payload : { raw: payload }
+        }
+      ]);
+      return;
+    }
+    devMockStore.webhook_events.add(eventId);
+  },
+
+  /**
+   * Atomic Insert-First Idempotency Check:
+   * Leverages PostgreSQL PRIMARY KEY constraint on `event_id`.
+   * Rejects simultaneous duplicate webhook deliveries at the database transaction layer.
+   */
+  async recordOrSkip(eventId, eventType, payload) {
+    if (assertSupabaseActive('WebhookEventsRepo.recordOrSkip')) {
+      const { error } = await supabase.from('webhook_events').insert([
+        {
+          event_id: eventId,
+          event_type: eventType,
+          payload: typeof payload === 'object' ? payload : { raw: payload }
+        }
+      ]);
+
+      if (error) {
+        // Code 23505 is PostgreSQL unique_violation
+        if (error.code === '23505' || (error.message && (error.message.includes('duplicate key') || error.message.includes('unique constraint')))) {
+          return { alreadyProcessed: true };
+        }
+        console.warn('[WebhookEventsRepo Insert Notice]', error.message);
+      }
+      return { alreadyProcessed: false };
+    }
+
+    if (devMockStore.webhook_events.has(eventId)) {
+      return { alreadyProcessed: true };
+    }
+    devMockStore.webhook_events.add(eventId);
+    return { alreadyProcessed: false };
+  }
+};
+
+// ============================================================================
+// REPOSITORIES — TRUE CLOUD PERSISTENCE VIA SUPABASE
 // ============================================================================
 
 const StudentsRepo = {
-  create(data) {
-    const db = loadDB();
+  async create(data) {
     const id = `stu_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
     const student = {
       id,
@@ -312,60 +376,83 @@ const StudentsRepo = {
       state: (data.state || '').trim(),
       created_at: new Date().toISOString()
     };
-    db.students.push(student);
-    saveDB();
 
-    // Asynchronously sync to Supabase
-    (async () => {
-      try {
-        if (supabase) {
-          await supabase.from('students').insert([student]);
-        } else {
-          await supabaseRest('students', { method: 'POST', body: [student] });
-        }
-      } catch (e) {}
-    })();
+    if (assertSupabaseActive('StudentsRepo.create')) {
+      const { data: inserted, error } = await supabase.from('students').insert([student]).select().single();
+      if (error) {
+        throw new Error(`Database error saving student record: ${error.message}`);
+      }
+      return inserted;
+    }
 
+    devMockStore.students.push(student);
     return student;
   },
 
-  findByRegId(regId) {
-    const db = loadDB();
-    return db.students.find(s => s.registration_id === regId) || null;
+  async findByRegId(regId) {
+    if (assertSupabaseActive('StudentsRepo.findByRegId')) {
+      const { data, error } = await supabase.from('students').select('*').eq('registration_id', regId).maybeSingle();
+      if (error) throw new Error(`Database error finding student: ${error.message}`);
+      return data || null;
+    }
+    return devMockStore.students.find(s => s.registration_id === regId) || null;
   },
 
-  findById(id) {
-    const db = loadDB();
-    return db.students.find(s => s.id === id) || null;
+  async findByEmail(email) {
+    const clean = email.toLowerCase().trim();
+    if (assertSupabaseActive('StudentsRepo.findByEmail')) {
+      const { data, error } = await supabase.from('students').select('*').eq('email', clean).order('created_at', { ascending: false });
+      if (error) throw new Error(`Database error finding student by email: ${error.message}`);
+      return data || [];
+    }
+    return devMockStore.students.filter(s => s.email === clean);
   },
 
-  findAll() {
-    const db = loadDB();
-    return db.students;
+  async findAll() {
+    if (assertSupabaseActive('StudentsRepo.findAll')) {
+      const { data, error } = await supabase.from('students').select('*');
+      if (error) throw new Error(`Database error fetching all students: ${error.message}`);
+      return data || [];
+    }
+    return devMockStore.students;
   }
 };
 
 const CoursesRepo = {
-  findAll() {
-    const db = loadDB();
-    return db.courses;
+  async findAll() {
+    if (supabase) {
+      try {
+        const { data, error } = await supabase.from('courses').select('*').eq('status', 'active');
+        if (!error && data && data.length > 0) return data;
+      } catch (e) {}
+    }
+    return OFFICIAL_COURSES;
   },
 
-  findById(id) {
-    const db = loadDB();
-    return db.courses.find(c => c.id === id) || null;
+  async findById(id) {
+    if (supabase) {
+      try {
+        const { data, error } = await supabase.from('courses').select('*').eq('id', id).maybeSingle();
+        if (!error && data) return data;
+      } catch (e) {}
+    }
+    return OFFICIAL_COURSES.find(c => c.id === id) || null;
   },
 
-  findByName(name) {
-    const db = loadDB();
+  async findByName(name) {
+    if (supabase) {
+      try {
+        const { data, error } = await supabase.from('courses').select('*').ilike('course_name', name.trim()).maybeSingle();
+        if (!error && data) return data;
+      } catch (e) {}
+    }
     const clean = name.toLowerCase().trim();
-    return db.courses.find(c => c.course_name.toLowerCase().trim() === clean || c.id === name) || null;
+    return OFFICIAL_COURSES.find(c => c.course_name.toLowerCase().trim() === clean || c.id === name) || null;
   }
 };
 
 const RegistrationsRepo = {
-  create(data) {
-    const db = loadDB();
+  async create(data) {
     const id = `reg_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
     const registration = {
       id,
@@ -384,90 +471,82 @@ const RegistrationsRepo = {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
-    db.registrations.push(registration);
-    saveDB();
 
-    // Asynchronously sync to Supabase
-    (async () => {
-      try {
-        if (supabase) {
-          await supabase.from('registrations').insert([registration]);
-        } else {
-          await supabaseRest('registrations', { method: 'POST', body: [registration] });
-        }
-      } catch (e) {}
-    })();
+    if (assertSupabaseActive('RegistrationsRepo.create')) {
+      const { data: inserted, error } = await supabase.from('registrations').insert([registration]).select().single();
+      if (error) {
+        throw new Error(`Database error creating registration record: ${error.message}`);
+      }
+      return inserted;
+    }
 
+    devMockStore.registrations.push(registration);
     return registration;
   },
 
-  findByRegId(regId) {
-    const db = loadDB();
-    return db.registrations.find(r => r.registration_id === regId) || null;
+  async findByRegId(regId) {
+    if (assertSupabaseActive('RegistrationsRepo.findByRegId')) {
+      const { data, error } = await supabase.from('registrations').select('*').eq('registration_id', regId).maybeSingle();
+      if (error) throw new Error(`Database error finding registration: ${error.message}`);
+      return data || null;
+    }
+    return devMockStore.registrations.find(r => r.registration_id === regId) || null;
   },
 
-  update(regId, updates) {
-    const db = loadDB();
-    const idx = db.registrations.findIndex(r => r.registration_id === regId);
-    if (idx === -1) return null;
-
-    db.registrations[idx] = {
-      ...db.registrations[idx],
+  async update(regId, updates) {
+    const payload = {
       ...updates,
       updated_at: new Date().toISOString()
     };
-    saveDB();
 
-    const updatedRecord = db.registrations[idx];
+    if (assertSupabaseActive('RegistrationsRepo.update')) {
+      const { data, error } = await supabase.from('registrations').update(payload).eq('registration_id', regId).select().maybeSingle();
+      if (error) throw new Error(`Database error updating registration: ${error.message}`);
+      return data;
+    }
 
-    // Asynchronously sync update to Supabase
-    (async () => {
-      try {
-        if (supabase) {
-          await supabase.from('registrations').update(updates).eq('registration_id', regId);
-        } else {
-          await supabaseRest(`registrations?registration_id=eq.${regId}`, {
-            method: 'PATCH',
-            body: updates
-          });
-        }
-      } catch (e) {}
-    })();
-
-    return updatedRecord;
+    const idx = devMockStore.registrations.findIndex(r => r.registration_id === regId);
+    if (idx !== -1) {
+      devMockStore.registrations[idx] = { ...devMockStore.registrations[idx], ...payload };
+      return devMockStore.registrations[idx];
+    }
+    return null;
   },
 
-  findAll() {
-    const db = loadDB();
-    return [...db.registrations].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  async findAll() {
+    if (assertSupabaseActive('RegistrationsRepo.findAll')) {
+      const { data, error } = await supabase.from('registrations').select('*').order('created_at', { ascending: false });
+      if (error) throw new Error(`Database error listing registrations: ${error.message}`);
+      return data || [];
+    }
+    return [...devMockStore.registrations].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   },
 
-  getDetailed(regId) {
-    const db = loadDB();
-    const reg = db.registrations.find(r => r.registration_id === regId);
+  async getDetailed(regId) {
+    const reg = await this.findByRegId(regId);
     if (!reg) return null;
 
-    const student = db.students.find(s => s.registration_id === regId) || {};
-    const payments = db.payments.filter(p => p.registration_id === regId);
-    const emailLogs = db.email_logs.filter(e => e.registration_id === regId);
+    const student = await StudentsRepo.findByRegId(regId);
+    const payments = await PaymentsRepo.findByRegId(regId);
+    const emailLogs = await EmailLogsRepo.findByRegId(regId);
 
     return {
       ...reg,
-      student,
-      payments,
-      email_logs: emailLogs
+      student: student || {},
+      payments: payments || [],
+      email_logs: emailLogs || []
     };
   },
 
-  getStats() {
-    const db = loadDB();
-    const regs = db.registrations;
-    const payments = db.payments.filter(p => p.payment_status === 'success');
+  async getStats() {
+    const regs = await this.findAll();
+    const payments = await PaymentsRepo.findAll();
+    const successPayments = payments.filter(p => p.payment_status === 'success');
 
     let totalRevenue = 0;
     let advancePaidCount = 0;
     let fullyPaidCount = 0;
-    let pendingPaymentCount = 0;
+    let balancePendingCount = 0;
     let failedCount = 0;
     let totalPendingBalance = 0;
 
@@ -479,38 +558,38 @@ const RegistrationsRepo = {
         todayCount++;
       }
 
-      if (r.registration_status === 'Advance Paid – Slot Reserved' || r.registration_status === 'Advance Paid') {
+      if (r.registration_status === 'Advance Paid') {
         advancePaidCount++;
+        totalPendingBalance += Number(r.remaining_balance || 0);
+      } else if (r.registration_status === 'Balance Pending') {
+        balancePendingCount++;
         totalPendingBalance += Number(r.remaining_balance || 0);
       } else if (r.registration_status === 'Fully Paid') {
         fullyPaidCount++;
       } else if (r.registration_status === 'Payment Failed') {
         failedCount++;
-      } else {
-        pendingPaymentCount++;
       }
     });
 
-    payments.forEach(p => {
+    successPayments.forEach(p => {
       totalRevenue += Number(p.amount || 0);
     });
 
     return {
       totalRegistrations: regs.length,
       advancePayments: advancePaidCount,
+      balancePendingPayments: balancePendingCount,
       fullPayments: fullyPaidCount,
       totalRevenueCollected: totalRevenue,
       pendingBalances: totalPendingBalance,
       failedPayments: failedCount,
-      pendingPayments: pendingPaymentCount,
       todayRegistrations: todayCount
     };
   }
 };
 
 const PaymentsRepo = {
-  create(data) {
-    const db = loadDB();
+  async create(data) {
     const id = `pay_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
     const payment = {
       id,
@@ -520,78 +599,79 @@ const PaymentsRepo = {
       razorpay_signature: data.razorpay_signature || null,
       amount: Number(data.amount),
       currency: data.currency || 'INR',
-      payment_type: data.payment_type,
+      payment_type: data.payment_type, // 'advance' | 'full' | 'balance' | 'subsequent'
       payment_status: data.payment_status || 'created',
       payment_method: data.payment_method || 'Razorpay',
       verified_at: data.verified_at || null,
       created_at: new Date().toISOString()
     };
-    db.payments.push(payment);
-    saveDB();
 
-    // Asynchronously sync to Supabase
-    (async () => {
-      try {
-        if (supabase) {
-          await supabase.from('payments').insert([payment]);
-        } else {
-          await supabaseRest('payments', { method: 'POST', body: [payment] });
-        }
-      } catch (e) {}
-    })();
+    if (assertSupabaseActive('PaymentsRepo.create')) {
+      const { data: inserted, error } = await supabase.from('payments').insert([payment]).select().single();
+      if (error) {
+        throw new Error(`Database error recording payment: ${error.message}`);
+      }
+      return inserted;
+    }
 
+    devMockStore.payments.push(payment);
     return payment;
   },
 
-  findByOrderId(orderId) {
-    const db = loadDB();
-    return db.payments.find(p => p.razorpay_order_id === orderId) || null;
+  async findByOrderId(orderId) {
+    if (assertSupabaseActive('PaymentsRepo.findByOrderId')) {
+      const { data, error } = await supabase.from('payments').select('*').eq('razorpay_order_id', orderId).maybeSingle();
+      if (error) throw new Error(`Database error finding order ID: ${error.message}`);
+      return data || null;
+    }
+    return devMockStore.payments.find(p => p.razorpay_order_id === orderId) || null;
   },
 
-  findByPaymentId(paymentId) {
-    const db = loadDB();
-    return db.payments.find(p => p.razorpay_payment_id === paymentId) || null;
+  async findByPaymentId(paymentId) {
+    if (assertSupabaseActive('PaymentsRepo.findByPaymentId')) {
+      const { data, error } = await supabase.from('payments').select('*').eq('razorpay_payment_id', paymentId).maybeSingle();
+      if (error) throw new Error(`Database error finding payment ID: ${error.message}`);
+      return data || null;
+    }
+    return devMockStore.payments.find(p => p.razorpay_payment_id === paymentId) || null;
   },
 
-  findByRegId(regId) {
-    const db = loadDB();
-    return db.payments.filter(p => p.registration_id === regId);
+  async findByRegId(regId) {
+    if (assertSupabaseActive('PaymentsRepo.findByRegId')) {
+      const { data, error } = await supabase.from('payments').select('*').eq('registration_id', regId).order('created_at', { ascending: false });
+      if (error) throw new Error(`Database error finding payments for registration: ${error.message}`);
+      return data || [];
+    }
+    return devMockStore.payments.filter(p => p.registration_id === regId);
   },
 
-  update(id, updates) {
-    const db = loadDB();
-    const idx = db.payments.findIndex(p => p.id === id);
-    if (idx === -1) return null;
+  async update(id, updates) {
+    if (assertSupabaseActive('PaymentsRepo.update')) {
+      const { data, error } = await supabase.from('payments').update(updates).eq('id', id).select().maybeSingle();
+      if (error) throw new Error(`Database error updating payment: ${error.message}`);
+      return data;
+    }
 
-    db.payments[idx] = {
-      ...db.payments[idx],
-      ...updates
-    };
-    saveDB();
-
-    // Asynchronously sync update to Supabase
-    (async () => {
-      try {
-        if (supabase) {
-          await supabase.from('payments').update(updates).eq('id', id);
-        } else {
-          await supabaseRest(`payments?id=eq.${id}`, { method: 'PATCH', body: updates });
-        }
-      } catch (e) {}
-    })();
-
-    return db.payments[idx];
+    const idx = devMockStore.payments.findIndex(p => p.id === id);
+    if (idx !== -1) {
+      devMockStore.payments[idx] = { ...devMockStore.payments[idx], ...updates };
+      return devMockStore.payments[idx];
+    }
+    return null;
   },
 
-  findAll() {
-    const db = loadDB();
-    return [...db.payments].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  async findAll() {
+    if (assertSupabaseActive('PaymentsRepo.findAll')) {
+      const { data, error } = await supabase.from('payments').select('*').order('created_at', { ascending: false });
+      if (error) throw new Error(`Database error fetching payments: ${error.message}`);
+      return data || [];
+    }
+    return [...devMockStore.payments].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   }
 };
 
 const EmailLogsRepo = {
-  create(data) {
-    const db = loadDB();
+  async create(data) {
     const id = `email_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
     const log = {
       id,
@@ -603,61 +683,69 @@ const EmailLogsRepo = {
       error_message: data.error_message || null,
       sent_at: new Date().toISOString()
     };
-    db.email_logs.push(log);
-    saveDB();
 
-    // Asynchronously sync to Supabase
-    (async () => {
+    if (supabase) {
       try {
-        if (supabase) {
-          await supabase.from('email_logs').insert([log]);
-        } else {
-          await supabaseRest('email_logs', { method: 'POST', body: [log] });
-        }
-      } catch (e) {}
-    })();
-
+        await supabase.from('email_logs').insert([log]);
+      } catch (err) {
+        console.warn('[EmailLogsRepo.create warning]', err.message);
+      }
+    } else {
+      devMockStore.email_logs.push(log);
+    }
     return log;
   },
 
-  findByRegId(regId) {
-    const db = loadDB();
-    return db.email_logs.filter(e => e.registration_id === regId);
+  async findByRegId(regId) {
+    if (assertSupabaseActive('EmailLogsRepo.findByRegId')) {
+      const { data, error } = await supabase.from('email_logs').select('*').eq('registration_id', regId).order('sent_at', { ascending: false });
+      if (error) throw new Error(`Database error fetching email logs: ${error.message}`);
+      return data || [];
+    }
+    return devMockStore.email_logs.filter(e => e.registration_id === regId);
   },
 
-  findAll() {
-    const db = loadDB();
-    return [...db.email_logs].sort((a, b) => new Date(b.sent_at) - new Date(a.sent_at));
+  async findAll() {
+    if (assertSupabaseActive('EmailLogsRepo.findAll')) {
+      const { data, error } = await supabase.from('email_logs').select('*').order('sent_at', { ascending: false });
+      if (error) throw new Error(`Database error fetching all email logs: ${error.message}`);
+      return data || [];
+    }
+    return [...devMockStore.email_logs].sort((a, b) => new Date(b.sent_at) - new Date(a.sent_at));
   }
 };
 
 const AdminUsersRepo = {
-  findByEmail(email) {
-    const db = loadDB();
+  async findByEmail(email) {
     const clean = email.toLowerCase().trim();
-    return db.admin_users.find(u => u.email === clean) || null;
+    if (assertSupabaseActive('AdminUsersRepo.findByEmail')) {
+      const { data, error } = await supabase.from('admin_users').select('*').eq('email', clean).maybeSingle();
+      if (error) throw new Error(`Database error checking admin credentials: ${error.message}`);
+      return data || null;
+    }
+    return devMockStore.admin_users.find(u => u.email === clean) || null;
   },
 
-  findById(id) {
-    const db = loadDB();
-    return db.admin_users.find(u => u.id === id) || null;
+  async findById(id) {
+    if (assertSupabaseActive('AdminUsersRepo.findById')) {
+      const { data, error } = await supabase.from('admin_users').select('*').eq('id', id).maybeSingle();
+      if (error) throw new Error(`Database error checking admin ID: ${error.message}`);
+      return data || null;
+    }
+    return devMockStore.admin_users.find(u => u.id === id) || null;
   },
 
-  updatePassword(email, newHash) {
-    const db = loadDB();
-    const idx = db.admin_users.findIndex(u => u.email === email.toLowerCase().trim());
+  async updatePassword(email, newHash) {
+    const clean = email.toLowerCase().trim();
+    if (assertSupabaseActive('AdminUsersRepo.updatePassword')) {
+      const { error } = await supabase.from('admin_users').update({ password_hash: newHash }).eq('email', clean);
+      if (error) throw new Error(`Database error updating password: ${error.message}`);
+      return true;
+    }
+
+    const idx = devMockStore.admin_users.findIndex(u => u.email === clean);
     if (idx !== -1) {
-      db.admin_users[idx].password_hash = newHash;
-      saveDB();
-
-      (async () => {
-        try {
-          if (supabase) {
-            await supabase.from('admin_users').update({ password_hash: newHash }).eq('email', email.toLowerCase().trim());
-          }
-        } catch (e) {}
-      })();
-
+      devMockStore.admin_users[idx].password_hash = newHash;
       return true;
     }
     return false;
@@ -665,11 +753,11 @@ const AdminUsersRepo = {
 };
 
 module.exports = {
-  loadDB,
-  saveDB,
   generateRegistrationId,
   seedInitialData,
   supabase,
+  RateLimiterRepo,
+  WebhookEventsRepo,
   StudentsRepo,
   CoursesRepo,
   RegistrationsRepo,

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard &bull; NEXTGEN DNA VENTURES</title>
+  <title>Admin Dashboard &bull; NEXTGEN DMA VENTURES</title>
   
   <!-- Google Fonts: Space Grotesk & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -189,7 +189,7 @@
       <div class="flex items-center gap-3">
         <img src="./logo.jpeg" alt="Logo" class="w-9 h-9 object-contain rounded-lg border border-white/20">
         <div>
-          <div class="font-display font-black text-sm tracking-wider text-white">NEXTGEN <span class="text-mint">DNA</span> VENTURES</div>
+          <div class="font-display font-black text-sm tracking-wider text-white">NEXTGEN <span class="text-mint">DMA</span> VENTURES</div>
           <div class="font-mono text-[9px] text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 rounded-full bg-mint animate-pulse"></span>
             <span>Admissions &bull; Payment Management Console</span>
@@ -405,7 +405,7 @@
 
     <!-- Footer -->
     <footer class="border-t border-white/10 py-4 px-8 text-center text-[11px] font-mono text-slate-500">
-      &copy; 2026 NEXTGEN DNA VENTURES &bull; Enterprise Admissions Engine &bull; HSR Layout, Sector 1, Bangalore
+      &copy; 2026 NEXTGEN DMA VENTURES &bull; Enterprise Admissions Engine &bull; HSR Layout, Sector 1, Bangalore
     </footer>
 
   </div>
@@ -497,7 +497,6 @@
           body: JSON.stringify({ email, password })
         });
         const data = await res.json();
-
         if (res.ok && data.success) {
           showDashboardView(data.user);
         } else {
@@ -849,8 +848,8 @@
 
       if (!amount || amount <= 0) {
         alert('Please enter a valid payment amount.');
-        return;
       }
+      return;
 
       try {
         const res = await fetch(`/api/admin/registrations/${regId}/record-payment`, {
@@ -886,4 +885,3 @@
 
 </body>
 </html>
-
