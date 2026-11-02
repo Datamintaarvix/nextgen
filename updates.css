@@ -176,3 +176,29 @@ body, h1, h2, h3, h4, h5, h6, p, span, a, li, small, strong, b, button, input, s
   box-shadow: 0 0 20px rgba(101, 210, 197, 0.2);
 }
 
+/* ============================================================
+   RESPONSIVE ENHANCEMENTS & ZERO OVERFLOW GUARANTEE
+   ============================================================ */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+}
+
+.container {
+  width: min(100% - 32px, 1440px) !important;
+  max-width: 1440px !important;
+  margin-inline: auto !important;
+}
+
+@media (min-width: 640px) {
+  .container {
+    width: min(100% - 48px, 1440px) !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    width: min(100% - 64px, 1440px) !important;
+  }
+}

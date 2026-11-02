@@ -147,7 +147,7 @@
                     playsinline
                     preload="auto"
                 >
-                    <source src="./ng.mp4" type="video/mp4">
+                    <source src="./vid1.mp4" type="video/mp4">
                 </video>
 
                 <!-- Floating Glass Live Status Badge on Video -->
@@ -226,28 +226,25 @@
                         </button>
                     </div>
 
-                    <!-- 10 Alternating Circular Glass Rows -->
-                    <div class="space-y-6">
+                    <!-- Modern 3-Column Responsive Services Grid -->
+                    <div class="services-grid">
                         
-                        <!-- 01 Web Development (Image Left, Content Right) -->
-                        <div class="service-alternating-row group">
-                            <div class="service-circle-frame">
-                                <div class="service-circle-glow"></div>
-                                <div class="service-circle-inner">
-                                    <img src="https://images.unsplash.com/photo-1547658719-da2b51169166?auto=format&fit=crop&w=600&q=80" alt="Web Development" class="service-circle-img">
-                                </div>
-                                <div class="service-circle-badge">01</div>
+                        <!-- 01 Web Development -->
+                        <div class="service-card group">
+                            <div class="service-card-media">
+                                <img src="https://images.unsplash.com/photo-1547658719-da2b51169166?auto=format&fit=crop&w=800&q=80" alt="Web Development" class="service-card-img" loading="lazy">
+                                <div class="service-card-badge">01</div>
                             </div>
-                            <div class="service-content-side">
-                                <div class="service-meta-tag">
-                                    <span class="service-meta-number">01 / 10</span>
-                                    <span>Engineering &bull; Web Platforms</span>
+                            <div class="service-card-body">
+                                <div class="service-card-meta">
+                                    <span class="service-meta-pill">01 / 10</span>
+                                    <span class="service-meta-category">Engineering &bull; Web Platforms</span>
                                 </div>
-                                <h3 class="service-title">Web Development</h3>
-                                <p class="service-desc">
+                                <h3 class="service-card-title">Web Development</h3>
+                                <p class="service-card-desc">
                                     Modern, responsive full-stack web applications and architectures engineered for enterprise scale. We deliver performant web portals, high-converting digital storefronts, and robust browser ecosystems designed around speed, accessibility, and clean code.
                                 </p>
-                                <div class="service-tech-tags">
+                                <div class="service-card-tech">
                                     <span class="service-tech-tag">React.js</span>
                                     <span class="service-tech-tag">Next.js</span>
                                     <span class="service-tech-tag">TypeScript</span>
@@ -255,32 +252,31 @@
                                     <span class="service-tech-tag">REST APIs</span>
                                     <span class="service-tech-tag">Node.js</span>
                                 </div>
-                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
-                                    <span>Explore Web Track</span>
-                                    <i class="fa-solid fa-arrow-right text-xs"></i>
-                                </button>
+                                <div class="service-card-footer">
+                                    <button onclick="navigateToTab('courses')" class="service-card-cta">
+                                        <span>Explore Web Track</span>
+                                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 02 Software Development (Content Left, Image Right) -->
-                        <div class="service-alternating-row reverse-row group">
-                            <div class="service-circle-frame">
-                                <div class="service-circle-glow"></div>
-                                <div class="service-circle-inner">
-                                    <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80" alt="Software Development" class="service-circle-img">
-                                </div>
-                                <div class="service-circle-badge">02</div>
+                        <!-- 02 Software Development -->
+                        <div class="service-card group">
+                            <div class="service-card-media">
+                                <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80" alt="Software Development" class="service-card-img" loading="lazy">
+                                <div class="service-card-badge">02</div>
                             </div>
-                            <div class="service-content-side">
-                                <div class="service-meta-tag">
-                                    <span class="service-meta-number">02 / 10</span>
-                                    <span>Architecture &bull; Core Engineering</span>
+                            <div class="service-card-body">
+                                <div class="service-card-meta">
+                                    <span class="service-meta-pill">02 / 10</span>
+                                    <span class="service-meta-category">Architecture &bull; Core Engineering</span>
                                 </div>
-                                <h3 class="service-title">Software Development</h3>
-                                <p class="service-desc">
+                                <h3 class="service-card-title">Software Development</h3>
+                                <p class="service-card-desc">
                                     Robust backend systems, microservices, and bespoke software solutions crafted with strict clean code standards. From complex multi-tenant SaaS backends to database optimization, we engineer software ready to handle millions of transactions.
                                 </p>
-                                <div class="service-tech-tags">
+                                <div class="service-card-tech">
                                     <span class="service-tech-tag">Java 17+</span>
                                     <span class="service-tech-tag">Spring Boot</span>
                                     <span class="service-tech-tag">Microservices</span>
@@ -288,32 +284,31 @@
                                     <span class="service-tech-tag">Docker</span>
                                     <span class="service-tech-tag">System Design</span>
                                 </div>
-                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
-                                    <span>Explore Software Track</span>
-                                    <i class="fa-solid fa-arrow-right text-xs"></i>
-                                </button>
+                                <div class="service-card-footer">
+                                    <button onclick="navigateToTab('courses')" class="service-card-cta">
+                                        <span>Explore Software Track</span>
+                                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 03 UI/UX Design (Image Left, Content Right) -->
-                        <div class="service-alternating-row group">
-                            <div class="service-circle-frame">
-                                <div class="service-circle-glow"></div>
-                                <div class="service-circle-inner">
-                                    <img src="https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=600&q=80" alt="UI/UX Design" class="service-circle-img">
-                                </div>
-                                <div class="service-circle-badge">03</div>
+                        <!-- 03 UI/UX Design -->
+                        <div class="service-card group">
+                            <div class="service-card-media">
+                                <img src="https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=800&q=80" alt="UI/UX Design" class="service-card-img" loading="lazy">
+                                <div class="service-card-badge">03</div>
                             </div>
-                            <div class="service-content-side">
-                                <div class="service-meta-tag">
-                                    <span class="service-meta-number">03 / 10</span>
-                                    <span>Experience &bull; Product Design</span>
+                            <div class="service-card-body">
+                                <div class="service-card-meta">
+                                    <span class="service-meta-pill">03 / 10</span>
+                                    <span class="service-meta-category">Experience &bull; Product Design</span>
                                 </div>
-                                <h3 class="service-title">UI/UX Design</h3>
-                                <p class="service-desc">
+                                <h3 class="service-card-title">UI/UX Design</h3>
+                                <p class="service-card-desc">
                                     Intuitive, user-centered digital products combining comprehensive design systems, user journeys, wireframing, interactive prototyping, and visual clarity. We bridge the gap between creative visual artistry and functional usability.
                                 </p>
-                                <div class="service-tech-tags">
+                                <div class="service-card-tech">
                                     <span class="service-tech-tag">Figma</span>
                                     <span class="service-tech-tag">Design Systems</span>
                                     <span class="service-tech-tag">User Research</span>
@@ -321,32 +316,31 @@
                                     <span class="service-tech-tag">Prototyping</span>
                                     <span class="service-tech-tag">Usability Testing</span>
                                 </div>
-                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
-                                    <span>Explore Design Track</span>
-                                    <i class="fa-solid fa-arrow-right text-xs"></i>
-                                </button>
+                                <div class="service-card-footer">
+                                    <button onclick="navigateToTab('courses')" class="service-card-cta">
+                                        <span>Explore Design Track</span>
+                                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 04 Mobile App Development (Content Left, Image Right) -->
-                        <div class="service-alternating-row reverse-row group">
-                            <div class="service-circle-frame">
-                                <div class="service-circle-glow"></div>
-                                <div class="service-circle-inner">
-                                    <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&q=80" alt="Mobile App Development" class="service-circle-img">
-                                </div>
-                                <div class="service-circle-badge">04</div>
+                        <!-- 04 Mobile App Development -->
+                        <div class="service-card group">
+                            <div class="service-card-media">
+                                <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=800&q=80" alt="Mobile App Development" class="service-card-img" loading="lazy">
+                                <div class="service-card-badge">04</div>
                             </div>
-                            <div class="service-content-side">
-                                <div class="service-meta-tag">
-                                    <span class="service-meta-number">04 / 10</span>
-                                    <span>Mobile &bull; Cross-Platform</span>
+                            <div class="service-card-body">
+                                <div class="service-card-meta">
+                                    <span class="service-meta-pill">04 / 10</span>
+                                    <span class="service-meta-category">Mobile &bull; Cross-Platform</span>
                                 </div>
-                                <h3 class="service-title">Mobile App Development</h3>
-                                <p class="service-desc">
+                                <h3 class="service-card-title">Mobile App Development</h3>
+                                <p class="service-card-desc">
                                     High-performance iOS and Android mobile experiences using Flutter and React Native with native device capability integrations, offline caching, push notifications, and cloud synchronization for seamless on-the-go utility.
                                 </p>
-                                <div class="service-tech-tags">
+                                <div class="service-card-tech">
                                     <span class="service-tech-tag">Flutter</span>
                                     <span class="service-tech-tag">Dart</span>
                                     <span class="service-tech-tag">React Native</span>
@@ -354,64 +348,62 @@
                                     <span class="service-tech-tag">iOS / Android</span>
                                     <span class="service-tech-tag">App Store Deploy</span>
                                 </div>
-                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
-                                    <span>Explore Mobile Track</span>
-                                    <i class="fa-solid fa-arrow-right text-xs"></i>
-                                </button>
+                                <div class="service-card-footer">
+                                    <button onclick="navigateToTab('courses')" class="service-card-cta">
+                                        <span>Explore Mobile Track</span>
+                                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 05 E-Commerce Solutions (Image Left, Content Right) -->
-                        <div class="service-alternating-row group">
-                            <div class="service-circle-frame">
-                                <div class="service-circle-glow"></div>
-                                <div class="service-circle-inner">
-                                    <img src="https://images.unsplash.com/photo-1556742049-0a67c5574f73?auto=format&fit=crop&w=600&q=80" alt="E-Commerce Solutions" class="service-circle-img">
-                                </div>
-                                <div class="service-circle-badge">05</div>
+                        <!-- 05 E-Commerce Solutions -->
+                        <div class="service-card group">
+                            <div class="service-card-media">
+                                <img src="https://images.unsplash.com/photo-1556742049-0a67c5574f73?auto=format&fit=crop&w=800&q=80" alt="E-Commerce Solutions" class="service-card-img" loading="lazy">
+                                <div class="service-card-badge">05</div>
                             </div>
-                            <div class="service-content-side">
-                                <div class="service-meta-tag">
-                                    <span class="service-meta-number">05 / 10</span>
-                                    <span>Commerce &bull; Conversion Engines</span>
+                            <div class="service-card-body">
+                                <div class="service-card-meta">
+                                    <span class="service-meta-pill">05 / 10</span>
+                                    <span class="service-meta-category">Commerce &bull; Conversion Engines</span>
                                 </div>
-                                <h3 class="service-title">E-Commerce Solutions</h3>
-                                <p class="service-desc">
+                                <h3 class="service-card-title">E-Commerce Solutions</h3>
+                                <p class="service-card-desc">
                                     Conversion-focused digital storefronts, multi-currency payment gateway integrations, frictionless checkout funnels, inventory orchestration, and headless commerce setups built to maximize average order value and customer retention.
                                 </p>
-                                <div class="service-tech-tags">
+                                <div class="service-card-tech">
                                     <span class="service-tech-tag">Shopify Plus</span>
                                     <span class="service-tech-tag">WooCommerce</span>
                                     <span class="service-tech-tag">Stripe Gateway</span>
                                     <span class="service-tech-tag">Payment APIs</span>
                                     <span class="service-tech-tag">Headless Storefront</span>
                                 </div>
-                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
-                                    <span>Explore Commerce Track</span>
-                                    <i class="fa-solid fa-arrow-right text-xs"></i>
-                                </button>
+                                <div class="service-card-footer">
+                                    <button onclick="navigateToTab('courses')" class="service-card-cta">
+                                        <span>Explore Commerce Track</span>
+                                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 06 AI & Automation (Content Left, Image Right) -->
-                        <div class="service-alternating-row reverse-row group">
-                            <div class="service-circle-frame">
-                                <div class="service-circle-glow"></div>
-                                <div class="service-circle-inner">
-                                    <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=600&q=80" alt="AI & Automation" class="service-circle-img">
-                                </div>
-                                <div class="service-circle-badge">06</div>
+                        <!-- 06 AI & Automation -->
+                        <div class="service-card group">
+                            <div class="service-card-media">
+                                <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80" alt="AI & Automation" class="service-card-img" loading="lazy">
+                                <div class="service-card-badge">06</div>
                             </div>
-                            <div class="service-content-side">
-                                <div class="service-meta-tag">
-                                    <span class="service-meta-number">06 / 10</span>
-                                    <span>Intelligence &bull; Generative AI</span>
+                            <div class="service-card-body">
+                                <div class="service-card-meta">
+                                    <span class="service-meta-pill">06 / 10</span>
+                                    <span class="service-meta-category">Intelligence &bull; Generative AI</span>
                                 </div>
-                                <h3 class="service-title">AI &amp; Automation</h3>
-                                <p class="service-desc">
+                                <h3 class="service-card-title">AI &amp; Automation</h3>
+                                <p class="service-card-desc">
                                     Generative AI, LLMs, neural network architectures, and intelligent workflow automation saving thousands of repetitive manual hours. We engineer custom enterprise AI bots, vector search knowledge engines, and automated decision workflows.
                                 </p>
-                                <div class="service-tech-tags">
+                                <div class="service-card-tech">
                                     <span class="service-tech-tag">PyTorch</span>
                                     <span class="service-tech-tag">OpenAI API</span>
                                     <span class="service-tech-tag">LangChain</span>
@@ -419,32 +411,31 @@
                                     <span class="service-tech-tag">LLM Prompts</span>
                                     <span class="service-tech-tag">Python Bots</span>
                                 </div>
-                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
-                                    <span>Explore AI Track</span>
-                                    <i class="fa-solid fa-arrow-right text-xs"></i>
-                                </button>
+                                <div class="service-card-footer">
+                                    <button onclick="navigateToTab('courses')" class="service-card-cta">
+                                        <span>Explore AI Track</span>
+                                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 07 Cloud & Deployment (Image Left, Content Right) -->
-                        <div class="service-alternating-row group">
-                            <div class="service-circle-frame">
-                                <div class="service-circle-glow"></div>
-                                <div class="service-circle-inner">
-                                    <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80" alt="Cloud & DevOps" class="service-circle-img">
-                                </div>
-                                <div class="service-circle-badge">07</div>
+                        <!-- 07 Cloud & DevOps -->
+                        <div class="service-card group">
+                            <div class="service-card-media">
+                                <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80" alt="Cloud & DevOps" class="service-card-img" loading="lazy">
+                                <div class="service-card-badge">07</div>
                             </div>
-                            <div class="service-content-side">
-                                <div class="service-meta-tag">
-                                    <span class="service-meta-number">07 / 10</span>
-                                    <span>Infrastructure &bull; Cloud & DevOps</span>
+                            <div class="service-card-body">
+                                <div class="service-card-meta">
+                                    <span class="service-meta-pill">07 / 10</span>
+                                    <span class="service-meta-category">Infrastructure &bull; Cloud & DevOps</span>
                                 </div>
-                                <h3 class="service-title">Cloud &amp; DevOps</h3>
-                                <p class="service-desc">
+                                <h3 class="service-card-title">Cloud &amp; DevOps</h3>
+                                <p class="service-card-desc">
                                     Scalable cloud hosting across AWS and Microsoft Azure, automated CI/CD continuous deployment pipelines, container orchestration with Kubernetes, and Infrastructure-as-Code setups ensuring 99.99% uptime and auto-scaling resilience.
                                 </p>
-                                <div class="service-tech-tags">
+                                <div class="service-card-tech">
                                     <span class="service-tech-tag">AWS Cloud</span>
                                     <span class="service-tech-tag">Azure</span>
                                     <span class="service-tech-tag">Docker</span>
@@ -452,64 +443,62 @@
                                     <span class="service-tech-tag">CI/CD Jenkins</span>
                                     <span class="service-tech-tag">Terraform</span>
                                 </div>
-                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
-                                    <span>Explore Cloud Track</span>
-                                    <i class="fa-solid fa-arrow-right text-xs"></i>
-                                </button>
+                                <div class="service-card-footer">
+                                    <button onclick="navigateToTab('courses')" class="service-card-cta">
+                                        <span>Explore Cloud Track</span>
+                                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 08 Custom Digital Solutions (Content Left, Image Right) -->
-                        <div class="service-alternating-row reverse-row group">
-                            <div class="service-circle-frame">
-                                <div class="service-circle-glow"></div>
-                                <div class="service-circle-inner">
-                                    <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80" alt="Custom Digital Solutions" class="service-circle-img">
-                                </div>
-                                <div class="service-circle-badge">08</div>
+                        <!-- 08 Custom Digital Solutions -->
+                        <div class="service-card group">
+                            <div class="service-card-media">
+                                <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80" alt="Custom Digital Solutions" class="service-card-img" loading="lazy">
+                                <div class="service-card-badge">08</div>
                             </div>
-                            <div class="service-content-side">
-                                <div class="service-meta-tag">
-                                    <span class="service-meta-number">08 / 10</span>
-                                    <span>Enterprise &bull; Custom Platforms</span>
+                            <div class="service-card-body">
+                                <div class="service-card-meta">
+                                    <span class="service-meta-pill">08 / 10</span>
+                                    <span class="service-meta-category">Enterprise &bull; Custom Platforms</span>
                                 </div>
-                                <h3 class="service-title">Custom Digital Solutions</h3>
-                                <p class="service-desc">
-                                    Tailored proprietary software platforms and internal tooling built to eliminate unique industry bottlenecks, legacy workflow friction, and operational silos. We architect custom solutions matched strictly to your business DNA.
+                                <h3 class="service-card-title">Custom Digital Solutions</h3>
+                                <p class="service-card-desc">
+                                    Tailored proprietary software platforms and internal tooling built to eliminate unique industry bottlenecks, legacy workflow friction, and operational silos. We architect custom solutions matched strictly to your business DMA.
                                 </p>
-                                <div class="service-tech-tags">
+                                <div class="service-card-tech">
                                     <span class="service-tech-tag">Custom Portals</span>
                                     <span class="service-tech-tag">Enterprise ERP</span>
                                     <span class="service-tech-tag">REST &amp; GraphQL</span>
                                     <span class="service-tech-tag">Role Permissions</span>
                                     <span class="service-tech-tag">Security Compliance</span>
                                 </div>
-                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
-                                    <span>Explore Custom Solutions</span>
-                                    <i class="fa-solid fa-arrow-right text-xs"></i>
-                                </button>
+                                <div class="service-card-footer">
+                                    <button onclick="navigateToTab('courses')" class="service-card-cta">
+                                        <span>Explore Custom Solutions</span>
+                                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 09 Data Analytics (Image Left, Content Right) -->
-                        <div class="service-alternating-row group">
-                            <div class="service-circle-frame">
-                                <div class="service-circle-glow"></div>
-                                <div class="service-circle-inner">
-                                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80" alt="Data Analytics" class="service-circle-img">
-                                </div>
-                                <div class="service-circle-badge">09</div>
+                        <!-- 09 Data Analytics & BI -->
+                        <div class="service-card group">
+                            <div class="service-card-media">
+                                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80" alt="Data Analytics" class="service-card-img" loading="lazy">
+                                <div class="service-card-badge">09</div>
                             </div>
-                            <div class="service-content-side">
-                                <div class="service-meta-tag">
-                                    <span class="service-meta-number">09 / 10</span>
-                                    <span>Intelligence &bull; Business Analytics</span>
+                            <div class="service-card-body">
+                                <div class="service-card-meta">
+                                    <span class="service-meta-pill">09 / 10</span>
+                                    <span class="service-meta-category">Intelligence &bull; Business Analytics</span>
                                 </div>
-                                <h3 class="service-title">Data Analytics &amp; BI</h3>
-                                <p class="service-desc">
+                                <h3 class="service-card-title">Data Analytics &amp; BI</h3>
+                                <p class="service-card-desc">
                                     Transforming complex enterprise datasets into interactive Power BI and SQL executive dashboards, predictive data models, and statistical insights that give leadership clear visibility into growth drivers and revenue opportunities.
                                 </p>
-                                <div class="service-tech-tags">
+                                <div class="service-card-tech">
                                     <span class="service-tech-tag">Power BI</span>
                                     <span class="service-tech-tag">Advanced SQL</span>
                                     <span class="service-tech-tag">Tableau</span>
@@ -517,42 +506,43 @@
                                     <span class="service-tech-tag">DAX Studio</span>
                                     <span class="service-tech-tag">ETL Pipelines</span>
                                 </div>
-                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
-                                    <span>Explore Data Track</span>
-                                    <i class="fa-solid fa-arrow-right text-xs"></i>
-                                </button>
+                                <div class="service-card-footer">
+                                    <button onclick="navigateToTab('courses')" class="service-card-cta">
+                                        <span>Explore Data Track</span>
+                                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 10 Social Media Management (Content Left, Image Right) -->
-                        <div class="service-alternating-row reverse-row group">
-                            <div class="service-circle-frame">
-                                <div class="service-circle-glow"></div>
-                                <div class="service-circle-inner">
-                                    <img src="https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=crop&w=600&q=80" alt="Social Media Management" class="service-circle-img">
-                                </div>
-                                <div class="service-circle-badge">10</div>
+                        <!-- 10 Social & Growth Marketing -->
+                        <div class="service-card group">
+                            <div class="service-card-media">
+                                <img src="https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=crop&w=800&q=80" alt="Social Media Management" class="service-card-img" loading="lazy">
+                                <div class="service-card-badge">10</div>
                             </div>
-                            <div class="service-content-side">
-                                <div class="service-meta-tag">
-                                    <span class="service-meta-number">10 / 10</span>
-                                    <span>Growth &bull; Digital Performance</span>
+                            <div class="service-card-body">
+                                <div class="service-card-meta">
+                                    <span class="service-meta-pill">10 / 10</span>
+                                    <span class="service-meta-category">Growth &bull; Digital Performance</span>
                                 </div>
-                                <h3 class="service-title">Social &amp; Growth Marketing</h3>
-                                <p class="service-desc">
+                                <h3 class="service-card-title">Social &amp; Growth Marketing</h3>
+                                <p class="service-card-desc">
                                     Strategic brand positioning, multi-channel performance digital marketing, Search Engine Optimization (SEO), Meta and Google Ads acquisition campaigns, and audience engagement architectures designed for sustainable, compounding growth.
                                 </p>
-                                <div class="service-tech-tags">
+                                <div class="service-card-tech">
                                     <span class="service-tech-tag">SEO Strategy</span>
                                     <span class="service-tech-tag">Google Ads</span>
                                     <span class="service-tech-tag">Meta Ads Manager</span>
                                     <span class="service-tech-tag">GA4 Analytics</span>
                                     <span class="service-tech-tag">Brand Storytelling</span>
                                 </div>
-                                <button onclick="navigateToTab('courses')" class="service-cta-btn">
-                                    <span>Explore Growth Track</span>
-                                    <i class="fa-solid fa-arrow-right text-xs"></i>
-                                </button>
+                                <div class="service-card-footer">
+                                    <button onclick="navigateToTab('courses')" class="service-card-cta">
+                                        <span>Explore Growth Track</span>
+                                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
