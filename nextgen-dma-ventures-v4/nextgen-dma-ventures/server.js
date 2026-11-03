@@ -40,6 +40,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'nextgen_session_secret_default_2026_xyz!';
 
+// Vercel Multi-Services Binding Resolution
+// Injects target internal service base URL when running as a multi-service project
+const NEXTGEN_BACKEND_URL = process.env.NEXTGEN_BACKEND_URL;
+if (NEXTGEN_BACKEND_URL) {
+  console.log('[Vercel Services] Bound internal backend service URL:', NEXTGEN_BACKEND_URL);
+}
+
 // Initialize Razorpay Client
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder';
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'rzp_secret_placeholder';
