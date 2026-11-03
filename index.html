@@ -69,6 +69,291 @@
     <!-- Custom Glassmorphism CSS -->
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="updates.css">
+    <style>
+      /* ============================================================
+         EMBEDDED CRITICAL PRODUCTION CSS — ZERO-DEPENDENCY GUARANTEE
+         ============================================================ */
+      html, body {
+        width: 100% !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .container {
+        width: min(100% - 32px, 1440px) !important;
+        max-width: 1440px !important;
+        margin-inline: auto !important;
+      }
+      @media (min-width: 640px) {
+        .container { width: min(100% - 48px, 1440px) !important; }
+      }
+      @media (min-width: 1024px) {
+        .container { width: min(100% - 64px, 1440px) !important; }
+      }
+
+      /* Navbar */
+      #navbar {
+        background: #ffffff !important;
+        border-bottom: 1px solid rgba(101, 210, 197, 0.3) !important;
+      }
+      .nav-link {
+        font-family: 'Space Grotesk', monospace !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        color: #000000 !important;
+        padding: 8px 18px !important;
+        border-radius: 9999px !important;
+        background: transparent !important;
+        border: none !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+      }
+      .nav-link:hover {
+        background: rgba(101, 210, 197, 0.14) !important;
+      }
+      .nav-link.active {
+        background: #000000 !important;
+        color: #65D2C5 !important;
+      }
+
+      /* Hero Video Container */
+      .hero-video-fullscreen {
+        position: relative !important;
+        width: 100% !important;
+        height: 92vh !important;
+        min-height: 520px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
+        background: #000000 !important;
+      }
+      .hero-video-fullscreen video {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+      }
+      .hero-video-gradient-bottom {
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: 140px !important;
+        background: linear-gradient(to top, #000000, transparent) !important;
+        pointer-events: none !important;
+      }
+      .hero-scroll-indicator {
+        position: absolute !important;
+        bottom: 30px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 8px !important;
+        z-index: 10 !important;
+      }
+      .hero-scroll-text {
+        font-family: 'Space Grotesk', monospace !important;
+        font-size: 9px !important;
+        letter-spacing: 0.25em !important;
+        color: rgba(255, 255, 255, 0.7) !important;
+      }
+      .hero-scroll-line {
+        width: 1px !important;
+        height: 36px !important;
+        background: linear-gradient(to bottom, #65D2C5, transparent) !important;
+        animation: scrollLinePulse 2s infinite !important;
+      }
+      @keyframes scrollLinePulse {
+        0% { transform: scaleY(0); transform-origin: top; }
+        50% { transform: scaleY(1); transform-origin: top; }
+        51% { transform: scaleY(1); transform-origin: bottom; }
+        100% { transform: scaleY(0); transform-origin: bottom; }
+      }
+
+      /* 3-COLUMN SERVICES GRID */
+      .services-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+        width: 100% !important;
+      }
+      @media (min-width: 640px) {
+        .services-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          gap: 28px !important;
+        }
+      }
+      @media (min-width: 1024px) {
+        .services-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+          gap: 32px !important;
+        }
+      }
+
+      /* Service Card */
+      .service-card {
+        background: #ffffff !important;
+        border: 1px solid rgba(101, 210, 197, 0.35) !important;
+        border-radius: 22px !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+        transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+      }
+      .service-card:hover {
+        transform: translateY(-4px) !important;
+        border-color: #65D2C5 !important;
+        box-shadow: 0 16px 36px rgba(101, 210, 197, 0.2) !important;
+      }
+
+      .service-card-media {
+        position: relative !important;
+        width: 100% !important;
+        aspect-ratio: 16 / 10 !important;
+        overflow: hidden !important;
+        background: #000000 !important;
+      }
+      .service-card-img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        transition: transform 0.5s ease !important;
+      }
+      .service-card:hover .service-card-img {
+        transform: scale(1.06) !important;
+      }
+
+      .service-card-badge {
+        position: absolute !important;
+        top: 14px !important;
+        right: 14px !important;
+        width: 38px !important;
+        height: 38px !important;
+        border-radius: 10px !important;
+        background: rgba(0, 0, 0, 0.85) !important;
+        border: 1.5px solid #65D2C5 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: #65D2C5 !important;
+        font-family: 'Space Grotesk', monospace !important;
+        font-size: 13px !important;
+        font-weight: 800 !important;
+        z-index: 2 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+      }
+      .service-card:hover .service-card-badge {
+        background: #65D2C5 !important;
+        color: #000000 !important;
+      }
+
+      .service-card-body {
+        padding: 22px 20px 24px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        flex-grow: 1 !important;
+        background: #ffffff !important;
+      }
+      .service-card-meta {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin-bottom: 10px !important;
+      }
+      .service-meta-pill {
+        font-family: 'Space Grotesk', monospace !important;
+        font-size: 10px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        color: #000000 !important;
+        background: #e8f7f6 !important;
+        border: 1px solid rgba(101, 210, 197, 0.4) !important;
+        padding: 3px 8px !important;
+        border-radius: 6px !important;
+      }
+      .service-meta-category {
+        font-family: 'Space Grotesk', monospace !important;
+        font-size: 11px !important;
+        color: #666666 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.04em !important;
+      }
+      .service-card-title {
+        font-family: 'Bebas Neue', sans-serif !important;
+        font-size: 28px !important;
+        color: #000000 !important;
+        letter-spacing: 0.04em !important;
+        line-height: 1.1 !important;
+        margin: 0 0 10px 0 !important;
+        text-transform: uppercase !important;
+      }
+      .service-card-desc {
+        font-size: 13.5px !important;
+        color: #444444 !important;
+        line-height: 1.6 !important;
+        margin: 0 0 16px 0 !important;
+        flex-grow: 1 !important;
+      }
+      .service-card-tech {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        margin-bottom: 18px !important;
+      }
+      .service-tech-tag {
+        background: #f4f5f5 !important;
+        border: 1px solid rgba(0, 0, 0, 0.08) !important;
+        border-radius: 6px !important;
+        padding: 4px 9px !important;
+        font-family: 'Space Grotesk', monospace !important;
+        font-size: 11px !important;
+        font-weight: 600 !important;
+        color: #222222 !important;
+      }
+      .service-card-footer {
+        margin-top: auto !important;
+        padding-top: 14px !important;
+        border-top: 1px solid rgba(101, 210, 197, 0.2) !important;
+      }
+      .service-card-cta {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        font-family: 'Space Grotesk', monospace !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        color: #008779 !important;
+        background: transparent !important;
+        border: none !important;
+        cursor: pointer !important;
+        transition: gap 0.2s ease, color 0.2s ease !important;
+        padding: 0 !important;
+      }
+      .service-card:hover .service-card-cta {
+        color: #000000 !important;
+        gap: 12px !important;
+      }
+
+      /* 3D Capabilities Section Containment */
+      .capabilities-arc-section {
+        overflow: hidden !important;
+        contain: paint !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        background: #000000 !important;
+      }
+      .capabilities-arc-track {
+        max-width: 100vw !important;
+        overflow: hidden !important;
+      }
+    </style>
 </head>
 
 <body class="bg-white text-black font-sans antialiased overflow-x-hidden selection:bg-mint selection:text-black">
@@ -228,7 +513,7 @@
                     </div>
 
                     <!-- Modern 3-Column Responsive Services Grid -->
-                    <div class="services-grid">
+                    <div class="services-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 w-full">
                         
                         <!-- 01 Web Development -->
                         <div class="service-card group">
@@ -436,7 +721,7 @@
                                 <p class="service-card-desc">
                                     Scalable cloud hosting across AWS and Microsoft Azure, automated CI/CD continuous deployment pipelines, container orchestration with Kubernetes, and Infrastructure-as-Code setups ensuring 99.99% uptime and auto-scaling resilience.
                                 </p>
-                                <div class="service-tech-tag">
+                                <div class="service-card-tech">
                                     <span class="service-tech-tag">AWS Cloud</span>
                                     <span class="service-tech-tag">Azure</span>
                                     <span class="service-tech-tag">Docker</span>
