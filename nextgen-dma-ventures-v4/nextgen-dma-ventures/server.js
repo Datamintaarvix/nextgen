@@ -84,8 +84,21 @@ app.use((req, res, next) => {
 });
 app.use(express.urlencoded({ extended: true }));
 
-// Static frontend asset directory resolution (supports both root and nested folder execution)
+// Static frontend asset directory resolution & automatic root asset consolidation
 const nestedDir = path.join(__dirname, 'nextgen-dma-ventures-v4', 'nextgen-dma-ventures');
+try {
+  ['logo.jpeg', 'san.jpeg', 'vid1.mp4'].forEach((file) => {
+    const rootPath = path.join(__dirname, file);
+    const sourcePath = path.join(nestedDir, file);
+    if (!fs.existsSync(rootPath) && fs.existsSync(sourcePath)) {
+      fs.copyFileSync(sourcePath, rootPath);
+      console.log(`[Asset Setup] Copied ${file} to canonical root.`);
+    }
+  });
+} catch (e) {
+  // Silent fallback for read-only environments
+}
+
 const staticDir = fs.existsSync(path.join(__dirname, 'index.html'))
   ? __dirname
   : (fs.existsSync(path.join(nestedDir, 'index.html'))
