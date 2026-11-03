@@ -1874,56 +1874,59 @@ function createCourseCardHTML(course) {
     
     return `
       <article class="course-tile group">
-        <div class="course-media">
-          <img src="${course.image}" alt="${course.name}" loading="lazy">
-          <span class="course-index">${course.badge} &bull; ${course.durationText}</span>
+        <!-- Full Background Cover Image (Design matching reference with text over image) -->
+        <div class="course-img-bg-wrap">
+          <img src="${course.image}" alt="${course.name}" class="course-bg-img" loading="lazy">
         </div>
-        <div class="course-body">
-          <span class="course-domain">${course.category}</span>
-          <h3 class="font-display">${course.name}</h3>
+
+        <!-- Dark Gradient Overlay for Contrast & Readability -->
+        <div class="course-card-overlay"></div>
+
+        <!-- Top Floating Frosted Glass Pills (matching 'starts at ₱4,999' reference) -->
+        <div class="course-top-bar">
+          <span class="course-badge-pill">${course.badge} &bull; ${course.durationText}</span>
+          <span class="course-starts-pill">starts at ₹2,499</span>
+        </div>
+
+        <!-- Text Content Layered Directly Over Image at Bottom -->
+        <div class="course-overlay-content">
+          <span class="course-domain-tag">${course.category}</span>
+          <h3 class="course-card-title">${course.name}</h3>
           
-          <div class="course-meta">
-            <span><i class="fa-regular fa-clock text-mint"></i> ${course.durationText}</span>
-            <span><i class="fa-solid fa-graduation-cap text-mint"></i> Internship Incl.</span>
+          <div class="course-meta-row">
+            <span>${course.durationText}</span>
+            <span class="text-white/40">&bull;</span>
+            <span><i class="fa-solid fa-star text-mint text-[11px] mr-1"></i>Internship Incl.</span>
           </div>
 
-          <p class="course-overview">${course.overview}</p>
-          
-          <p class="course-career">
-            <i class="fa-solid fa-briefcase text-mint"></i>
-            <span><strong>Target Role:</strong> ${primaryRole}</span>
-          </p>
-
-          <!-- Skills tags -->
-          <div>
-            <div class="course-tools-label">Key Competencies</div>
-            <div class="course-tools">
-              ${skillsList.slice(0, 4).map(skill => `<span>${skill}</span>`).join('')}
-              ${skillsList.length > 4 ? `<span>+${skillsList.length - 4} more</span>` : ''}
-            </div>
+          <div class="course-location-row">
+            <i class="fa-solid fa-location-dot text-[#ef4444] text-[11px]"></i>
+            <span>${primaryRole} &bull; Bangalore &amp; Remote</span>
           </div>
 
-          <!-- Highly Visible Fee Display -->
-          <div class="course-pricing-row">
+          <p class="course-overview-text">${course.overview}</p>
+
+          <!-- Skills tags in frosted glass pills -->
+          <div class="course-tags-row">
+            ${skillsList.slice(0, 3).map(skill => `<span class="course-tag-glass">${skill}</span>`).join('')}
+            ${skillsList.length > 3 ? `<span class="course-tag-glass">+${skillsList.length - 3}</span>` : ''}
+          </div>
+
+          <!-- Bottom Fee & Buttons -->
+          <div class="course-bottom-bar">
             <div>
-              <div class="course-price-label">Total Course Fee</div>
-              <div class="course-price-amount">${course.formattedFee}</div>
+              <div class="course-fee-label">TOTAL FEE</div>
+              <div class="course-fee-val">${course.formattedFee}</div>
             </div>
-            <div class="course-duration-badge">
-              <i class="fa-regular fa-calendar-check text-mint"></i>
-              <span>${course.durationText}</span>
+            <div class="course-actions-group">
+              <button onclick="openCourseModal('${course.id}')" class="course-btn-details" aria-label="View Details for ${course.name}">
+                <span>Details</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </button>
+              <button onclick="openBookingModal('${course.id}', 'advance')" class="course-btn-book" aria-label="Book Slot for ${course.name}">
+                <span>Book Slot</span>
+              </button>
             </div>
           </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="course-actions">
-          <button onclick="openCourseModal('${course.id}')" aria-label="View Details for ${course.name}">
-            <span>View Details</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </button>
-          <button onclick="openBookingModal('${course.id}', 'advance')" aria-label="Book Slot for ${course.name}">
-            <span>Book Slot (₹2,499)</span> <i class="fa-solid fa-ticket text-[10px]"></i>
-          </button>
         </div>
       </article>`;
 }

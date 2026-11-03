@@ -210,31 +210,74 @@
         box-shadow: 0 16px 36px rgba(101, 210, 197, 0.2) !important;
       }
 
-      .service-card-media {
+      /* ============================================================
+         SERVICES CARDS — EL NIDO DESIGN (IMAGE BG WITH TEXT OVERLAY)
+         ============================================================ */
+      .service-card {
         position: relative !important;
-        width: 100% !important;
-        aspect-ratio: 16 / 10 !important;
+        border-radius: 22px !important;
         overflow: hidden !important;
+        min-height: 440px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
         background: #000000 !important;
+        border: 1px solid rgba(101, 210, 197, 0.35) !important;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2) !important;
+        transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease !important;
+      }
+      .service-card:hover {
+        transform: translateY(-6px) !important;
+        border-color: #65D2C5 !important;
+        box-shadow: 0 20px 40px rgba(101, 210, 197, 0.3) !important;
+      }
+
+      .service-card-media {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        overflow: hidden !important;
+        z-index: 1 !important;
+        padding: 0 !important;
+        background: transparent !important;
       }
       .service-card-img {
         width: 100% !important;
         height: 100% !important;
+        min-width: 100% !important;
+        min-height: 100% !important;
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
         object-fit: cover !important;
-        transition: transform 0.5s ease !important;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        display: block !important;
       }
       .service-card:hover .service-card-img {
-        transform: scale(1.06) !important;
+        transform: scale(1.08) !important;
+      }
+
+      /* Dark gradient overlay so text over image is crystal clear */
+      .service-card::after {
+        content: '' !important;
+        position: absolute !important;
+        inset: 0 !important;
+        z-index: 2 !important;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.15) 30%, rgba(0, 0, 0, 0.78) 65%, rgba(0, 0, 0, 0.96) 100%) !important;
+        pointer-events: none !important;
       }
 
       .service-card-badge {
         position: absolute !important;
-        top: 14px !important;
-        right: 14px !important;
-        width: 38px !important;
-        height: 38px !important;
-        border-radius: 10px !important;
-        background: rgba(0, 0, 0, 0.85) !important;
+        top: 16px !important;
+        right: 16px !important;
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 12px !important;
+        background: rgba(0, 0, 0, 0.75) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
         border: 1.5px solid #65D2C5 !important;
         display: flex !important;
         align-items: center !important;
@@ -243,26 +286,25 @@
         font-family: 'Space Grotesk', monospace !important;
         font-size: 13px !important;
         font-weight: 800 !important;
-        z-index: 2 !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
-      }
-      .service-card:hover .service-card-badge {
-        background: #65D2C5 !important;
-        color: #000000 !important;
+        z-index: 3 !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
       }
 
       .service-card-body {
-        padding: 22px 20px 24px !important;
+        position: relative !important;
+        z-index: 3 !important;
+        padding: 24px 20px 20px !important;
         display: flex !important;
         flex-direction: column !important;
-        flex-grow: 1 !important;
-        background: #ffffff !important;
+        justify-content: flex-end !important;
+        margin-top: auto !important;
+        background: transparent !important;
       }
       .service-card-meta {
         display: flex !important;
         align-items: center !important;
         gap: 8px !important;
-        margin-bottom: 10px !important;
+        margin-bottom: 8px !important;
       }
       .service-meta-pill {
         font-family: 'Space Grotesk', monospace !important;
@@ -270,8 +312,9 @@
         font-weight: 700 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.05em !important;
-        color: #000000 !important;
-        background: #e8f7f6 !important;
+        color: #65D2C5 !important;
+        background: rgba(0, 0, 0, 0.6) !important;
+        backdrop-filter: blur(8px) !important;
         border: 1px solid rgba(101, 210, 197, 0.4) !important;
         padding: 3px 8px !important;
         border-radius: 6px !important;
@@ -279,57 +322,61 @@
       .service-meta-category {
         font-family: 'Space Grotesk', monospace !important;
         font-size: 11px !important;
-        color: #666666 !important;
+        color: rgba(255, 255, 255, 0.8) !important;
         text-transform: uppercase !important;
         letter-spacing: 0.04em !important;
       }
       .service-card-title {
         font-family: 'Bebas Neue', sans-serif !important;
         font-size: 28px !important;
-        color: #000000 !important;
+        color: #ffffff !important;
         letter-spacing: 0.04em !important;
         line-height: 1.1 !important;
-        margin: 0 0 10px 0 !important;
+        margin: 0 0 8px 0 !important;
         text-transform: uppercase !important;
       }
       .service-card-desc {
-        font-size: 13.5px !important;
-        color: #444444 !important;
-        line-height: 1.6 !important;
-        margin: 0 0 16px 0 !important;
-        flex-grow: 1 !important;
+        font-size: 13px !important;
+        color: rgba(255, 255, 255, 0.82) !important;
+        line-height: 1.55 !important;
+        margin: 0 0 14px 0 !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 3 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
       }
       .service-card-tech {
         display: flex !important;
         flex-wrap: wrap !important;
-        gap: 6px !important;
-        margin-bottom: 18px !important;
+        gap: 5px !important;
+        margin-bottom: 16px !important;
       }
       .service-tech-tag {
-        background: #f4f5f5 !important;
-        border: 1px solid rgba(0, 0, 0, 0.08) !important;
+        background: rgba(255, 255, 255, 0.12) !important;
+        backdrop-filter: blur(8px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 6px !important;
-        padding: 4px 9px !important;
+        padding: 3px 8px !important;
         font-family: 'Space Grotesk', monospace !important;
-        font-size: 11px !important;
+        font-size: 10.5px !important;
         font-weight: 600 !important;
-        color: #222222 !important;
+        color: #ffffff !important;
       }
       .service-card-footer {
         margin-top: auto !important;
-        padding-top: 14px !important;
-        border-top: 1px solid rgba(101, 210, 197, 0.2) !important;
+        padding-top: 12px !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
       }
       .service-card-cta {
         display: inline-flex !important;
         align-items: center !important;
         gap: 8px !important;
         font-family: 'Space Grotesk', monospace !important;
-        font-size: 12px !important;
+        font-size: 11px !important;
         font-weight: 700 !important;
         text-transform: uppercase !important;
-        letter-spacing: 0.05em !important;
-        color: #008779 !important;
+        letter-spacing: 0.06em !important;
+        color: #65D2C5 !important;
         background: transparent !important;
         border: none !important;
         cursor: pointer !important;
@@ -337,8 +384,260 @@
         padding: 0 !important;
       }
       .service-card:hover .service-card-cta {
-        color: #000000 !important;
+        color: #ffffff !important;
         gap: 12px !important;
+      }
+
+      /* ============================================================
+         COURSE CARDS — EL NIDO DESIGN (IMAGE BG WITH TEXT OVERLAY)
+         ============================================================ */
+      .course-tile {
+        position: relative !important;
+        border-radius: 22px !important;
+        overflow: hidden !important;
+        min-height: 480px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        background: #000000 !important;
+        border: 1px solid rgba(101, 210, 197, 0.3) !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25) !important;
+        transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease !important;
+      }
+      .course-tile:hover {
+        transform: translateY(-6px) !important;
+        border-color: #65D2C5 !important;
+        box-shadow: 0 20px 40px rgba(101, 210, 197, 0.3) !important;
+      }
+
+      .course-img-bg-wrap {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        overflow: hidden !important;
+        z-index: 1 !important;
+      }
+      .course-bg-img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        display: block !important;
+      }
+      .course-tile:hover .course-bg-img {
+        transform: scale(1.08) !important;
+      }
+
+      .course-card-overlay {
+        position: absolute !important;
+        inset: 0 !important;
+        z-index: 2 !important;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.15) 30%, rgba(0, 0, 0, 0.78) 65%, rgba(0, 0, 0, 0.96) 100%) !important;
+        pointer-events: none !important;
+      }
+
+      .course-top-bar {
+        position: relative !important;
+        z-index: 3 !important;
+        padding: 16px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important;
+      }
+
+      .course-badge-pill {
+        background: rgba(0, 0, 0, 0.75) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        color: #65D2C5 !important;
+        font-family: 'Space Grotesk', monospace !important;
+        font-size: 10px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.08em !important;
+        padding: 5px 12px !important;
+        border-radius: 9999px !important;
+        border: 1px solid rgba(101, 210, 197, 0.4) !important;
+      }
+
+      .course-starts-pill {
+        background: rgba(255, 255, 255, 0.9) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        color: #000000 !important;
+        font-family: 'Space Grotesk', monospace !important;
+        font-size: 10.5px !important;
+        font-weight: 800 !important;
+        padding: 5px 12px !important;
+        border-radius: 9999px !important;
+        border: 1px solid rgba(255, 255, 255, 0.5) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+      }
+
+      .course-overlay-content {
+        position: relative !important;
+        z-index: 3 !important;
+        padding: 18px 20px 20px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-end !important;
+        margin-top: auto !important;
+      }
+
+      .course-domain-tag {
+        color: #65D2C5 !important;
+        font-family: 'Space Grotesk', monospace !important;
+        font-size: 10px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.12em !important;
+        margin-bottom: 4px !important;
+        display: block !important;
+      }
+
+      .course-card-title {
+        color: #ffffff !important;
+        font-family: 'Bebas Neue', sans-serif !important;
+        font-size: 26px !important;
+        line-height: 1.15 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.03em !important;
+        margin: 0 0 8px 0 !important;
+      }
+
+      .course-meta-row {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        font-size: 11.5px !important;
+        font-family: 'Space Grotesk', monospace !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        margin-bottom: 6px !important;
+      }
+
+      .course-location-row {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        font-size: 11px !important;
+        font-family: 'Space Grotesk', monospace !important;
+        color: rgba(255, 255, 255, 0.85) !important;
+        margin-bottom: 10px !important;
+      }
+
+      .course-overview-text {
+        font-size: 12px !important;
+        color: rgba(255, 255, 255, 0.75) !important;
+        line-height: 1.5 !important;
+        margin-bottom: 12px !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+      }
+
+      .course-tags-row {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 5px !important;
+        margin-bottom: 14px !important;
+      }
+
+      .course-tag-glass {
+        background: rgba(255, 255, 255, 0.12) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: #ffffff !important;
+        font-family: 'Space Grotesk', monospace !important;
+        font-size: 10px !important;
+        font-weight: 600 !important;
+        padding: 3px 8px !important;
+        border-radius: 6px !important;
+      }
+
+      .course-bottom-bar {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
+        padding-top: 12px !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+      }
+
+      .course-fee-label {
+        font-family: 'Space Grotesk', monospace !important;
+        font-size: 8.5px !important;
+        font-weight: 700 !important;
+        color: rgba(255, 255, 255, 0.6) !important;
+        letter-spacing: 0.1em !important;
+        text-transform: uppercase !important;
+        line-height: 1 !important;
+        margin-bottom: 2px !important;
+      }
+
+      .course-fee-val {
+        font-family: 'Bebas Neue', sans-serif !important;
+        font-size: 26px !important;
+        line-height: 1 !important;
+        color: #65D2C5 !important;
+        letter-spacing: 0.02em !important;
+      }
+
+      .course-actions-group {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+      }
+
+      .course-btn-details {
+        padding: 8px 12px !important;
+        border-radius: 9999px !important;
+        background: rgba(255, 255, 255, 0.15) !important;
+        backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: #ffffff !important;
+        font-family: 'Space Grotesk', monospace !important;
+        font-size: 10.5px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 5px !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+      }
+      .course-btn-details:hover {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+
+      .course-btn-book {
+        padding: 8px 14px !important;
+        border-radius: 9999px !important;
+        background: #65D2C5 !important;
+        border: 1px solid #65D2C5 !important;
+        color: #000000 !important;
+        font-family: 'Space Grotesk', monospace !important;
+        font-size: 10.5px !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 5px !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 4px 15px rgba(101, 210, 197, 0.4) !important;
+      }
+      .course-btn-book:hover {
+        background: #ffffff !important;
+        border-color: #ffffff !important;
+        color: #000000 !important;
       }
 
       /* 3D Capabilities Section Containment */
