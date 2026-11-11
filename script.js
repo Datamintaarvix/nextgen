@@ -2411,6 +2411,10 @@ async function handleBookingFormSubmit(e) {
             throw new Error(orderData.error || 'Failed to create payment order on server.');
         }
 
+        if (!orderData.key_id || orderData.key_id.includes('placeholder')) {
+            throw new Error('Online payment gateway is temporarily unconfigured. Please contact NEXTGEN DMA VENTURES admissions.');
+        }
+
         // Step 3: Initialize Razorpay Checkout Window
         const isAdvance = paymentType === 'advance';
         const options = {
@@ -2480,14 +2484,8 @@ async function handleBookingFormSubmit(e) {
             });
             rzp.open();
         } else {
-            // Fallback simulator for offline dev without Razorpay script loaded
-            console.warn("Razorpay script not detected, triggering development mock verification");
-            await verifyPaymentWithBackend({
-                registration_id: registrationId,
-                razorpay_order_id: orderData.order_id,
-                razorpay_payment_id: `pay_mock_${Date.now()}`,
-                razorpay_signature: `sig_mock_${Date.now()}`
-            });
+            // Strict error on checkout script loading failure — never simulate success
+            throw new Error('Razorpay secure checkout could not be loaded. Please ensure ad-blockers or privacy extensions are disabled, check your internet connection, or contact NEXTGEN DMA VENTURES admissions.');
         }
 
     } catch (err) {
@@ -2506,7 +2504,7 @@ async function verifyPaymentWithBackend(verificationData) {
         });
 
         const verifyData = await verifyRes.json();
-        if (!verifyRes.ok || !verifyData.success) {
+        if (!verifyRes.ok || !verifyData.success || !verifyData.verified) {
             throw new Error(verifyData.error || 'Server signature verification failed.');
         }
 

@@ -17,7 +17,12 @@ const isProduction = process.env.NODE_ENV === 'production' || Boolean(process.en
 
 // Supabase Credentials from Environment
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';
+const SUPABASE_SERVICE_ROLE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+
+const SUPABASE_KEY =
+  SUPABASE_SERVICE_ROLE_KEY ||
+  (!isProduction ? process.env.SUPABASE_ANON_KEY || '' : '');
 
 let supabase = null;
 if (SUPABASE_URL && SUPABASE_KEY) {
@@ -301,8 +306,7 @@ const WebhookEventsRepo = {
     if (assertSupabaseActive('WebhookEventsRepo.isProcessed')) {
       const { data, error } = await supabase.from('webhook_events').select('event_id').eq('event_id', eventId).maybeSingle();
       if (error) {
-        console.warn('[WebhookEventsRepo Supabase Error]', error.message);
-        return false;
+        throw new Error(`Database error checking webhook event status: ${error.message}`);
       }
       return Boolean(data);
     }
@@ -311,13 +315,16 @@ const WebhookEventsRepo = {
 
   async record(eventId, eventType, payload) {
     if (assertSupabaseActive('WebhookEventsRepo.record')) {
-      await supabase.from('webhook_events').insert([
+      const { error } = await supabase.from('webhook_events').insert([
         {
           event_id: eventId,
           event_type: eventType,
           payload: typeof payload === 'object' ? payload : { raw: payload }
         }
       ]);
+      if (error) {
+        throw new Error(`Database error recording webhook event: ${error.message}`);
+      }
       return;
     }
     devMockStore.webhook_events.add(eventId);
@@ -340,10 +347,10 @@ const WebhookEventsRepo = {
 
       if (error) {
         // Code 23505 is PostgreSQL unique_violation
-        if (error.code === '23505' || (error.message && (error.message.includes('duplicate key') || error.message.includes('unique constraint')))) {
+        if (error.code === '23505') {
           return { alreadyProcessed: true };
         }
-        console.warn('[WebhookEventsRepo Insert Notice]', error.message);
+        throw new Error(`Database error recording webhook event: ${error.message}`);
       }
       return { alreadyProcessed: false };
     }
@@ -424,7 +431,7 @@ const CoursesRepo = {
       try {
         const { data, error } = await supabase.from('courses').select('*').eq('status', 'active');
         if (!error && data && data.length > 0) return data;
-      } catch (e) {}
+      } catch (e) { }
     }
     return OFFICIAL_COURSES;
   },
@@ -434,7 +441,7 @@ const CoursesRepo = {
       try {
         const { data, error } = await supabase.from('courses').select('*').eq('id', id).maybeSingle();
         if (!error && data) return data;
-      } catch (e) {}
+      } catch (e) { }
     }
     return OFFICIAL_COURSES.find(c => c.id === id) || null;
   },
@@ -444,7 +451,7 @@ const CoursesRepo = {
       try {
         const { data, error } = await supabase.from('courses').select('*').ilike('course_name', name.trim()).maybeSingle();
         if (!error && data) return data;
-      } catch (e) {}
+      } catch (e) { }
     }
     const clean = name.toLowerCase().trim();
     return OFFICIAL_COURSES.find(c => c.course_name.toLowerCase().trim() === clean || c.id === name) || null;
@@ -589,6 +596,83 @@ const RegistrationsRepo = {
 };
 
 const PaymentsRepo = {
+  async processRazorpayPayment(arg1, arg2, arg3, arg4, arg5, arg6) {
+    if (!supabase) {
+      throw new Error('Database service unavailable: Supabase client is not configured. Atomic Razorpay payment processing requires an active database connection and cannot be simulated in local mock store.');
+    }
+
+    let p_order_id;
+    let p_payment_id;
+    let p_registration_id;
+    let p_amount;
+    let p_currency;
+    let p_signature;
+
+    if (typeof arg1 === 'object' && arg1 !== null) {
+      p_order_id = arg1.p_order_id || arg1.order_id || arg1.razorpay_order_id || arg1.orderId;
+      p_payment_id = arg1.p_payment_id || arg1.payment_id || arg1.razorpay_payment_id || arg1.paymentId;
+      p_registration_id = arg1.p_registration_id || arg1.registration_id || arg1.regId || arg1.registrationId;
+      p_amount = Number(arg1.p_amount !== undefined ? arg1.p_amount : arg1.amount);
+      p_currency = arg1.p_currency || arg1.currency || 'INR';
+      p_signature = arg1.p_signature || arg1.signature || arg1.razorpay_signature || null;
+    } else {
+      p_order_id = arg1;
+      p_payment_id = arg2;
+      p_registration_id = arg3;
+      p_amount = Number(arg4);
+      p_currency = arg5 || 'INR';
+      p_signature = arg6 || null;
+    }
+
+    if (!p_order_id || !p_payment_id || !p_registration_id) {
+      throw new Error('Missing required payment parameters: order_id, payment_id, and registration_id are mandatory.');
+    }
+
+    if (isNaN(p_amount) || p_amount <= 0) {
+      throw new Error('Invalid payment amount: amount must be a positive number.');
+    }
+
+    const { data, error } = await supabase.rpc('process_razorpay_payment', {
+      p_order_id,
+      p_payment_id,
+      p_registration_id,
+      p_amount,
+      p_currency,
+      p_signature
+    });
+
+    if (error) {
+      throw new Error(`Database error processing Razorpay payment: ${error.message}`);
+    }
+
+    if (!data) {
+      throw new Error('Database error processing Razorpay payment: No data returned from payment processing function.');
+    }
+
+    if (typeof data === 'boolean' && !data) {
+      throw new Error('Payment processing failed: Database function returned false.');
+    }
+
+    const resultObj = Array.isArray(data) ? data[0] : data;
+    if (!resultObj || typeof resultObj !== 'object' || Array.isArray(resultObj)) {
+      throw new Error('Payment processing failed: Malformed or unexpected response returned from payment processing function.');
+    }
+
+    if (resultObj.error) {
+      throw new Error(`Payment processing failed: ${resultObj.error}`);
+    }
+
+    if (resultObj.success !== true) {
+      throw new Error(`Payment processing failed: ${resultObj.message || 'Database function did not return explicit success: true.'}`);
+    }
+
+    if (resultObj.payment_status === 'failed' || resultObj.status === 'failed') {
+      throw new Error('Payment processing failed: Payment record status is failed.');
+    }
+
+    return resultObj;
+  },
+
   async create(data) {
     const id = `pay_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
     const payment = {

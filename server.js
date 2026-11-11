@@ -48,23 +48,44 @@ if (NEXTGEN_BACKEND_URL) {
 }
 
 // Initialize Razorpay Client
-const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder';
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'rzp_secret_placeholder';
-const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || 'rzp_webhook_placeholder';
+const RAZORPAY_KEY_ID = (process.env.RAZORPAY_KEY_ID || '').trim();
+const RAZORPAY_KEY_SECRET = (process.env.RAZORPAY_KEY_SECRET || '').trim();
+const RAZORPAY_WEBHOOK_SECRET = (process.env.RAZORPAY_WEBHOOK_SECRET || '').trim();
+
+function isPlaceholderCredential(val) {
+  if (!val || typeof val !== 'string') return true;
+  const lower = val.toLowerCase().trim();
+  return (
+    lower === '' ||
+    lower.includes('placeholder') ||
+    lower.includes('yourkey') ||
+    lower.includes('yoursecret') ||
+    lower.includes('yourwebhook') ||
+    lower.includes('xxx')
+  );
+}
+
+const isRazorpayConfigured = Boolean(
+  RAZORPAY_KEY_ID &&
+  RAZORPAY_KEY_SECRET &&
+  !isPlaceholderCredential(RAZORPAY_KEY_ID) &&
+  !isPlaceholderCredential(RAZORPAY_KEY_SECRET)
+);
 
 let razorpayClient = null;
-if (RAZORPAY_KEY_ID && RAZORPAY_KEY_SECRET && !RAZORPAY_KEY_ID.includes('placeholder')) {
+if (isRazorpayConfigured) {
   try {
     razorpayClient = new Razorpay({
       key_id: RAZORPAY_KEY_ID,
       key_secret: RAZORPAY_KEY_SECRET
     });
-    console.log('[Razorpay] Initialized with Key ID:', RAZORPAY_KEY_ID);
+    console.log('[Razorpay] Initialized successfully. Key prefix:', RAZORPAY_KEY_ID.substring(0, 8) + '...');
   } catch (err) {
-    console.warn('[Razorpay] Failed to initialize live SDK client, fallback active:', err.message);
+    console.error('[Razorpay] Failed to initialize live SDK client:', err.message);
+    razorpayClient = null;
   }
 } else {
-  console.log('[Razorpay] Test/Dev placeholder mode active. Set valid keys in .env for live transactions.');
+  console.warn('[Razorpay Security Alert] Valid Razorpay credentials not configured. Live online transactions and automatic payment approvals are strictly disabled.');
 }
 
 // Global Middlewares
@@ -102,8 +123,8 @@ try {
 const staticDir = fs.existsSync(path.join(__dirname, 'index.html'))
   ? __dirname
   : (fs.existsSync(path.join(nestedDir, 'index.html'))
-      ? nestedDir
-      : __dirname);
+    ? nestedDir
+    : __dirname);
 
 app.use(express.static(staticDir));
 if (staticDir !== __dirname) {
@@ -208,9 +229,10 @@ function verifyAdminSession(req, res, next) {
 
 app.get('/api/config/public-key', (req, res) => {
   res.json({
-    keyId: RAZORPAY_KEY_ID,
+    keyId: isRazorpayConfigured ? RAZORPAY_KEY_ID : null,
+    isConfigured: isRazorpayConfigured,
     advanceAmount: 2499,
-    isTestMode: RAZORPAY_KEY_ID.startsWith('rzp_test') || RAZORPAY_KEY_ID.includes('placeholder'),
+    isTestMode: isRazorpayConfigured && RAZORPAY_KEY_ID.startsWith('rzp_test'),
     currency: 'INR',
     companyName: 'NEXTGEN DMA VENTURES'
   });
@@ -280,8 +302,8 @@ app.post('/api/registration/initiate', async (req, res) => {
     const matchedStudent = existingStudent.find(s => s.email.toLowerCase() === email.toLowerCase().trim());
     if (matchedStudent) {
       const existingRegs = await RegistrationsRepo.findAll();
-      const duplicateConfirmed = existingRegs.find(r => 
-        r.student_id === matchedStudent.id && 
+      const duplicateConfirmed = existingRegs.find(r =>
+        r.student_id === matchedStudent.id &&
         (r.course_id === course.id || r.course_name.toLowerCase() === course.course_name.toLowerCase()) &&
         (r.registration_status === 'Fully Paid' || r.registration_status === 'Advance Paid – Slot Reserved' || r.registration_status === 'Advance Paid')
       );
@@ -364,6 +386,13 @@ app.post('/api/registration/initiate', async (req, res) => {
 
 app.post('/api/payment/create-order', async (req, res) => {
   try {
+    if (!razorpayClient || !isRazorpayConfigured) {
+      console.error('[Create Order Rejected] Razorpay client is unconfigured or credentials are missing/placeholder.');
+      return res.status(503).json({
+        error: 'Online payment gateway is temporarily unavailable. Please contact NEXTGEN DMA VENTURES admissions directly.'
+      });
+    }
+
     const { registration_id } = req.body;
 
     if (!registration_id) {
@@ -403,26 +432,19 @@ app.post('/api/payment/create-order', async (req, res) => {
 
     const amountInPaise = amountInINR * 100;
 
-    let razorpayOrderId = null;
-
-    if (razorpayClient) {
-      // Real Razorpay order creation via SDK
-      const order = await razorpayClient.orders.create({
-        amount: amountInPaise,
-        currency: 'INR',
-        receipt: registration_id,
-        notes: {
-          registration_id,
-          course_id: reg.course_id,
-          course_name: reg.course_name,
-          payment_type: paymentTypeForOrder
-        }
-      });
-      razorpayOrderId = order.id;
-    } else {
-      // Development mock order creation
-      razorpayOrderId = `order_ndv_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
-    }
+    // Real Razorpay order creation via SDK (No mock order creation)
+    const order = await razorpayClient.orders.create({
+      amount: amountInPaise,
+      currency: 'INR',
+      receipt: registration_id,
+      notes: {
+        registration_id,
+        course_id: reg.course_id,
+        course_name: reg.course_name,
+        payment_type: paymentTypeForOrder
+      }
+    });
+    const razorpayOrderId = order.id;
 
     // Record Payment Entry in DB
     await PaymentsRepo.create({
@@ -464,153 +486,203 @@ app.post('/api/payment/verify-payment', async (req, res) => {
       razorpay_signature
     } = req.body;
 
-    if (!registration_id || !razorpay_order_id || !razorpay_payment_id) {
-      return res.status(400).json({ error: 'Missing required payment verification parameters.' });
+    if (!registration_id || !razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({
+        error: 'Missing required payment verification parameters (registration_id, razorpay_order_id, razorpay_payment_id, razorpay_signature).'
+      });
+    }
+
+    // Reject simulated or mock credentials
+    if (
+      typeof razorpay_payment_id !== 'string' ||
+      typeof razorpay_order_id !== 'string' ||
+      typeof razorpay_signature !== 'string' ||
+      typeof registration_id !== 'string' ||
+      razorpay_payment_id.startsWith('pay_mock') ||
+      razorpay_order_id.startsWith('order_ndv') ||
+      razorpay_signature.startsWith('sig_mock')
+    ) {
+      return res.status(400).json({
+        error: 'Invalid payment parameters: Mock or simulated transactions are strictly rejected.'
+      });
+    }
+
+    // Enforce genuine server-side Razorpay configuration
+    if (!razorpayClient || !isRazorpayConfigured || !RAZORPAY_KEY_SECRET || isPlaceholderCredential(RAZORPAY_KEY_SECRET)) {
+      console.error('[Payment Verification Rejected] Razorpay client/secret is unconfigured or a placeholder.');
+      return res.status(503).json({
+        error: 'Payment verification service is temporarily unavailable. Please contact admissions with your transaction details.'
+      });
     }
 
     const reg = await RegistrationsRepo.findByRegId(registration_id);
     if (!reg) {
-      return res.status(404).json({ error: 'Registration record not found.' });
+      return res.status(404).json({ error: 'Registration record not found: ' + registration_id });
     }
 
-    // Verify order ID belongs to this registration
-    let paymentRecord = await PaymentsRepo.findByOrderId(razorpay_order_id);
-    if (paymentRecord && paymentRecord.registration_id !== registration_id) {
+    // Verify stored payment record exists for this order
+    const paymentRecord = await PaymentsRepo.findByOrderId(razorpay_order_id);
+    if (!paymentRecord) {
+      return res.status(400).json({ error: 'Order ID not recognized: No corresponding payment record in database.' });
+    }
+
+    // Verify order belongs to this registration
+    if (paymentRecord.registration_id !== registration_id) {
       return res.status(400).json({ error: 'Transaction order ID does not match this registration record.' });
     }
 
-    const student = await StudentsRepo.findByRegId(registration_id);
-
-    // Idempotency check: Return existing verified receipt if this payment was already verified
-    if (paymentRecord && paymentRecord.payment_status === 'success' && paymentRecord.razorpay_payment_id === razorpay_payment_id) {
-      return res.json({
-        success: true,
-        verified: true,
-        registration_id,
-        status: reg.registration_status,
-        message: 'Transaction already verified and processed.',
-        receipt: {
-          student_name: student ? student.full_name : 'Student',
-          email: student ? student.email : '',
-          course_name: reg.course_name,
-          duration: reg.course_duration,
-          total_fee: reg.total_course_fee,
-          amount_paid: reg.total_amount_paid,
-          remaining_balance: reg.remaining_balance,
-          payment_id: razorpay_payment_id,
-          order_id: razorpay_order_id,
-          payment_type: paymentRecord.payment_type
-        }
-      });
-    }
-
-    // Signature Verification Logic
+    // Cryptographic HMAC-SHA256 Signature Verification (Constant-Time)
     let isSignatureValid = false;
-
-    if (RAZORPAY_KEY_SECRET && !RAZORPAY_KEY_SECRET.includes('placeholder')) {
+    try {
+      const payload = `${razorpay_order_id}|${razorpay_payment_id}`;
       const generatedSignature = crypto
         .createHmac('sha256', RAZORPAY_KEY_SECRET)
-        .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+        .update(payload)
         .digest('hex');
 
-      isSignatureValid = (generatedSignature === razorpay_signature);
-    } else {
-      // In Dev/Test placeholder mode, simulate successful verification
-      isSignatureValid = true;
-      console.log(`[Dev Verification] Test mode verified for Order: ${razorpay_order_id}, Payment: ${razorpay_payment_id}`);
+      const sigBuf = Buffer.from(razorpay_signature, 'utf8');
+      const genBuf = Buffer.from(generatedSignature, 'utf8');
+
+      if (sigBuf.length === genBuf.length && crypto.timingSafeEqual(sigBuf, genBuf)) {
+        isSignatureValid = true;
+      }
+    } catch (sigErr) {
+      console.error('[Signature Verification Error]', sigErr.message);
+      isSignatureValid = false;
     }
 
     if (!isSignatureValid) {
       console.warn(`[Payment Verification Failed] Signature mismatch for Order: ${razorpay_order_id}`);
-      await RegistrationsRepo.update(registration_id, { registration_status: 'Payment Failed' });
-      if (paymentRecord) {
-        await PaymentsRepo.update(paymentRecord.id, { payment_status: 'failed' });
-      }
       return res.status(400).json({ error: 'Payment signature verification failed. Invalid transaction signature.' });
     }
 
-    // Calculate verified payment updates
-    const verifiedAmount = paymentRecord ? Number(paymentRecord.amount) : (reg.payment_type === 'advance' ? 2499 : Number(reg.total_course_fee));
-    const currentPaid = Number(reg.total_amount_paid || 0);
-    const totalFee = Number(reg.total_course_fee);
-    const newPaid = Math.min(totalFee, currentPaid + verifiedAmount);
-    const newRemaining = Math.max(0, totalFee - newPaid);
-
-    let finalStatus;
-    if (newRemaining === 0) {
-      finalStatus = 'Fully Paid';
-    } else if (reg.payment_type === 'advance' && newPaid === 2499) {
-      finalStatus = 'Advance Paid';
-    } else {
-      finalStatus = 'Balance Pending';
-    }
-
-    // 1. Update/Record Payment Record
-    if (paymentRecord) {
-      await PaymentsRepo.update(paymentRecord.id, {
-        razorpay_payment_id,
-        razorpay_signature,
-        payment_status: 'success',
-        verified_at: new Date().toISOString()
-      });
-    } else {
-      paymentRecord = await PaymentsRepo.create({
-        registration_id,
-        razorpay_order_id,
-        razorpay_payment_id,
-        razorpay_signature,
-        amount: verifiedAmount,
-        currency: 'INR',
-        payment_type: reg.payment_type,
-        payment_status: 'success',
-        verified_at: new Date().toISOString()
+    // Authoritative Gateway Verification: Fetch payment using the official Razorpay SDK
+    let fetchedPayment;
+    try {
+      fetchedPayment = await razorpayClient.payments.fetch(razorpay_payment_id);
+    } catch (fetchErr) {
+      console.error('[Razorpay Fetch Error]', fetchErr.message);
+      return res.status(502).json({
+        error: 'Unable to confirm payment with the payment gateway. Please try again shortly.'
       });
     }
 
-    // 2. Update Registration Record
-    const updatedReg = await RegistrationsRepo.update(registration_id, {
-      total_amount_paid: newPaid,
-      remaining_balance: newRemaining,
-      registration_status: finalStatus
-    });
+    if (!fetchedPayment) {
+      return res.status(400).json({ error: 'Payment record not found on payment gateway.' });
+    }
 
-    // 3. Send Automatic Branded Email Receipt
-    let emailResult = { success: false };
-    if (student && student.email) {
-      emailResult = await sendPaymentReceipt({
-        registrationId: registration_id,
-        studentName: student.full_name,
-        studentEmail: student.email,
-        courseName: reg.course_name,
-        courseDuration: reg.course_duration,
-        totalCourseFee: reg.total_course_fee,
-        paymentType: paymentRecord.payment_type,
-        amountPaid: verifiedAmount,
-        remainingBalance: newRemaining,
-        razorpayPaymentId: razorpay_payment_id,
-        razorpayOrderId: razorpay_order_id,
-        paymentDate: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+    // Require status === 'captured' and captured === true
+    if (fetchedPayment.status !== 'captured' || fetchedPayment.captured !== true) {
+      return res.status(400).json({
+        error: `Payment verification failed: Gateway status is '${fetchedPayment.status}', expected 'captured'.`
       });
+    }
+
+    // Verify fetched order ID matches the submitted order ID
+    if (fetchedPayment.order_id !== razorpay_order_id) {
+      return res.status(400).json({
+        error: 'Payment verification failed: Gateway order ID does not match submitted order ID.'
+      });
+    }
+
+    // Verify fetched payment ID matches the submitted payment ID
+    if (fetchedPayment.id !== razorpay_payment_id) {
+      return res.status(400).json({
+        error: 'Payment verification failed: Gateway payment ID does not match submitted payment ID.'
+      });
+    }
+
+    // Verify currency is INR
+    if (fetchedPayment.currency !== 'INR') {
+      return res.status(400).json({
+        error: `Payment verification failed: Invalid currency '${fetchedPayment.currency}'. Expected INR.`
+      });
+    }
+
+    // Compare fetched amount (in paise) against Number(paymentRecord.amount) * 100
+    const expectedAmountPaise = Math.round(Number(paymentRecord.amount) * 100);
+    if (Number(fetchedPayment.amount) !== expectedAmountPaise) {
+      return res.status(400).json({
+        error: `Payment verification failed: Gateway amount ${fetchedPayment.amount} paise does not match expected order amount ${expectedAmountPaise} paise.`
+      });
+    }
+
+    // Call PaymentsRepo.processRazorpayPayment() with amount in INR (NOT paise)
+    let rpcResult;
+    try {
+      rpcResult = await PaymentsRepo.processRazorpayPayment({
+        p_order_id: razorpay_order_id,
+        p_payment_id: razorpay_payment_id,
+        p_registration_id: registration_id,
+        p_amount: Number(paymentRecord.amount),
+        p_currency: 'INR',
+        p_signature: razorpay_signature
+      });
+    } catch (rpcErr) {
+      console.error('[Process Razorpay Payment RPC Error]', rpcErr.message);
+      return res.status(500).json({
+        error: 'We could not complete payment processing. Please contact admissions with your transaction details.'
+      });
+    }
+
+    // Strict RPC result classification: never treat missing/malformed RPC results as newly processed
+    const isValidRpcResult = Boolean(rpcResult && typeof rpcResult === 'object' && rpcResult.success === true);
+    const isNewlyProcessed = Boolean(isValidRpcResult && rpcResult.already_processed === false);
+    const isAlreadyProcessed = Boolean(isValidRpcResult && rpcResult.already_processed === true);
+
+    if (!isNewlyProcessed && !isAlreadyProcessed) {
+      console.error('[Process Razorpay Payment RPC Invalid Result]', rpcResult);
+      return res.status(500).json({ error: 'Database error processing payment: Malformed or unexpected RPC result.' });
+    }
+
+    // Refresh registration and student data for receipt response
+    const updatedReg = (await RegistrationsRepo.findByRegId(registration_id)) || reg;
+    const student = await StudentsRepo.findByRegId(registration_id);
+
+    // Send receipt email ONLY if newly processed
+    let emailSent = false;
+    if (isNewlyProcessed && student && student.email) {
+      try {
+        const emailResult = await sendPaymentReceipt({
+          registrationId: registration_id,
+          studentName: student.full_name,
+          studentEmail: student.email,
+          courseName: updatedReg.course_name,
+          courseDuration: updatedReg.course_duration,
+          totalCourseFee: updatedReg.total_course_fee,
+          paymentType: paymentRecord.payment_type || updatedReg.payment_type,
+          amountPaid: Number(paymentRecord.amount),
+          remainingBalance: updatedReg.remaining_balance,
+          razorpayPaymentId: razorpay_payment_id,
+          razorpayOrderId: razorpay_order_id,
+          paymentDate: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+        });
+        emailSent = Boolean(emailResult && emailResult.success);
+      } catch (emailErr) {
+        // Email errors must never reverse or fail a confirmed payment
+        console.error('[Receipt Email Error - Non-Fatal]', emailErr.message);
+      }
     }
 
     res.json({
       success: true,
       verified: true,
       registration_id,
-      status: finalStatus,
+      status: updatedReg.registration_status,
+      message: isAlreadyProcessed ? 'Transaction already verified and processed.' : 'Payment verified and processed successfully.',
       receipt: {
         student_name: student ? student.full_name : 'Student',
         email: student ? student.email : '',
-        course_name: reg.course_name,
-        duration: reg.course_duration,
-        total_fee: reg.total_course_fee,
-        amount_paid: verifiedAmount,
-        total_paid_to_date: newPaid,
-        remaining_balance: newRemaining,
+        course_name: updatedReg.course_name,
+        duration: updatedReg.course_duration,
+        total_fee: updatedReg.total_course_fee,
+        amount_paid: Number(paymentRecord.amount),
+        total_paid_to_date: updatedReg.total_amount_paid,
+        remaining_balance: updatedReg.remaining_balance,
         payment_id: razorpay_payment_id,
         order_id: razorpay_order_id,
-        payment_type: paymentRecord.payment_type,
-        email_sent: emailResult.success
+        payment_type: paymentRecord.payment_type || updatedReg.payment_type,
+        email_sent: emailSent
       }
     });
   } catch (err) {
@@ -620,25 +692,20 @@ app.post('/api/payment/verify-payment', async (req, res) => {
 });
 
 // ============================================================================
-// PUBLIC API: PAYMENT FAILURE NOTIFIER
+// PUBLIC API: PAYMENT FAILURE / CANCELLATION NOTIFIER (NON-AUTHORITATIVE)
 // ============================================================================
 
 app.post('/api/payment/payment-failed', async (req, res) => {
   try {
-    const { registration_id, razorpay_order_id, error_description } = req.body;
-    if (registration_id) {
-      await RegistrationsRepo.update(registration_id, {
-        registration_status: 'Payment Failed',
-        notes: `Payment failed at checkout: ${error_description || 'User cancelled or gateway rejected'}`
-      });
-    }
-    if (razorpay_order_id) {
-      const p = await PaymentsRepo.findByOrderId(razorpay_order_id);
-      if (p) await PaymentsRepo.update(p.id, { payment_status: 'failed' });
-    }
-    res.json({ success: true, status: 'Payment Failed' });
+    console.warn('[Payment Notice] Client reported a checkout issue. No financial or registration records were modified.');
+
+    return res.status(202).json({
+      success: true,
+      status: 'notification_received'
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('[Payment Notice Error]', err.message);
+    return res.status(500).json({ error: 'Internal server error processing notification.' });
   }
 });
 
@@ -651,108 +718,165 @@ app.post('/api/payment/webhook', async (req, res) => {
     const signature = req.headers['x-razorpay-signature'];
     const rawBody = req.body;
 
-    if (RAZORPAY_WEBHOOK_SECRET && !RAZORPAY_WEBHOOK_SECRET.includes('placeholder')) {
+    if (!signature) {
+      return res.status(400).send('Missing webhook signature header');
+    }
+
+    if (!RAZORPAY_WEBHOOK_SECRET || isPlaceholderCredential(RAZORPAY_WEBHOOK_SECRET)) {
+      console.error('[Webhook Rejected] Server RAZORPAY_WEBHOOK_SECRET is unconfigured or a placeholder.');
+      return res.status(503).send('Webhook verification unconfigured');
+    }
+
+    let isWebhookValid = false;
+    try {
       const expectedSignature = crypto
         .createHmac('sha256', RAZORPAY_WEBHOOK_SECRET)
         .update(rawBody)
         .digest('hex');
 
-      if (signature !== expectedSignature) {
-        console.warn('[Webhook Error] Invalid Razorpay webhook signature');
-        return res.status(400).send('Invalid signature');
+      const sigBuf = Buffer.from(signature, 'utf8');
+      const expBuf = Buffer.from(expectedSignature, 'utf8');
+
+      if (sigBuf.length === expBuf.length && crypto.timingSafeEqual(sigBuf, expBuf)) {
+        isWebhookValid = true;
       }
+    } catch (err) {
+      console.error('[Webhook Verification Error]', err.message);
+      isWebhookValid = false;
     }
 
-    const event = JSON.parse(rawBody.toString());
-    const eventId = req.headers['x-razorpay-event-id'] || event.id || `evt_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
+    if (!isWebhookValid) {
+      console.warn('[Webhook Error] Invalid Razorpay webhook signature');
+      return res.status(400).send('Invalid signature');
+    }
 
-    // Atomic Persistent Webhook Idempotency Check & Insert
-    const { alreadyProcessed } = await WebhookEventsRepo.recordOrSkip(eventId, event.event, event);
-    if (alreadyProcessed) {
-      console.log(`[Webhook Notice] Event ${eventId} was already processed or is processing concurrently. Skipping duplicate execution.`);
+    let event;
+    try {
+      event = JSON.parse(rawBody.toString());
+    } catch (jsonErr) {
+      return res.status(400).send('Invalid webhook JSON payload');
+    }
+
+    // Require explicit event ID - Do NOT generate random fallback IDs
+    const eventId = req.headers['x-razorpay-event-id'] || event.id;
+    if (!eventId) {
+      return res.status(400).send('Missing webhook event identifier');
+    }
+
+    // Filter event type: Support payment.captured ONLY
+    if (event.event !== 'payment.captured') {
+      console.log(`[Webhook Notice] Safely ignoring unsupported event type: ${event.event}`);
+      return res.json({ status: 'ignored_unsupported_event', event: event.event, event_id: eventId });
+    }
+
+    // Read-only Deduplication Check before processing
+    const isEventAlreadyProcessed = await WebhookEventsRepo.isProcessed(eventId);
+    if (isEventAlreadyProcessed) {
+      console.log(`[Webhook Notice] Event ${eventId} was already processed. Skipping duplicate execution.`);
       return res.json({ status: 'already_processed', event_id: eventId });
     }
-    console.log(`[Webhook Event Processed] ID: ${eventId}, Type: ${event.event}`);
 
-    if (event.event === 'payment.captured' || event.event === 'order.paid') {
-      const paymentEntity = event.payload.payment.entity;
-      const orderId = paymentEntity.order_id;
-      const paymentId = paymentEntity.id;
-      const notes = paymentEntity.notes || {};
-      const regId = notes.registration_id;
+    // Extract payment entity
+    const paymentEntity = event.payload?.payment?.entity;
+    if (!paymentEntity) {
+      return res.status(400).send('Missing payment entity in webhook payload');
+    }
 
-      if (regId) {
-        const reg = await RegistrationsRepo.findByRegId(regId);
-        if (reg && reg.registration_status !== 'Fully Paid') {
-          const verifiedAmount = Number(paymentEntity.amount) / 100;
-          const currentPaid = Number(reg.total_amount_paid || 0);
-          const totalFee = Number(reg.total_course_fee);
-          const newPaid = Math.min(totalFee, currentPaid + verifiedAmount);
-          const newRemaining = Math.max(0, totalFee - newPaid);
+    if (paymentEntity.status !== 'captured' || paymentEntity.captured !== true) {
+      return res.status(400).send('Webhook payment is not confirmed as captured.');
+    }
 
-          let finalStatus;
-          if (newRemaining === 0) {
-            finalStatus = 'Fully Paid';
-          } else if (reg.payment_type === 'advance' && newPaid === 2499) {
-            finalStatus = 'Advance Paid';
-          } else {
-            finalStatus = 'Balance Pending';
-          }
+    const paymentId = paymentEntity.id;
+    const orderId = paymentEntity.order_id;
+    const notes = paymentEntity.notes || {};
+    const regId = notes.registration_id;
 
-          let paymentRecord = await PaymentsRepo.findByPaymentId(paymentId);
-          if (!paymentRecord) {
-            paymentRecord = await PaymentsRepo.findByOrderId(orderId);
-          }
+    if (!paymentId || !orderId || !regId) {
+      return res.status(400).send('Webhook payload missing required payment identifiers or registration note');
+    }
 
-          if (paymentRecord) {
-            await PaymentsRepo.update(paymentRecord.id, {
-              razorpay_payment_id: paymentId,
-              payment_status: 'success',
-              verified_at: new Date().toISOString()
-            });
-          } else {
-            await PaymentsRepo.create({
-              registration_id: regId,
-              razorpay_order_id: orderId,
-              razorpay_payment_id: paymentId,
-              amount: verifiedAmount,
-              currency: 'INR',
-              payment_type: notes.payment_type || reg.payment_type,
-              payment_status: 'success',
-              verified_at: new Date().toISOString()
-            });
-          }
+    if (paymentEntity.currency !== 'INR') {
+      return res.status(400).send(`Invalid currency in webhook: Expected INR, got ${paymentEntity.currency}`);
+    }
 
-          await RegistrationsRepo.update(regId, {
-            total_amount_paid: newPaid,
-            remaining_balance: newRemaining,
-            registration_status: finalStatus
+    // Verify registration exists
+    const reg = await RegistrationsRepo.findByRegId(regId);
+    if (!reg) {
+      return res.status(404).send('Registration record not found for webhook: ' + regId);
+    }
+
+    // Verify stored payment record exists for this order and matches registration
+    const paymentRecord = await PaymentsRepo.findByOrderId(orderId);
+    if (!paymentRecord) {
+      return res.status(400).send('Order ID not recognized: No corresponding payment record in database');
+    }
+    if (paymentRecord.registration_id !== regId) {
+      return res.status(400).send('Order ID does not match registration record in database');
+    }
+
+    // Verify amount in paise matches stored amount in INR * 100
+    const expectedAmountPaise = Math.round(Number(paymentRecord.amount) * 100);
+    if (Number(paymentEntity.amount) !== expectedAmountPaise) {
+      return res.status(400).send(`Amount mismatch: Expected ${expectedAmountPaise} paise, received ${paymentEntity.amount} paise`);
+    }
+
+    // Call atomic RPC PaymentsRepo.processRazorpayPayment() with amount in INR
+    const rpcResult = await PaymentsRepo.processRazorpayPayment({
+      p_order_id: orderId,
+      p_payment_id: paymentId,
+      p_registration_id: regId,
+      p_amount: Number(paymentRecord.amount),
+      p_currency: 'INR',
+      p_signature: null // Webhooks are verified at webhook envelope level
+    });
+
+    // Strict RPC result classification: never treat missing/malformed RPC results as newly processed
+    const isValidRpcResult = Boolean(rpcResult && typeof rpcResult === 'object' && rpcResult.success === true);
+    const isNewlyProcessed = Boolean(isValidRpcResult && rpcResult.already_processed === false);
+    const isAlreadyProcessed = Boolean(isValidRpcResult && rpcResult.already_processed === true);
+
+    if (!isNewlyProcessed && !isAlreadyProcessed) {
+      console.error('[Webhook Process Razorpay Payment RPC Invalid Result]', rpcResult);
+      return res.status(500).send('Webhook error: Malformed or unexpected RPC result');
+    }
+
+    // Record webhook event deduplication ONLY after successful payment processing
+    try {
+      await WebhookEventsRepo.record(eventId, event.event, event);
+    } catch (eventLogErr) {
+      // Event log failure must NOT reverse or fail the confirmed payment
+      console.warn('[Webhook Log Notice] Failed to record webhook event entry:', eventLogErr.message);
+    }
+
+    if (isNewlyProcessed) {
+      const student = await StudentsRepo.findByRegId(regId);
+      const updatedReg = (await RegistrationsRepo.findByRegId(regId)) || reg;
+      if (student && student.email) {
+        try {
+          await sendPaymentReceipt({
+            registrationId: regId,
+            studentName: student.full_name,
+            studentEmail: student.email,
+            courseName: updatedReg.course_name,
+            courseDuration: updatedReg.course_duration,
+            totalCourseFee: updatedReg.total_course_fee,
+            paymentType: paymentRecord.payment_type || notes.payment_type || reg.payment_type,
+            amountPaid: Number(paymentRecord.amount),
+            remainingBalance: updatedReg.remaining_balance,
+            razorpayPaymentId: paymentId,
+            razorpayOrderId: orderId,
+            paymentDate: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
           });
-
-          const student = await StudentsRepo.findByRegId(regId);
-          if (student && student.email) {
-            await sendPaymentReceipt({
-              registrationId: regId,
-              studentName: student.full_name,
-              studentEmail: student.email,
-              courseName: reg.course_name,
-              courseDuration: reg.course_duration,
-              totalCourseFee: reg.total_course_fee,
-              paymentType: notes.payment_type || reg.payment_type,
-              amountPaid: verifiedAmount,
-              remainingBalance: newRemaining,
-              razorpayPaymentId: paymentId,
-              razorpayOrderId: orderId
-            });
-          }
+        } catch (emailErr) {
+          console.error('[Webhook Receipt Email Error - Non-Fatal]', emailErr.message);
         }
       }
     }
 
-    res.json({ status: 'ok', event_id: eventId });
+    return res.json({ status: 'ok', event_id: eventId });
   } catch (err) {
     console.error('[Webhook Processing Error]', err);
-    res.status(500).send('Webhook error');
+    res.status(500).send('Webhook processing failed.');
   }
 });
 
@@ -1181,7 +1305,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start Server (Standalone or Local development)
-if (!process.env.VERCEL) {
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
     console.log(`\n============================================================`);
     console.log(`🚀 NEXTGEN DMA VENTURES SERVER RUNNING`);
@@ -1189,10 +1313,16 @@ if (!process.env.VERCEL) {
     console.log(`🔒 Admin Panel   : http://localhost:${PORT}/admin`);
     console.log(`🔑 Admin Login   : ${defaultAdminEmail}`);
     console.log(`🔐 Admin Status  : ${defaultAdminPassword || defaultAdminHash ? '[SECURED VIA ENV]' : '[PENDING CONFIGURATION]'}`);
-    console.log(`💳 Razorpay Mode : ${RAZORPAY_KEY_ID.startsWith('rzp_test') ? 'TEST' : (RAZORPAY_KEY_ID.includes('placeholder') ? 'DEV-SIMULATOR' : 'LIVE')}`);
+    console.log(`💳 Razorpay Mode : ${isRazorpayConfigured ? (RAZORPAY_KEY_ID.startsWith('rzp_test') ? 'TEST' : 'LIVE') : 'DISABLED (CREDENTIALS MISSING / PLACEHOLDER)'}`);
     console.log(`============================================================\n`);
   });
 }
+
+// Internal helper for unit test mocking
+app._setRazorpayClient = (client) => {
+  razorpayClient = client;
+};
+app._getRazorpayClient = () => razorpayClient;
 
 // Export for Vercel Serverless Function Handler
 module.exports = app;
