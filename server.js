@@ -24,6 +24,7 @@ const jwt = require('jsonwebtoken');
 const {
   generateRegistrationId,
   seedInitialData,
+  supabase,
   RateLimiterRepo,
   WebhookEventsRepo,
   StudentsRepo,
@@ -35,6 +36,13 @@ const {
 } = require('./db');
 
 const { sendPaymentReceipt, formatINR } = require('./emailService');
+
+let APP_VERSION = '2.0.0';
+try {
+  APP_VERSION = require('./package.json').version || APP_VERSION;
+} catch (err) {
+  // Fallback version if package metadata cannot be resolved
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -224,8 +232,53 @@ function verifyAdminSession(req, res, next) {
 }
 
 // ============================================================================
-// PUBLIC API: CONFIG & COURSES
+// PUBLIC API: HEALTH, CONFIG & COURSES
 // ============================================================================
+
+app.get('/api/health', async (req, res) => {
+  const environment = process.env.VERCEL_ENV || process.env.NODE_ENV || 'development';
+
+  if (!supabase) {
+    return res.status(503).json({
+      success: false,
+      environment,
+      version: APP_VERSION,
+      database: 'unavailable'
+    });
+  }
+
+  try {
+    const { error } = await supabase
+      .from('courses')
+      .select('id')
+      .limit(1);
+
+    if (error) {
+      console.error('[Health Check Database Error]', error.message);
+      return res.status(503).json({
+        success: false,
+        environment,
+        version: APP_VERSION,
+        database: 'unavailable'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      environment,
+      version: APP_VERSION,
+      database: 'healthy'
+    });
+  } catch (err) {
+    console.error('[Health Check Exception]', err.message);
+    return res.status(503).json({
+      success: false,
+      environment,
+      version: APP_VERSION,
+      database: 'unavailable'
+    });
+  }
+});
 
 app.get('/api/config/public-key', (req, res) => {
   res.json({

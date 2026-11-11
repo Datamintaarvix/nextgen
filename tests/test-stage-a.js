@@ -715,6 +715,111 @@ async function runTests() {
   RegistrationsRepo.update = origRegUpdate;
   PaymentsRepo.update = origPayUpdate;
 
+  // TEST SUITE 10: /api/health Endpoint Connectivity & Security
+  console.log('\n--- Test Suite 10: /api/health Database Connectivity & Security ---');
+
+  // 10a: Unconfigured Supabase returns 503 without exposing secrets
+  const unconfigHealthRes = await dispatch(appLive, { url: '/api/health', method: 'GET' });
+  assert(
+    unconfigHealthRes.statusCode === 503 &&
+    unconfigHealthRes.json &&
+    unconfigHealthRes.json.success === false &&
+    unconfigHealthRes.json.database === 'unavailable' &&
+    unconfigHealthRes.json.version === '2.0.0' &&
+    typeof unconfigHealthRes.json.environment === 'string',
+    '/api/health returns HTTP 503 when Supabase client is not configured'
+  );
+
+  // 10b/10c/10d: Mocked Supabase client connectivity tests
+  const Module = require('module');
+  const origModuleRequire = Module.prototype.require;
+  const prevSupabaseUrl = process.env.SUPABASE_URL;
+  const prevSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const prevVercelEnv = process.env.VERCEL_ENV;
+
+  let mockHealthBehavior = async () => ({ data: [{ id: 'ai-001' }], error: null });
+
+  try {
+    Module.prototype.require = function(request) {
+      if (request === '@supabase/supabase-js') {
+        return {
+          createClient: () => ({
+            from: () => ({
+              select: () => ({
+                limit: async () => mockHealthBehavior()
+              })
+            })
+          })
+        };
+      }
+      return origModuleRequire.apply(this, arguments);
+    };
+
+    process.env.SUPABASE_URL = 'https://mock-health-test.supabase.co';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'mock_health_secret_key_xyz';
+    process.env.VERCEL_ENV = 'preview';
+    clearRequireCache();
+
+    const appWithDb = require(path.join(projectRoot, 'server.js'));
+
+    // 10b: Healthy database returns 200 JSON without credentials
+    const healthyRes = await dispatch(appWithDb, { url: '/api/health', method: 'GET' });
+    assert(
+      healthyRes.statusCode === 200 &&
+      healthyRes.json &&
+      healthyRes.json.success === true &&
+      healthyRes.json.environment === 'preview' &&
+      healthyRes.json.version === '2.0.0' &&
+      healthyRes.json.database === 'healthy' &&
+      !healthyRes.body.includes('mock-health-test.supabase.co') &&
+      !healthyRes.body.includes('mock_health_secret_key_xyz'),
+      '/api/health returns HTTP 200 with safe JSON when Supabase check succeeds'
+    );
+
+    // 10c: Database query error returns 503 without leaking error details
+    mockHealthBehavior = async () => ({
+      data: null,
+      error: { message: 'FATAL: password auth failed for postgres://user:secret@host/db' }
+    });
+    const dbErrRes = await dispatch(appWithDb, { url: '/api/health', method: 'GET' });
+    assert(
+      dbErrRes.statusCode === 503 &&
+      dbErrRes.json &&
+      dbErrRes.json.success === false &&
+      dbErrRes.json.database === 'unavailable' &&
+      dbErrRes.json.error === undefined &&
+      !dbErrRes.body.includes('FATAL') &&
+      !dbErrRes.body.includes('postgres://') &&
+      !dbErrRes.body.includes('secret'),
+      '/api/health returns HTTP 503 without exposing internal errors on Supabase query failure'
+    );
+
+    // 10d: Thrown exception during DB check returns 503 without leaking details
+    mockHealthBehavior = async () => {
+      throw new Error('ECONNREFUSED 10.0.0.10:5432 secret_db_host');
+    };
+    const dbThrowRes = await dispatch(appWithDb, { url: '/api/health', method: 'GET' });
+    assert(
+      dbThrowRes.statusCode === 503 &&
+      dbThrowRes.json &&
+      dbThrowRes.json.success === false &&
+      dbThrowRes.json.database === 'unavailable' &&
+      !dbThrowRes.body.includes('ECONNREFUSED') &&
+      !dbThrowRes.body.includes('10.0.0.10') &&
+      !dbThrowRes.body.includes('secret_db_host'),
+      '/api/health returns HTTP 503 without leaking stack or host details on thrown exception'
+    );
+  } finally {
+    Module.prototype.require = origModuleRequire;
+    if (prevSupabaseUrl === undefined) delete process.env.SUPABASE_URL;
+    else process.env.SUPABASE_URL = prevSupabaseUrl;
+    if (prevSupabaseKey === undefined) delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+    else process.env.SUPABASE_SERVICE_ROLE_KEY = prevSupabaseKey;
+    if (prevVercelEnv === undefined) delete process.env.VERCEL_ENV;
+    else process.env.VERCEL_ENV = prevVercelEnv;
+    clearRequireCache();
+  }
+
   console.log('\n============================================================');
   console.log(`TEST RUN COMPLETE: ${testsPassed} PASSED, ${testsFailed} FAILED`);
   console.log('============================================================\n');
