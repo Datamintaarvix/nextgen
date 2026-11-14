@@ -1874,13 +1874,10 @@ function createCourseCardHTML(course) {
     
     return `
       <article class="course-tile group">
-        <!-- Full Background Cover Image (Design matching reference with text over image) -->
+        <!-- Full Background Cover Image (Image Alone Without Black Overlay) -->
         <div class="course-img-bg-wrap">
           <img src="${course.image}" alt="${course.name}" class="course-bg-img" loading="lazy">
         </div>
-
-        <!-- Dark Gradient Overlay for Contrast & Readability -->
-        <div class="course-card-overlay"></div>
 
         <!-- Top Floating Frosted Glass Pills (matching 'starts at ₱4,999' reference) -->
         <div class="course-top-bar">
@@ -1903,8 +1900,6 @@ function createCourseCardHTML(course) {
             <i class="fa-solid fa-location-dot text-[#ef4444] text-[11px]"></i>
             <span>${primaryRole} &bull; Bangalore &amp; Remote</span>
           </div>
-
-          <p class="course-overview-text">${course.overview}</p>
 
           <!-- Skills tags in frosted glass pills -->
           <div class="course-tags-row">
@@ -2734,4 +2729,157 @@ async function submitCourseApplicationAPI(payload) {
             });
         }, 500);
     });
+}
+
+// ============================================================
+// EXPLORE OUR CAPABILITIES — SIDE NAVIGATION & SCROLLABLE PATH
+// ============================================================
+
+function scrollArcGallery(direction) {
+    const viewport = document.getElementById('capabilities-arc-viewport');
+    if (!viewport) return;
+    
+    // Width of card + gap is ~220px to 260px depending on screen
+    const cardWidth = window.innerWidth < 640 ? 190 : (window.innerWidth < 1024 ? 220 : 250);
+    const scrollStep = cardWidth * 1.5;
+    
+    viewport.scrollBy({
+        left: direction * scrollStep,
+        behavior: 'smooth'
+    });
+}
+
+function updateArcScrollProgress() {
+    const viewport = document.getElementById('capabilities-arc-viewport');
+    const thumb = document.getElementById('arc-scroll-path-thumb');
+    const track = document.getElementById('arc-scroll-path-track');
+    const counter = document.getElementById('arc-scroll-counter');
+    const prevSideBtn = document.getElementById('arc-side-prev');
+    const nextSideBtn = document.getElementById('arc-side-next');
+    const prevPathBtn = document.getElementById('arc-path-left-btn');
+    const nextPathBtn = document.getElementById('arc-path-right-btn');
+    
+    if (!viewport || !thumb || !track) return;
+    
+    const maxScroll = viewport.scrollWidth - viewport.clientWidth;
+    const currentScroll = viewport.scrollLeft;
+    
+    if (maxScroll <= 0) {
+        thumb.style.left = '0%';
+        thumb.style.width = '100%';
+        if (prevSideBtn) prevSideBtn.classList.add('is-disabled');
+        if (nextSideBtn) nextSideBtn.classList.add('is-disabled');
+        if (prevPathBtn) prevPathBtn.classList.add('is-disabled');
+        if (nextPathBtn) nextPathBtn.classList.add('is-disabled');
+        return;
+    }
+    
+    // Calculate thumb width and position percentage
+    const visibleRatio = viewport.clientWidth / viewport.scrollWidth;
+    const thumbWidthPercent = Math.max(18, Math.min(45, visibleRatio * 100));
+    thumb.style.width = `${thumbWidthPercent}%`;
+    
+    const scrollRatio = Math.max(0, Math.min(1, currentScroll / maxScroll));
+    const maxThumbLeft = 100 - thumbWidthPercent;
+    const thumbLeft = scrollRatio * maxThumbLeft;
+    thumb.style.left = `${thumbLeft}%`;
+    
+    // Update counter indicator (01 / 07 to 07 / 07)
+    const totalCards = 7;
+    const activeIndex = Math.min(totalCards, Math.max(1, Math.round(scrollRatio * (totalCards - 1)) + 1));
+    if (counter) {
+        counter.textContent = `0${activeIndex} / 0${totalCards}`;
+    }
+    
+    // Toggle active/disabled states on arrow buttons
+    const isAtStart = currentScroll <= 8;
+    const isAtEnd = currentScroll >= maxScroll - 8;
+    
+    if (prevSideBtn) prevSideBtn.classList.toggle('is-disabled', isAtStart);
+    if (prevPathBtn) prevPathBtn.classList.toggle('is-disabled', isAtStart);
+    if (nextSideBtn) nextSideBtn.classList.toggle('is-disabled', isAtEnd);
+    if (nextPathBtn) nextPathBtn.classList.toggle('is-disabled', isAtEnd);
+}
+
+function initArcScrollControls() {
+    const viewport = document.getElementById('capabilities-arc-viewport');
+    const track = document.getElementById('arc-scroll-path-track');
+    if (!viewport) return;
+    
+    // Update on scroll & resize
+    viewport.addEventListener('scroll', updateArcScrollProgress, { passive: true });
+    window.addEventListener('resize', updateArcScrollProgress);
+    
+    // Track click to jump along the scrollable path
+    if (track) {
+        track.addEventListener('click', (e) => {
+            const rect = track.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickRatio = Math.max(0, Math.min(1, clickX / rect.width));
+            const maxScroll = viewport.scrollWidth - viewport.clientWidth;
+            viewport.scrollTo({
+                left: clickRatio * maxScroll,
+                behavior: 'smooth'
+            });
+        });
+    }
+    
+    // Mouse drag-to-scroll support
+    let isDown = false;
+    let startX = 0;
+    let scrollLeftPos = 0;
+    let dragThreshold = false;
+    
+    viewport.addEventListener('mousedown', (e) => {
+        isDown = true;
+        dragThreshold = false;
+        viewport.classList.add('is-dragging');
+        startX = e.pageX - viewport.offsetLeft;
+        scrollLeftPos = viewport.scrollLeft;
+    });
+    
+    window.addEventListener('mouseup', () => {
+        if (!isDown) return;
+        isDown = false;
+        viewport.classList.remove('is-dragging');
+        setTimeout(() => { dragThreshold = false; }, 50);
+    });
+    
+    viewport.addEventListener('mouseleave', () => {
+        if (!isDown) return;
+        isDown = false;
+        viewport.classList.remove('is-dragging');
+    });
+    
+    viewport.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        const x = e.pageX - viewport.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        if (Math.abs(walk) > 6) {
+            dragThreshold = true;
+        }
+        e.preventDefault();
+        viewport.scrollLeft = scrollLeftPos - walk;
+    });
+
+    // Prevent navigation if user was dragging
+    const cards = viewport.querySelectorAll('.arc-card');
+    cards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (dragThreshold) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
+    });
+    
+    // Initial calculation
+    setTimeout(updateArcScrollProgress, 100);
+}
+
+// Auto-initialize when ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initArcScrollControls);
+} else {
+    initArcScrollControls();
 }

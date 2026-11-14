@@ -504,10 +504,10 @@ main {
   position: relative;
   border-radius: 22px;
   overflow: hidden;
-  min-height: 440px;
+  min-height: 500px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-end;
   background: #000000;
   border: 1px solid var(--mint-border);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -544,12 +544,9 @@ main {
 }
 
 .service-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.15) 30%, rgba(0, 0, 0, 0.78) 65%, rgba(0, 0, 0, 0.96) 100%);
-  pointer-events: none;
+  display: none !important;
+  content: none !important;
+  background: none !important;
 }
 
 .service-card-badge {
@@ -590,7 +587,14 @@ main {
   flex-direction: column;
   justify-content: flex-end;
   margin-top: auto;
+  width: 100%;
   background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-radius: 0;
+  border: none;
+  margin: 0;
+  box-shadow: none;
 }
 
 .service-card-meta {
@@ -605,9 +609,9 @@ main {
   font-size: 10px;
   font-weight: 800;
   color: var(--mint);
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(101, 210, 197, 0.4);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(101, 210, 197, 0.5);
   padding: 3px 8px;
   border-radius: 6px;
 }
@@ -616,19 +620,32 @@ main {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.95);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 3px 10px;
+  border-radius: 6px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
 }
 
 .service-card-title {
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: 30px;
   line-height: 1.15;
-  color: #ffffff;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
   text-transform: uppercase;
-  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.72) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   transition: color 0.25s ease;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95), 0 1px 3px rgba(0, 0, 0, 1);
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.9));
 }
 
 .service-card:hover .service-card-title {
@@ -636,14 +653,7 @@ main {
 }
 
 .service-card-desc {
-  font-size: 13px;
-  line-height: 1.55;
-  color: rgba(255, 255, 255, 0.82);
-  margin-bottom: 14px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: none !important;
 }
 
 .service-card-tech {
@@ -654,22 +664,24 @@ main {
 }
 
 .service-tech-tag {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   font-family: var(--font-mono);
   font-size: 10.5px;
   font-weight: 600;
   color: #ffffff;
   padding: 3px 8px;
   border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
   transition: all 0.2s ease;
 }
 
 .service-card:hover .service-tech-tag {
-  background: rgba(101, 210, 197, 0.25);
+  background: var(--mint);
   border-color: var(--mint);
-  color: #ffffff;
+  color: #000000;
 }
 
 .service-card-footer {
@@ -720,6 +732,105 @@ main {
   max-width: 100vw !important;
 }
 
+.capabilities-arc-stage {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Floating Side Navigation Buttons */
+.arc-side-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 35;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 15, 20, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(101, 210, 197, 0.5);
+  color: var(--mint);
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(101, 210, 197, 0.25);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.arc-prev-btn {
+  left: 20px;
+}
+
+.arc-next-btn {
+  right: 20px;
+}
+
+@media (max-width: 640px) {
+  .arc-side-nav-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 14px;
+  }
+  .arc-prev-btn {
+    left: 8px;
+  }
+  .arc-next-btn {
+    right: 8px;
+  }
+}
+
+.arc-side-nav-btn:hover {
+  background: var(--mint);
+  color: #000000;
+  border-color: var(--mint);
+  transform: translateY(-50%) scale(1.12);
+  box-shadow: 0 14px 32px rgba(101, 210, 197, 0.55), 0 0 20px rgba(101, 210, 197, 0.4);
+}
+
+.arc-side-nav-btn:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.arc-side-nav-btn.is-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: translateY(-50%) scale(1);
+  box-shadow: none;
+}
+
+/* Edge Vignette Overlays */
+.arc-side-vignette {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 90px;
+  z-index: 25;
+  pointer-events: none;
+}
+
+.arc-vignette-left {
+  left: 0;
+  background: linear-gradient(to right, #000000 0%, rgba(0, 0, 0, 0.7) 45%, transparent 100%);
+}
+
+.arc-vignette-right {
+  right: 0;
+  background: linear-gradient(to left, #000000 0%, rgba(0, 0, 0, 0.7) 45%, transparent 100%);
+}
+
+@media (max-width: 640px) {
+  .arc-side-vignette {
+    width: 40px;
+  }
+}
+
 .capabilities-arc-viewport {
   perspective: 1200px;
   perspective-origin: center center;
@@ -730,6 +841,14 @@ main {
   padding: 30px 10px 40px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  scroll-behavior: smooth;
+  cursor: grab;
+  user-select: none;
+}
+
+.capabilities-arc-viewport.is-dragging {
+  cursor: grabbing;
+  scroll-behavior: auto;
 }
 
 .capabilities-arc-viewport::-webkit-scrollbar {
@@ -791,12 +910,18 @@ main {
 .arc-card-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.2) 60%, transparent 100%);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-radius: 0;
+  border: none;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   padding: 18px;
   color: #ffffff;
+  box-shadow: none;
+  z-index: 5;
 }
 
 .arc-card-role {
@@ -813,7 +938,11 @@ main {
   font-size: 20px;
   line-height: 1.1;
   text-transform: uppercase;
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.72) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9));
   margin-top: 2px;
 }
 
@@ -862,6 +991,127 @@ main {
   border-color: var(--mint) !important;
 }
 
+/* Scroll Controls & Interactive Path Below Gallery */
+.arc-scroll-controls-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 18px;
+  position: relative;
+  z-index: 30;
+  padding: 0 16px;
+}
+
+.arc-scroll-path-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.arc-track-arrow-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(101, 210, 197, 0.35);
+  color: var(--mint);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  outline: none;
+}
+
+.arc-track-arrow-btn:hover {
+  background: var(--mint);
+  color: #000000;
+  border-color: var(--mint);
+  transform: scale(1.08);
+  box-shadow: 0 0 16px rgba(101, 210, 197, 0.5);
+}
+
+.arc-track-arrow-btn:active {
+  transform: scale(0.92);
+}
+
+.arc-track-arrow-btn.is-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* The side-scrollable path track & thumb */
+.arc-scroll-path-track {
+  position: relative;
+  width: 280px;
+  max-width: 60vw;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  cursor: pointer;
+  border: 1px solid rgba(101, 210, 197, 0.25);
+  transition: height 0.2s ease, background 0.2s ease;
+  overflow: visible;
+}
+
+.arc-scroll-path-track:hover {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.arc-scroll-path-thumb {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  height: 100%;
+  min-width: 40px;
+  width: 25%;
+  background: linear-gradient(90deg, #65D2C5, #9DF2E8);
+  border-radius: 999px;
+  box-shadow: 0 0 14px rgba(101, 210, 197, 0.85);
+  cursor: grab;
+  transition: left 0.1s ease-out, transform 0.2s ease;
+}
+
+.arc-scroll-path-thumb:hover {
+  box-shadow: 0 0 20px rgba(101, 210, 197, 1);
+  transform: translateY(-50%) scaleY(1.3);
+}
+
+.arc-scroll-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.arc-scroll-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+
+.arc-scroll-counter {
+  color: var(--mint);
+  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
 /* ============================================================
    COURSE CARDS — EL NIDO DESIGN (IMAGE BG WITH TEXT OVERLAY)
    ============================================================ */
@@ -908,11 +1158,9 @@ main {
 }
 
 .course-card-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.15) 30%, rgba(0, 0, 0, 0.78) 65%, rgba(0, 0, 0, 0.96) 100%);
-  pointer-events: none;
+  display: none !important;
+  content: none !important;
+  background: none !important;
 }
 
 .course-top-bar {
@@ -962,6 +1210,13 @@ main {
   flex-direction: column;
   justify-content: flex-end;
   margin-top: auto;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-radius: 0;
+  border: none;
+  margin: 0;
+  box-shadow: none;
 }
 
 .course-domain-tag {
@@ -973,16 +1228,22 @@ main {
   letter-spacing: 0.12em;
   margin-bottom: 4px;
   display: block;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
 }
 
 .course-card-title {
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.72) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   font-family: var(--font-display);
-  font-size: 26px;
+  font-size: 28px;
   line-height: 1.15;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   margin: 0 0 8px 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95), 0 1px 3px rgba(0, 0, 0, 1);
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.9));
 }
 
 .course-meta-row {
@@ -994,6 +1255,7 @@ main {
   color: #ffffff;
   font-weight: 600;
   margin-bottom: 6px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
 }
 
 .course-location-row {
@@ -1002,19 +1264,15 @@ main {
   gap: 6px;
   font-size: 11px;
   font-family: var(--font-mono);
-  color: rgba(255, 255, 255, 0.85);
+  color: #ffffff;
   margin-bottom: 10px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
 }
 
-.course-overview-text {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.75);
-  line-height: 1.5;
-  margin-bottom: 12px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.course-overview-text,
+.service-card-desc,
+.course-overview {
+  display: none !important;
 }
 
 .course-tags-row {
@@ -1025,16 +1283,18 @@ main {
 }
 
 .course-tag-glass {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   color: #ffffff;
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
   padding: 3px 8px;
   border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .course-bottom-bar {
@@ -1042,8 +1302,19 @@ main {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 }
 
 .course-fee-label {
@@ -1486,4 +1757,14 @@ main {
 @keyframes modalFadeIn {
   from { opacity: 0; transform: scale(0.98); }
   to   { opacity: 1; transform: scale(1); }
+}
+
+/* Override service card body for glassmorphism */
+.service-card-body {
+  background: var(--glass-bg-light) !important;
+  backdrop-filter: var(--glass-blur-sm) !important;
+  -webkit-backdrop-filter: var(--glass-blur-sm) !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--glass-border-light) !important;
+  box-shadow: var(--glass-shadow) !important;
 }

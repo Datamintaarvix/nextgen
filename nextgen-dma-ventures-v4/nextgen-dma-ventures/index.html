@@ -217,10 +217,10 @@
         position: relative !important;
         border-radius: 22px !important;
         overflow: hidden !important;
-        min-height: 440px !important;
+        min-height: 500px !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: space-between !important;
+        justify-content: flex-end !important;
         background: #000000 !important;
         border: 1px solid rgba(101, 210, 197, 0.35) !important;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2) !important;
@@ -258,14 +258,11 @@
         transform: scale(1.08) !important;
       }
 
-      /* Dark gradient overlay so text over image is crystal clear */
+      /* Removed black color overlay - image displays pure and crisp alone */
       .service-card::after {
-        content: '' !important;
-        position: absolute !important;
-        inset: 0 !important;
-        z-index: 2 !important;
-        background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.15) 30%, rgba(0, 0, 0, 0.78) 65%, rgba(0, 0, 0, 0.96) 100%) !important;
-        pointer-events: none !important;
+        display: none !important;
+        content: none !important;
+        background: none !important;
       }
 
       .service-card-badge {
@@ -298,7 +295,14 @@
         flex-direction: column !important;
         justify-content: flex-end !important;
         margin-top: auto !important;
+        width: 100% !important;
         background: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+        margin: 0 !important;
+        box-shadow: none !important;
       }
       .service-card-meta {
         display: flex !important;
@@ -313,59 +317,71 @@
         text-transform: uppercase !important;
         letter-spacing: 0.05em !important;
         color: #65D2C5 !important;
-        background: rgba(0, 0, 0, 0.6) !important;
-        backdrop-filter: blur(8px) !important;
-        border: 1px solid rgba(101, 210, 197, 0.4) !important;
+        background: rgba(0, 0, 0, 0.45) !important;
+        backdrop-filter: blur(6px) !important;
+        border: 1px solid rgba(101, 210, 197, 0.5) !important;
         padding: 3px 8px !important;
         border-radius: 6px !important;
       }
       .service-meta-category {
         font-family: 'Space Grotesk', monospace !important;
         font-size: 11px !important;
-        color: rgba(255, 255, 255, 0.8) !important;
+        font-weight: 700 !important;
+        color: rgba(255, 255, 255, 0.95) !important;
         text-transform: uppercase !important;
-        letter-spacing: 0.04em !important;
+        letter-spacing: 0.06em !important;
+        background: rgba(0, 0, 0, 0.45) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        padding: 3px 10px !important;
+        border-radius: 6px !important;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
       }
       .service-card-title {
         font-family: 'Bebas Neue', sans-serif !important;
-        font-size: 28px !important;
-        color: #ffffff !important;
+        font-size: 30px !important;
         letter-spacing: 0.04em !important;
         line-height: 1.1 !important;
-        margin: 0 0 8px 0 !important;
+        margin: 0 0 10px 0 !important;
         text-transform: uppercase !important;
+        color: rgba(255, 255, 255, 0.95) !important;
+        background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.72) 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95), 0 1px 3px rgba(0, 0, 0, 1) !important;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.9)) !important;
       }
       .service-card-desc {
-        font-size: 13px !important;
-        color: rgba(255, 255, 255, 0.82) !important;
-        line-height: 1.55 !important;
-        margin: 0 0 14px 0 !important;
-        display: -webkit-box !important;
-        -webkit-line-clamp: 3 !important;
-        -webkit-box-orient: vertical !important;
-        overflow: hidden !important;
+        display: none !important;
+      }
+      .course-overview-text {
+        display: none !important;
       }
       .service-card-tech {
         display: flex !important;
         flex-wrap: wrap !important;
         gap: 5px !important;
-        margin-bottom: 16px !important;
+        margin-bottom: 14px !important;
       }
       .service-tech-tag {
-        background: rgba(255, 255, 255, 0.12) !important;
-        backdrop-filter: blur(8px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        background: rgba(0, 0, 0, 0.35) !important;
+        backdrop-filter: blur(6px) !important;
+        -webkit-backdrop-filter: blur(6px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
         border-radius: 6px !important;
         padding: 3px 8px !important;
         font-family: 'Space Grotesk', monospace !important;
         font-size: 10.5px !important;
         font-weight: 600 !important;
         color: #ffffff !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
       }
       .service-card-footer {
         margin-top: auto !important;
-        padding-top: 12px !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+        padding-top: 10px !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
       }
       .service-card-cta {
         display: inline-flex !important;
@@ -377,15 +393,22 @@
         text-transform: uppercase !important;
         letter-spacing: 0.06em !important;
         color: #65D2C5 !important;
-        background: transparent !important;
-        border: none !important;
+        background: rgba(0, 0, 0, 0.45) !important;
+        backdrop-filter: blur(6px) !important;
+        -webkit-backdrop-filter: blur(6px) !important;
+        border: 1px solid rgba(101, 210, 197, 0.55) !important;
+        padding: 6px 14px !important;
+        border-radius: 9999px !important;
         cursor: pointer !important;
-        transition: gap 0.2s ease, color 0.2s ease !important;
-        padding: 0 !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
       }
       .service-card:hover .service-card-cta {
-        color: #ffffff !important;
+        background: #65D2C5 !important;
+        color: #000000 !important;
+        border-color: #65D2C5 !important;
         gap: 12px !important;
+        box-shadow: 0 0 16px rgba(101, 210, 197, 0.7) !important;
       }
 
       /* ============================================================
@@ -429,12 +452,11 @@
         transform: scale(1.08) !important;
       }
 
+      /* Removed black color overlay - course images display pure and crisp alone */
       .course-card-overlay {
-        position: absolute !important;
-        inset: 0 !important;
-        z-index: 2 !important;
-        background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.15) 30%, rgba(0, 0, 0, 0.78) 65%, rgba(0, 0, 0, 0.96) 100%) !important;
-        pointer-events: none !important;
+        display: none !important;
+        content: none !important;
+        background: none !important;
       }
 
       .course-top-bar {
@@ -484,6 +506,26 @@
         flex-direction: column !important;
         justify-content: flex-end !important;
         margin-top: auto !important;
+        background: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+      }
+
+      .arc-card-name {
+        font-family: 'Bebas Neue', sans-serif !important;
+        font-size: 20px !important;
+        line-height: 1.1 !important;
+        text-transform: uppercase !important;
+        color: rgba(255, 255, 255, 0.95) !important;
+        background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.72) 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9)) !important;
+        margin-top: 2px !important;
       }
 
       .course-domain-tag {
@@ -495,16 +537,22 @@
         letter-spacing: 0.12em !important;
         margin-bottom: 4px !important;
         display: block !important;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
       }
 
       .course-card-title {
-        color: #ffffff !important;
+        color: rgba(255, 255, 255, 0.95) !important;
+        background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.72) 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
         font-family: 'Bebas Neue', sans-serif !important;
-        font-size: 26px !important;
+        font-size: 28px !important;
         line-height: 1.15 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.03em !important;
         margin: 0 0 8px 0 !important;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95), 0 1px 3px rgba(0, 0, 0, 1) !important;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.9)) !important;
       }
 
       .course-meta-row {
@@ -516,6 +564,7 @@
         color: #ffffff !important;
         font-weight: 600 !important;
         margin-bottom: 6px !important;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
       }
 
       .course-location-row {
@@ -524,39 +573,35 @@
         gap: 6px !important;
         font-size: 11px !important;
         font-family: 'Space Grotesk', monospace !important;
-        color: rgba(255, 255, 255, 0.85) !important;
+        color: #ffffff !important;
         margin-bottom: 10px !important;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95) !important;
       }
 
       .course-overview-text {
-        font-size: 12px !important;
-        color: rgba(255, 255, 255, 0.75) !important;
-        line-height: 1.5 !important;
-        margin-bottom: 12px !important;
-        display: -webkit-box !important;
-        -webkit-line-clamp: 2 !important;
-        -webkit-box-orient: vertical !important;
-        overflow: hidden !important;
+        display: none !important;
       }
 
       .course-tags-row {
         display: flex !important;
         flex-wrap: wrap !important;
         gap: 5px !important;
-        margin-bottom: 14px !important;
+        margin-bottom: 12px !important;
       }
 
       .course-tag-glass {
-        background: rgba(255, 255, 255, 0.12) !important;
-        backdrop-filter: blur(8px) !important;
-        -webkit-backdrop-filter: blur(8px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        background: rgba(0, 0, 0, 0.35) !important;
+        backdrop-filter: blur(6px) !important;
+        -webkit-backdrop-filter: blur(6px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
         color: #ffffff !important;
         font-family: 'Space Grotesk', monospace !important;
         font-size: 10px !important;
         font-weight: 600 !important;
         padding: 3px 8px !important;
         border-radius: 6px !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
       }
 
       .course-bottom-bar {
@@ -564,8 +609,13 @@
         align-items: center !important;
         justify-content: space-between !important;
         gap: 8px !important;
-        padding-top: 12px !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+        padding: 10px 12px !important;
+        border-radius: 12px !important;
+        background: rgba(0, 0, 0, 0.35) !important;
+        backdrop-filter: blur(6px) !important;
+        -webkit-backdrop-filter: blur(6px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
       }
 
       .course-fee-label {
@@ -647,10 +697,10 @@
         width: 100% !important;
         max-width: 100vw !important;
         background: #000000 !important;
+        position: relative !important;
       }
       .capabilities-arc-track {
-        max-width: 100vw !important;
-        overflow: hidden !important;
+        min-width: max-content !important;
       }
     </style>
 </head>
@@ -826,9 +876,6 @@
                                     <span class="service-meta-category">Engineering &bull; Web Platforms</span>
                                 </div>
                                 <h3 class="service-card-title">Web Development</h3>
-                                <p class="service-card-desc">
-                                    Modern, responsive full-stack web applications and architectures engineered for enterprise scale. We deliver performant web portals, high-converting digital storefronts, and robust browser ecosystems designed around speed, accessibility, and clean code.
-                                </p>
                                 <div class="service-card-tech">
                                     <span class="service-tech-tag">React.js</span>
                                     <span class="service-tech-tag">Next.js</span>
@@ -858,9 +905,6 @@
                                     <span class="service-meta-category">Architecture &bull; Core Engineering</span>
                                 </div>
                                 <h3 class="service-card-title">Software Development</h3>
-                                <p class="service-card-desc">
-                                    Robust backend systems, microservices, and bespoke software solutions crafted with strict clean code standards. From complex multi-tenant SaaS backends to database optimization, we engineer software ready to handle millions of transactions.
-                                </p>
                                 <div class="service-card-tech">
                                     <span class="service-tech-tag">Java 17+</span>
                                     <span class="service-tech-tag">Spring Boot</span>
@@ -890,9 +934,6 @@
                                     <span class="service-meta-category">Experience &bull; Product Design</span>
                                 </div>
                                 <h3 class="service-card-title">UI/UX Design</h3>
-                                <p class="service-card-desc">
-                                    Intuitive, user-centered digital products combining comprehensive design systems, user journeys, wireframing, interactive prototyping, and visual clarity. We bridge the gap between creative visual artistry and functional usability.
-                                </p>
                                 <div class="service-card-tech">
                                     <span class="service-tech-tag">Figma</span>
                                     <span class="service-tech-tag">Design Systems</span>
@@ -922,9 +963,6 @@
                                     <span class="service-meta-category">Mobile &bull; Cross-Platform</span>
                                 </div>
                                 <h3 class="service-card-title">Mobile App Development</h3>
-                                <p class="service-card-desc">
-                                    High-performance iOS and Android mobile experiences using Flutter and React Native with native device capability integrations, offline caching, push notifications, and cloud synchronization for seamless on-the-go utility.
-                                </p>
                                 <div class="service-card-tech">
                                     <span class="service-tech-tag">Flutter</span>
                                     <span class="service-tech-tag">Dart</span>
@@ -954,9 +992,6 @@
                                     <span class="service-meta-category">Commerce &bull; Conversion Engines</span>
                                 </div>
                                 <h3 class="service-card-title">E-Commerce Solutions</h3>
-                                <p class="service-card-desc">
-                                    Conversion-focused digital storefronts, multi-currency payment gateway integrations, frictionless checkout funnels, inventory orchestration, and headless commerce setups built to maximize average order value and customer retention.
-                                </p>
                                 <div class="service-card-tech">
                                     <span class="service-tech-tag">Shopify Plus</span>
                                     <span class="service-tech-tag">WooCommerce</span>
@@ -985,9 +1020,6 @@
                                     <span class="service-meta-category">Intelligence &bull; Generative AI</span>
                                 </div>
                                 <h3 class="service-card-title">AI &amp; Automation</h3>
-                                <p class="service-card-desc">
-                                    Generative AI, LLMs, neural network architectures, and intelligent workflow automation saving thousands of repetitive manual hours. We engineer custom enterprise AI bots, vector search knowledge engines, and automated decision workflows.
-                                </p>
                                 <div class="service-card-tech">
                                     <span class="service-tech-tag">PyTorch</span>
                                     <span class="service-tech-tag">OpenAI API</span>
@@ -1017,9 +1049,6 @@
                                     <span class="service-meta-category">Infrastructure &bull; Cloud & DevOps</span>
                                 </div>
                                 <h3 class="service-card-title">Cloud &amp; DevOps</h3>
-                                <p class="service-card-desc">
-                                    Scalable cloud hosting across AWS and Microsoft Azure, automated CI/CD continuous deployment pipelines, container orchestration with Kubernetes, and Infrastructure-as-Code setups ensuring 99.99% uptime and auto-scaling resilience.
-                                </p>
                                 <div class="service-card-tech">
                                     <span class="service-tech-tag">AWS Cloud</span>
                                     <span class="service-tech-tag">Azure</span>
@@ -1049,9 +1078,6 @@
                                     <span class="service-meta-category">Enterprise &bull; Custom Platforms</span>
                                 </div>
                                 <h3 class="service-card-title">Custom Digital Solutions</h3>
-                                <p class="service-card-desc">
-                                    Tailored proprietary software platforms and internal tooling built to eliminate unique industry bottlenecks, legacy workflow friction, and operational silos. We architect custom solutions matched strictly to your business DMA.
-                                </p>
                                 <div class="service-card-tech">
                                     <span class="service-tech-tag">Custom Portals</span>
                                     <span class="service-tech-tag">Enterprise ERP</span>
@@ -1080,9 +1106,6 @@
                                     <span class="service-meta-category">Intelligence &bull; Business Analytics</span>
                                 </div>
                                 <h3 class="service-card-title">Data Analytics &amp; BI</h3>
-                                <p class="service-card-desc">
-                                    Transforming complex enterprise datasets into interactive Power BI and SQL executive dashboards, predictive data models, and statistical insights that give leadership clear visibility into growth drivers and revenue opportunities.
-                                </p>
                                 <div class="service-card-tech">
                                     <span class="service-tech-tag">Power BI</span>
                                     <span class="service-tech-tag">Advanced SQL</span>
@@ -1112,9 +1135,6 @@
                                     <span class="service-meta-category">Growth &bull; Digital Performance</span>
                                 </div>
                                 <h3 class="service-card-title">Social &amp; Growth Marketing</h3>
-                                <p class="service-card-desc">
-                                    Strategic brand positioning, multi-channel performance digital marketing, Search Engine Optimization (SEO), Meta and Google Ads acquisition campaigns, and audience engagement architectures designed for sustainable, compounding growth.
-                                </p>
                                 <div class="service-card-tech">
                                     <span class="service-tech-tag">SEO Strategy</span>
                                     <span class="service-tech-tag">Google Ads</span>
@@ -1187,73 +1207,116 @@
 
                 </div>
 
-                <!-- 3D Curved Arc Ribbon of Portrait Cards (Cylindrical panorama effect) -->
-                <div class="capabilities-arc-viewport">
-                    <div class="capabilities-arc-track">
+                <!-- 3D Curved Arc Ribbon with Side Navigation Buttons & Scrollable Path -->
+                <div class="capabilities-arc-stage">
+                    
+                    <!-- Left Floating Navigation Button -->
+                    <button id="arc-side-prev" class="arc-side-nav-btn arc-prev-btn" onclick="scrollArcGallery(-1)" aria-label="Previous capability" title="Previous capability">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+
+                    <!-- Right Floating Navigation Button -->
+                    <button id="arc-side-next" class="arc-side-nav-btn arc-next-btn" onclick="scrollArcGallery(1)" aria-label="Next capability" title="Next capability">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                    <!-- Left & Right Vignette Shadows for smooth infinite edge fade -->
+                    <div class="arc-side-vignette arc-vignette-left"></div>
+                    <div class="arc-side-vignette arc-vignette-right"></div>
+
+                    <!-- 3D Curved Arc Viewport -->
+                    <div class="capabilities-arc-viewport" id="capabilities-arc-viewport">
+                        <div class="capabilities-arc-track" id="capabilities-arc-track">
+                            
+                            <!-- Card 1 (Far Left Arc) -->
+                            <div class="arc-card arc-card-1" onclick="navigateToTab('courses')">
+                                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=500&q=80" alt="Cloud Architect">
+                                <div class="arc-card-overlay">
+                                    <span class="arc-card-role">Cloud Architecture</span>
+                                    <div class="arc-card-name">Enterprise Systems</div>
+                                </div>
+                            </div>
+
+                            <!-- Card 2 (Mid-Left Arc) -->
+                            <div class="arc-card arc-card-2" onclick="navigateToTab('courses')">
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" alt="Full Stack Developer">
+                                <div class="arc-card-overlay">
+                                    <span class="arc-card-role">Full-Stack Web</span>
+                                    <div class="arc-card-name">Modern Platforms</div>
+                                </div>
+                            </div>
+
+                            <!-- Card 3 (Left-Center Arc) -->
+                            <div class="arc-card arc-card-3" onclick="navigateToTab('courses')">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&q=80" alt="AI & ML Specialist">
+                                <div class="arc-card-overlay">
+                                    <span class="arc-card-role">Machine Learning</span>
+                                    <div class="arc-card-name">Intelligent Bots</div>
+                                </div>
+                            </div>
+
+                            <!-- Card 4 (Center Key Card — Elevated) -->
+                            <div class="arc-card arc-card-4" onclick="navigateToTab('courses')">
+                                <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=500&q=80" alt="Lead Product Designer">
+                                <div class="arc-card-overlay">
+                                    <span class="arc-card-role">Creative Direction</span>
+                                    <div class="arc-card-name">UI/UX Innovation</div>
+                                </div>
+                            </div>
+
+                            <!-- Card 5 (Right-Center Arc) -->
+                            <div class="arc-card arc-card-5" onclick="navigateToTab('courses')">
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&q=80" alt="DevOps & SRE Engineer">
+                                <div class="arc-card-overlay">
+                                    <span class="arc-card-role">DevOps &amp; Cloud</span>
+                                    <div class="arc-card-name">CI/CD Pipelines</div>
+                                </div>
+                            </div>
+
+                            <!-- Card 6 (Mid-Right Arc) -->
+                            <div class="arc-card arc-card-6" onclick="navigateToTab('courses')">
+                                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=500&q=80" alt="Data Intelligence Lead">
+                                <div class="arc-card-overlay">
+                                    <span class="arc-card-role">Data Analytics</span>
+                                    <div class="arc-card-name">Power BI &amp; SQL</div>
+                                </div>
+                            </div>
+
+                            <!-- Card 7 (Far Right Arc) -->
+                            <div class="arc-card arc-card-7" onclick="navigateToTab('courses')">
+                                <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=500&q=80" alt="Cybersecurity Analyst">
+                                <div class="arc-card-overlay">
+                                    <span class="arc-card-role">Cyber Defense</span>
+                                    <div class="arc-card-name">Ethical Security</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Side Scrollable Path Controls -->
+                <div class="arc-scroll-controls-wrapper">
+                    <div class="arc-scroll-path-bar">
+                        <button class="arc-track-arrow-btn" onclick="scrollArcGallery(-1)" aria-label="Scroll left" id="arc-path-left-btn" title="Scroll left">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
                         
-                        <!-- Card 1 (Far Left Arc) -->
-                        <div class="arc-card arc-card-1" onclick="navigateToTab('courses')">
-                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=500&q=80" alt="Cloud Architect">
-                            <div class="arc-card-overlay">
-                                <span class="arc-card-role">Cloud Architecture</span>
-                                <div class="arc-card-name">Enterprise Systems</div>
-                            </div>
+                        <div class="arc-scroll-path-track" id="arc-scroll-path-track" title="Click or drag along the path to scroll">
+                            <div class="arc-scroll-path-thumb" id="arc-scroll-path-thumb"></div>
                         </div>
+                        
+                        <button class="arc-track-arrow-btn" onclick="scrollArcGallery(1)" aria-label="Scroll right" id="arc-path-right-btn" title="Scroll right">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
 
-                        <!-- Card 2 (Mid-Left Arc) -->
-                        <div class="arc-card arc-card-2" onclick="navigateToTab('courses')">
-                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" alt="Full Stack Developer">
-                            <div class="arc-card-overlay">
-                                <span class="arc-card-role">Full-Stack Web</span>
-                                <div class="arc-card-name">Modern Platforms</div>
-                            </div>
-                        </div>
-
-                        <!-- Card 3 (Left-Center Arc) -->
-                        <div class="arc-card arc-card-3" onclick="navigateToTab('courses')">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&q=80" alt="AI & ML Specialist">
-                            <div class="arc-card-overlay">
-                                <span class="arc-card-role">Machine Learning</span>
-                                <div class="arc-card-name">Intelligent Bots</div>
-                            </div>
-                        </div>
-
-                        <!-- Card 4 (Center Key Card — Elevated) -->
-                        <div class="arc-card arc-card-4" onclick="navigateToTab('courses')">
-                            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=500&q=80" alt="Lead Product Designer">
-                            <div class="arc-card-overlay">
-                                <span class="arc-card-role">Creative Direction</span>
-                                <div class="arc-card-name">UI/UX Innovation</div>
-                            </div>
-                        </div>
-
-                        <!-- Card 5 (Right-Center Arc) -->
-                        <div class="arc-card arc-card-5" onclick="navigateToTab('courses')">
-                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&q=80" alt="DevOps & SRE Engineer">
-                            <div class="arc-card-overlay">
-                                <span class="arc-card-role">DevOps &amp; Cloud</span>
-                                <div class="arc-card-name">CI/CD Pipelines</div>
-                            </div>
-                        </div>
-
-                        <!-- Card 6 (Mid-Right Arc) -->
-                        <div class="arc-card arc-card-6" onclick="navigateToTab('courses')">
-                            <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=500&q=80" alt="Data Intelligence Lead">
-                            <div class="arc-card-overlay">
-                                <span class="arc-card-role">Data Analytics</span>
-                                <div class="arc-card-name">Power BI &amp; SQL</div>
-                            </div>
-                        </div>
-
-                        <!-- Card 7 (Far Right Arc) -->
-                        <div class="arc-card arc-card-7" onclick="navigateToTab('courses')">
-                            <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=500&q=80" alt="Cybersecurity Analyst">
-                            <div class="arc-card-overlay">
-                                <span class="arc-card-role">Cyber Defense</span>
-                                <div class="arc-card-name">Ethical Security</div>
-                            </div>
-                        </div>
-
+                    <div class="arc-scroll-meta">
+                        <span class="arc-scroll-pill">
+                            <i class="fa-solid fa-arrows-left-right text-mint text-xs"></i>
+                            <span>Scroll or drag side to side</span>
+                        </span>
+                        <span class="arc-scroll-counter" id="arc-scroll-counter">01 / 07</span>
                     </div>
                 </div>
 
