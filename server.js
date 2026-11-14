@@ -113,6 +113,43 @@ app.use((req, res, next) => {
 });
 app.use(express.urlencoded({ extended: true }));
 
+// Internal Service Proxy: If NEXTGEN_BACKEND_URL binding is injected by Vercel Services,
+// forward /api requests to the internal nextgen-dma-ventures backend service
+if (NEXTGEN_BACKEND_URL) {
+  app.use('/api', async (req, res, next) => {
+    try {
+      const targetUrl = new URL(req.originalUrl, NEXTGEN_BACKEND_URL);
+      const headers = { ...req.headers };
+      delete headers.host;
+      delete headers['content-length'];
+
+      const fetchOptions = {
+        method: req.method,
+        headers,
+      };
+
+      if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body && Object.keys(req.body).length > 0) {
+        fetchOptions.headers['content-type'] = 'application/json';
+        fetchOptions.body = JSON.stringify(req.body);
+      }
+
+      const response = await fetch(targetUrl.toString(), fetchOptions);
+      res.status(response.status);
+      response.headers.forEach((val, key) => {
+        if (!['content-encoding', 'transfer-encoding'].includes(key.toLowerCase())) {
+          res.setHeader(key, val);
+        }
+      });
+
+      const data = await response.text();
+      return res.send(data);
+    } catch (err) {
+      console.warn('[Vercel Services Proxy Notice] Failed to forward to internal service, falling back to local handlers:', err.message);
+      next();
+    }
+  });
+}
+
 // Static frontend asset directory resolution & automatic root asset consolidation
 const nestedDir = path.join(__dirname, 'nextgen-dma-ventures-v4', 'nextgen-dma-ventures');
 try {
